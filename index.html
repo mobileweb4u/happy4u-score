@@ -146,6 +146,8 @@
                 <button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
                 <button class="menu-btn" id="open-history-btn">SUMMARY</button>
                 <button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
+                <button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
+                <button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
                 <button class="menu-btn">SHOT CLOCK</button>
                 <button class="menu-btn">ABOUT</button>
             </div>
@@ -175,6 +177,17 @@
                 <p style="color: #666;">No frames played yet.</p>
             </div>
             <button id="close-history-btn" class="menu-btn" style="border-color: #444;">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2>
+            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;">
+                <img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;">
+            </div>
+            <p style="color: #888; margin-top: 15px; font-size: 0.8rem;">Point opponent's camera at this code</p>
+            <button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button>
         </div>
     </div>
 
