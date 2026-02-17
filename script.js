@@ -41,7 +41,6 @@ const reportTextArea = document.getElementById('report-text-area');
 
 // --- 1. Match Setup Logic (UPPERCASE ENFORCED HERE) ---
 document.getElementById('save-setup-btn').addEventListener('click', () => {
-    // Force uppercase immediately on input
     gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
     gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
     gameState.raceTo = parseInt(document.getElementById('race-input').value) || 3;
@@ -324,7 +323,7 @@ const drillImages = [
     "Drill/drill7.png", 
     "Drill/drill8.png", 
     "Drill/drill9.png"
-]; // ADD YOUR FILENAMES HERE!
+]; 
 
 let currentDrillIndex = 0;
 
@@ -333,7 +332,7 @@ const drillDisplay = document.getElementById('drill-display');
 const drillName = document.getElementById('drill-name');
 
 document.getElementById('open-drills-btn').addEventListener('click', () => {
-    infoModal.style.display = 'none'; // Close the menu if open
+    infoModal.style.display = 'none'; 
     drillModal.style.display = 'flex';
     showDrill(0);
 });
@@ -345,7 +344,6 @@ function showDrill(index) {
     }
     currentDrillIndex = index;
     drillDisplay.src = drillImages[index];
-    // This cleans up the file path to show just the name
     drillName.innerText = drillImages[index].replace('Drill/', '').replace('.png', '').toUpperCase();
 }
 
@@ -363,7 +361,7 @@ document.getElementById('close-drills').addEventListener('click', () => {
     drillModal.style.display = 'none';
 });
 
-// --- 12. OFFLINE/ONLINE NOTIFICATIONS ---
+// --- 12. ADVANCED NEON OFFLINE NOTIFICATIONS ---
 window.addEventListener('offline', () => {
     updateTicker("⚠️ OFFLINE MODE ACTIVE - APP RUNNING FROM CACHE");
     showConnectivityToast("You are now offline. Matches will still save locally!");
@@ -378,7 +376,6 @@ function showConnectivityToast(message) {
     const toast = document.createElement('div');
     toast.textContent = message;
     
-    // Advanced Neon Styling for AMOLED Screens
     Object.assign(toast.style, {
         position: 'fixed',
         bottom: '30px',
@@ -387,11 +384,10 @@ function showConnectivityToast(message) {
         backgroundColor: '#000',
         color: '#00ff44', 
         padding: '14px 28px',
-        borderRadius: '8px', // Sharper "Pro" look
+        borderRadius: '8px',
         border: '2px solid #00ff44',
-        // Multi-layered glow: 1. Green inner, 2. Green outer, 3. Soft spread
         boxShadow: '0 0 10px #00ff44, inset 0 0 5px #00ff44, 0 0 20px rgba(0, 255, 68, 0.4)',
-        textShadow: '0 0 5px #00ff44', // Makes the text itself glow
+        textShadow: '0 0 5px #00ff44', 
         zIndex: '10000',
         fontSize: '15px',
         fontFamily: 'monospace',
@@ -402,7 +398,6 @@ function showConnectivityToast(message) {
 
     document.body.appendChild(toast);
 
-    // Small "pop-up" animation
     setTimeout(() => {
         toast.style.bottom = '40px';
     }, 10);
@@ -413,3 +408,37 @@ function showConnectivityToast(message) {
         setTimeout(() => toast.remove(), 500);
     }, 4000);
 }
+
+// --- 13. SHARING & QR LOGIC ---
+document.getElementById('share-app-btn').addEventListener('click', async () => {
+    const shareData = {
+        title: 'HAPPY4U Pool Scoreboard',
+        text: 'Check out this Neon Pool Scoreboard for our match!',
+        url: window.location.href 
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied to clipboard!");
+        }
+    } catch (err) {
+        console.log('Error sharing:', err);
+    }
+});
+
+const qrModal = document.getElementById('qr-modal');
+const qrImage = document.getElementById('qr-image');
+
+document.getElementById('open-qr-btn').addEventListener('click', () => {
+    const currentUrl = window.location.href;
+    const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chld=H|0&chl=${encodeURIComponent(currentUrl)}`;
+    qrImage.src = qrUrl;
+    qrModal.style.display = 'flex';
+});
+
+document.getElementById('close-qr-btn').addEventListener('click', () => {
+    qrModal.style.display = 'none';
+});
