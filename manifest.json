@@ -1,18 +1,21 @@
 {
-  "name": "HAPPY4U Pool Scoreboard",
+  "name": "HAPPY4U Neon Pool Scoreboard",
   "short_name": "HAPPY4U",
-  "description": "Professional Pool Scoreboard by Freddie Russell",
-  "start_url": "/happy4u-score/",
-  "scope": "/happy4u-score/",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#0a0a0a",
+  "background_color": "#000000",
   "theme_color": "#00ff44",
   "icons": [
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "src": "icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
