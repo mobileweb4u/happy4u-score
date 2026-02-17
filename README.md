@@ -79,5 +79,5 @@ My Understanding:
 Your app isn't just a simple counter; it's a Match Management System. By tracking the "type" of win (Dish vs Normal) and the "Lag" winner, 
 you've built something specifically for pool players that most generic scoreboard apps don't offer.
 
-Would you like me to help you write the "License" section or a "How to contribute" section for your GitHub as well?
+
 
