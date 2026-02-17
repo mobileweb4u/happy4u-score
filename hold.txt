@@ -1,8 +1,11 @@
 
 TODO:
-Would you like me to add a button that allows you to "Download" the QR code as a picture so you can print it out for the pool hall wall?
+Would you like me to add a button that allows you to "Download" the QR code as a 
+picture so you can print it out for the pool hall wall?
 
 should we adjust the width of the box to fit the Samsung screen better?
+
+Would you like me to make the buttons turn a neon color when they are clicked to match your "Cyber" theme?
 
 
 ================Do not change any of my code=============================
@@ -13,6 +16,87 @@ with the copy on my https://github.com/mobileweb4u/happy4u-score
 
 
 
+
+
+
+
+===========================================================
+
+I want to three button on the same line1 like
+
+    <button class="menu-btn">GAME MODE</button>
+
+                <button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
+
+                <button class="menu-btn" id="open-history-btn">SUMMARY</button>
+
+      I want to three button on the same line2 like
+
+    <button class="menu-btn" id="open-drills-btn" style="border-color: 
+    var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
+
+                <button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
+
+                <button class="menu-btn" id="open-qr-btn" style="border-color: gold;
+                 color: gold;">OPEN QR SYNC</button>
+
+       I want to three button on the same line3 like
+
+       <button class="menu-btn" id="install-pwa-btn" style="display:none; border-color:
+        #00ff44; color: #00ff44;">INSTALL APP</button>
+
+                <button class="menu-btn">SHOT CLOCK</button>
+
+                <button class="menu-btn">ABOUT</button>
+
+        I want to one button on the same line4 like
+
+        </div>
+
+            <button id="close-info-btn" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">CLOSE</button>
+
+        </div>
+
+ see the image               
+
+I'm not sure where to put this code 
+
+
+
+here is my index.html that is working well
+
+
+
+Only can you have the update code that I required to do this include
+
+
+
+the full code I just want to copy paste and tests
+
+
+
+show me where you added the new code
+
+
+
+explain your understanding? 
+
+
+
+this the code that needed to be added
+
+
+
+
+
+
+
+
+
+
+
+
+==================================================
 I have reviewed the logic in your script against the URL provided. Your implementation is solid and follows 
 the Progressive Web App (PWA) standards we discussed.
 
