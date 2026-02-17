@@ -1,22 +1,18 @@
 {
-  "name": "Happy4U Pool Scoreboard",
-  "short_name": "PoolScore",
-  "description": "Happy4U Pool Scoreboard",
-  "start_url": "index.html",
+  "name": "HAPPY4U Pool Scoreboard",
+  "short_name": "HAPPY4U",
+  "description": "Professional Pool Scoreboard by Freddie Russell",
+  "start_url": "/happy4u-score/",
+  "scope": "/happy4u-score/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#00ff44",
-  "orientation": "landscape",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
