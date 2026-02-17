@@ -442,3 +442,21 @@ document.getElementById('open-qr-btn').addEventListener('click', () => {
 document.getElementById('close-qr-btn').addEventListener('click', () => {
     qrModal.style.display = 'none';
 });
+
+let deferredPrompt;
+const installBtn = document.getElementById('install-pwa-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block'; // Only show button if app can be installed
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') installBtn.style.display = 'none';
+        deferredPrompt = null;
+    }
+});
