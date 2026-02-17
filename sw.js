@@ -1,28 +1,21 @@
+const GHPATH = '/happy4u-score';
 const CACHE_NAME = 'happy4u-v1';
+
 const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  './icon-512.png',
-  './favicon.png'
+  `${GHPATH}/`,
+  `${GHPATH}/index.html`,
+  `${GHPATH}/style.css`,
+  `${GHPATH}/script.js`,
+  `${GHPATH}/manifest.json`,
+  `${GHPATH}/favicon.png`,
+  `${GHPATH}/icon-512.png`,
+  `${GHPATH}/Drill/drill1.png`,
+  `${GHPATH}/Drill/drill2.png`,
+  `${GHPATH}/Drill/drill3.png`,
+  `${GHPATH}/Drill/drill4.png`,
+  `${GHPATH}/Drill/drill5.png`,
+  `${GHPATH}/Drill/drill6.png`,
+  `${GHPATH}/Drill/drill7.png`,
+  `${GHPATH}/Drill/drill8.png`,
+  `${GHPATH}/Drill/drill9.png`
 ];
-
-// Install the service worker and cache files
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
-});
-
-// Serve cached content when offline
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
-});
