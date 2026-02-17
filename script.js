@@ -362,3 +362,46 @@ document.getElementById('prev-drill').addEventListener('click', () => {
 document.getElementById('close-drills').addEventListener('click', () => {
     drillModal.style.display = 'none';
 });
+
+// --- 12. OFFLINE/ONLINE NOTIFICATIONS ---
+window.addEventListener('offline', () => {
+    updateTicker("⚠️ OFFLINE MODE ACTIVE - APP RUNNING FROM CACHE");
+    showConnectivityToast("You are now offline. Matches will still save locally!");
+});
+
+window.addEventListener('online', () => {
+    updateTicker("🌐 BACK ONLINE - STABLE CONNECTION RESTORED");
+    showConnectivityToast("You are back online!");
+});
+
+function showConnectivityToast(message) {
+    // Create the notification element
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    
+    // Style it to match your Neon theme
+    Object.assign(toast.style, {
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#000',
+        color: '#00ff44', // Neon Green
+        padding: '12px 24px',
+        borderRadius: '50px',
+        border: '2px solid #00ff44',
+        boxShadow: '0 0 15px rgba(0, 255, 68, 0.5)',
+        zIndex: '10000',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'opacity 0.5s ease'
+    });
+
+    document.body.appendChild(toast);
+
+    // Fade out and remove after 4 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+}
