@@ -15,6 +15,33 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* NEW CSS TO CREATE THE 3-BUTTON ROW LAYOUT */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Forces exactly 3 columns */
+            gap: 10px; /* Space between buttons */
+            width: 100%;
+        }
+
+        .menu-btn {
+            font-size: 0.7rem; /* Smaller font to ensure 3 fit on one line */
+            padding: 10px 2px;
+            text-align: center;
+            white-space: nowrap; /* Prevents text from wrapping */
+        }
+
+        /* Forces the Close button to occupy its own line at the bottom */
+        #close-info-btn {
+            grid-column: span 3; 
+            margin-top: 20px;
+            background: none;
+            border: none;
+            color: gray;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -94,14 +121,17 @@
                 <button class="menu-btn">GAME MODE</button>
                 <button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
                 <button class="menu-btn" id="open-history-btn">SUMMARY</button>
+
                 <button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
                 <button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
                 <button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
+
                 <button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button>
                 <button class="menu-btn">SHOT CLOCK</button>
                 <button class="menu-btn">ABOUT</button>
+
+                <button id="close-info-btn">CLOSE</button>
             </div>
-            <button id="close-info-btn" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">CLOSE</button>
         </div>
     </div>
 
@@ -159,7 +189,7 @@
       <div class="modal-content" style="width: 90%; max-width: 900px;">
         <h2 style="color: gold; margin-bottom: 15px;">MATCH REPORT PREVIEW</h2>
         <pre id="report-text-area"></pre>
-        <div class="menu-grid" style="display: flex; flex-direction: row; gap: 10px; margin-top: 20px; width: 100%;">
+        <div class="menu-grid-alt" style="display: flex; flex-direction: row; gap: 10px; margin-top: 20px; width: 100%;">
             <button id="copy-report-btn" class="menu-btn" style="flex: 1; font-size: 0.9rem; padding: 12px 5px;">📋 COPY</button>
             <button id="reset-history-btn" class="menu-btn" style="flex: 1; font-size: 0.9rem; padding: 12px 5px; border-color: #ff4444; color: #ff4444;">⚠️ RESET</button>
             <button id="close-report-view" class="menu-btn" style="flex: 1; font-size: 0.9rem; padding: 12px 5px;">CLOSE</button>
@@ -174,7 +204,7 @@
                 <img id="drill-display" src="" alt="Drill Image" style="width: 100%; height: auto; max-height: 55vh; object-fit: contain; border: 1px solid var(--neon-green);">
                 <p id="drill-name" style="margin-top: 10px; font-weight: bold; color: var(--cyber-cyan); letter-spacing: 2px;"></p>
             </div>
-            <div class="menu-grid" style="display: flex; flex-direction: row; gap: 10px; margin-top: 15px; width: 100%;">
+            <div class="menu-grid-alt" style="display: flex; flex-direction: row; gap: 10px; margin-top: 15px; width: 100%;">
                 <button id="prev-drill" class="menu-btn" style="flex: 1;">⬅ PREV</button>
                 <button id="next-drill" class="menu-btn" style="flex: 1;">NEXT ➡</button>
                 <button id="close-drills" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;">CLOSE</button>
