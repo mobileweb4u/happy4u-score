@@ -11,7 +11,9 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png"> <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" href="icon-192.png"> 
+
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -85,6 +87,35 @@
         </div>
     </div>
 
+    <div id="info-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content info-menu">
+            <h2 style="color: var(--neon-magenta); margin-bottom: 20px;">MAIN MENU</h2>
+            <div class="menu-grid">
+                <button class="menu-btn">GAME MODE</button>
+                <button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
+                <button class="menu-btn" id="open-history-btn">SUMMARY</button>
+                <button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
+                <button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
+                <button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
+                <button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button>
+                <button class="menu-btn">SHOT CLOCK</button>
+                <button class="menu-btn">ABOUT</button>
+            </div>
+            <button id="close-info-btn" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2>
+            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;">
+                <img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;">
+            </div>
+            <p style="color: #888; margin-top: 15px; font-size: 0.8rem;">Point opponent's camera at this code</p>
+            <button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button>
+        </div>
+    </div>
+
     <div id="lag-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <h2>WHO WON THE LAG?</h2>
@@ -110,14 +141,12 @@
     <div id="winner-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content" style="width: 95%; max-width: 600px;">
             <h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2>
-            
             <div style="display: flex; flex-direction: column; gap: 15px;">
                 <div style="display: flex; gap: 10px; width: 100%;">
                     <button id="again-race-btn" class="menu-btn" style="flex: 1; font-size: 0.8rem;">AGAIN RACE</button>
                     <button class="end-game menu-btn" style="flex: 1; background: #ff4444; font-size: 0.8rem;">END MATCH</button>
                     <button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green); font-size: 0.8rem;">NEW RACE</button>
                 </div>
-
                 <div style="display: flex; gap: 10px; width: 100%;">
                     <button id="save-match-btn" class="menu-btn" style="flex: 1; background: #222; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button>
                     <button id="view-report-btn" class="menu-btn" style="flex: 1; background: #111; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button>
@@ -136,24 +165,6 @@
             <button id="close-report-view" class="menu-btn" style="flex: 1; font-size: 0.9rem; padding: 12px 5px;">CLOSE</button>
         </div>
       </div>
-    </div>
-
-    <div id="info-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content info-menu">
-            <h2 style="color: var(--neon-magenta); margin-bottom: 20px;">MAIN MENU</h2>
-            <div class="menu-grid">
-                <button class="menu-btn">GAME MODE</button>
-                <button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
-                <button class="menu-btn" id="open-history-btn">SUMMARY</button>
-                <button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
-                <button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
-                <button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
-                <button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button>
-                <button class="menu-btn">SHOT CLOCK</button>
-                <button class="menu-btn">ABOUT</button>
-            </div>
-            <button id="close-info-btn" style="margin-top:20px; background:none; border:none; color:gray; cursor:pointer;">CLOSE</button>
-        </div>
     </div>
 
     <div id="drill-modal" class="modal-overlay" style="display:none;">
@@ -178,17 +189,6 @@
                 <p style="color: #666;">No frames played yet.</p>
             </div>
             <button id="close-history-btn" class="menu-btn" style="border-color: #444;">BACK TO MENU</button>
-        </div>
-    </div>
-
-    <div id="qr-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content" style="text-align: center;">
-            <h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2>
-            <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;">
-                <img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;">
-            </div>
-            <p style="color: #888; margin-top: 15px; font-size: 0.8rem;">Point opponent's camera at this code</p>
-            <button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button>
         </div>
     </div>
 
