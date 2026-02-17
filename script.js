@@ -375,33 +375,41 @@ window.addEventListener('online', () => {
 });
 
 function showConnectivityToast(message) {
-    // Create the notification element
     const toast = document.createElement('div');
     toast.textContent = message;
     
-    // Style it to match your Neon theme
+    // Advanced Neon Styling for AMOLED Screens
     Object.assign(toast.style, {
         position: 'fixed',
-        bottom: '20px',
+        bottom: '30px',
         left: '50%',
         transform: 'translateX(-50%)',
         backgroundColor: '#000',
-        color: '#00ff44', // Neon Green
-        padding: '12px 24px',
-        borderRadius: '50px',
+        color: '#00ff44', 
+        padding: '14px 28px',
+        borderRadius: '8px', // Sharper "Pro" look
         border: '2px solid #00ff44',
-        boxShadow: '0 0 15px rgba(0, 255, 68, 0.5)',
+        // Multi-layered glow: 1. Green inner, 2. Green outer, 3. Soft spread
+        boxShadow: '0 0 10px #00ff44, inset 0 0 5px #00ff44, 0 0 20px rgba(0, 255, 68, 0.4)',
+        textShadow: '0 0 5px #00ff44', // Makes the text itself glow
         zIndex: '10000',
-        fontSize: '14px',
+        fontSize: '15px',
+        fontFamily: 'monospace',
         fontWeight: 'bold',
-        transition: 'opacity 0.5s ease'
+        letterSpacing: '1px',
+        transition: 'opacity 0.5s ease, bottom 0.5s ease'
     });
 
     document.body.appendChild(toast);
 
-    // Fade out and remove after 4 seconds
+    // Small "pop-up" animation
+    setTimeout(() => {
+        toast.style.bottom = '40px';
+    }, 10);
+
     setTimeout(() => {
         toast.style.opacity = '0';
+        toast.style.bottom = '20px';
         setTimeout(() => toast.remove(), 500);
     }, 4000);
 }
