@@ -398,3 +398,10 @@ window.addEventListener('appinstalled', () => {
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
   installBtn.style.display = 'none';
 }
+
+window.addEventListener('appinstalled', () => {
+  // Hide the install button
+  installBtn.style.display = 'none';
+  // Alert the user where to find it
+  alert("Success! The Scoreboard is installed. You can find it in your Start Menu or by typing 'chrome://apps' in your browser.");
+});
