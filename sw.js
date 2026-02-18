@@ -1,8 +1,6 @@
 // ==========================================
 // --- SERVICE WORKER VERSION CONTROL ---
 // ==========================================
-// IMPORTANT: Every time you change script.js, update this name 
-// (e.g., 'happy4u-v2.3.1') to force the browser to update.
 const CACHE_NAME = 'happy4u-v2.3.1'; 
 
 const ASSETS = [
@@ -14,7 +12,6 @@ const ASSETS = [
   './favicon.png',
   './icon-192.png',
   './icon-512.png',
-  // Explicitly adding all Drills for offline access
   './Drill/drill1.png',
   './Drill/drill2.png',
   './Drill/drill3.png',
@@ -26,39 +23,49 @@ const ASSETS = [
   './Drill/drill9.png'
 ];
 
-// 1. Install Event - Saving files to cache
+// 1. INSTALL: Pre-cache all files
 self.addEventListener('install', (event) => {
-  // Force the waiting service worker to become active immediately
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('📦 PWA: Caching new scoreboard assets...');
-      return cache.addAll(ASSETS);
+      // Use "addAll" but catch errors if a file is missing
+      return cache.addAll(ASSETS).catch(err => {
+        console.error("❌ PWA: Failed to cache some assets. Check file paths!", err);
+      });
     })
   );
 });
 
-// 2. Activate Event - Cleaning up old caches
+// 2. ACTIVATE: Purge old versions immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        // Delete any cache that doesn't match the current CACHE_NAME
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log('✅ PWA: Old cache cleared, version ' + CACHE_NAME + ' active!');
-      return self.clients.claim(); // Immediately take control of all open tabs
+      // Ensures the new SW controls the page without a reload
+      return self.clients.claim();
     })
   );
 });
 
-// 3. Fetch Event - Offline Support
+// 3. FETCH: "Cache First, then Network" Strategy
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Return cached file (offline), or try to get it from network (online)
-      return cachedResponse || fetch(event.request);
+      // Return from cache OR fetch from web and update cache
+      return cachedResponse || fetch(event.request).then(response => {
+        return caches.open(CACHE_NAME).then(cache => {
+          // Only cache valid GET requests (prevents errors with analytics/external APIs)
+          if (event.request.url.startsWith('http') && event.request.method === 'GET') {
+             cache.put(event.request, response.clone());
+          }
+          return response;
+        });
+      });
+    }).catch(() => {
+        // If offline and file isn't in cache, you could return an offline page here
     })
   );
 });
