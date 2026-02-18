@@ -432,3 +432,24 @@ window.addEventListener('appinstalled', () => {
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
   installBtn.style.display = 'none';
 }
+
+// --- ABOUT MODAL LOGIC ---
+document.getElementById('open-about-btn').addEventListener('click', () => {
+    document.getElementById('about-modal').style.display = 'flex';
+});
+
+document.getElementById('close-about-btn').addEventListener('click', () => {
+    document.getElementById('about-modal').style.display = 'none';
+});
+
+// --- CLEAR CACHE LOGIC ---
+document.getElementById('clear-cache-btn').addEventListener('click', () => {
+    if (confirm("Clear local cache and force-update images?")) {
+        caches.keys().then((names) => {
+            for (let name of names) caches.delete(name);
+        }).then(() => {
+            alert("Cache cleared! App will now restart.");
+            window.location.reload(true);
+        });
+    }
+});
