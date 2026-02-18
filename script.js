@@ -1,8 +1,7 @@
 // ==========================================
 // --- VERSION CONTROL & AUTO-REFRESH ---
 // ==========================================
-// IMPORTANT: Change this number (e.g., to "2.3.2") whenever you push 
-// a new update to GitHub to force users' phones to refresh.
+// IMPORTANT: Change this number whenever you push a new update to GitHub
 const APP_VERSION = "2.3.1"; 
 
 function checkVersion() {
@@ -14,7 +13,6 @@ function checkVersion() {
                 for (let name of names) caches.delete(name);
             }).then(() => {
                 localStorage.setItem('app_version', APP_VERSION);
-                // Hard reload to pull the fresh code from GitHub
                 window.location.reload(true);
             });
         }
@@ -22,8 +20,6 @@ function checkVersion() {
         localStorage.setItem('app_version', APP_VERSION);
     }
 }
-
-// Execute version check immediately
 checkVersion();
 
 // ==========================================
@@ -57,9 +53,33 @@ window.addEventListener('load', runPWAHealthCheck);
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('✅ SERVICE WORKER: Registered!', reg))
+      .then(reg => {
+          console.log('✅ SERVICE WORKER: Registered!', reg);
+          
+          // Check for updates while app is open
+          reg.onupdatefound = () => {
+              const installingWorker = reg.installing;
+              installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      showUpdateToast();
+                  }
+              };
+          };
+      })
       .catch(err => console.log('❌ SERVICE WORKER: Registration failed:', err));
   });
+}
+
+// --- Update Notification Toast ---
+function showUpdateToast() {
+    const toast = document.createElement('div');
+    toast.innerHTML = `✨ Update Available! <button onclick="window.location.reload(true)" style="margin-left:10px; background:var(--neon-green); border:none; border-radius:3px; padding:2px 8px; cursor:pointer;">RELOAD</button>`;
+    Object.assign(toast.style, {
+        position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+        backgroundColor: '#333', color: '#fff', padding: '12px 20px', borderRadius: '8px',
+        boxShadow: '0 0 15px var(--neon-green)', zIndex: '10001', fontSize: '14px'
+    });
+    document.body.appendChild(toast);
 }
 
 // --- State Management ---
@@ -84,29 +104,28 @@ let gameState = {
 };
 
 // --- DOM Elements ---
-const setupModal = document.getElementById('setup-modal');
-const lagModal = document.getElementById('lag-modal');
-const dishModal = document.getElementById('dish-modal');
-const winnerModal = document.getElementById('winner-modal');
-const tickerElement = document.getElementById('news-ticker');
-const infoModal = document.getElementById('info-modal');
+const getEl = (id) => document.getElementById(id);
+const setupModal = getEl('setup-modal');
+const lagModal = getEl('lag-modal');
+const dishModal = getEl('dish-modal');
+const winnerModal = getEl('winner-modal');
+const tickerElement = getEl('news-ticker');
+const infoModal = getEl('info-modal');
 const infoIcon = document.querySelector('.info-icon');
-const reportViewModal = document.getElementById('report-view-modal');
-const reportTextArea = document.getElementById('report-text-area');
-const drillModal = document.getElementById('drill-modal');
-const aboutModal = document.getElementById('about-modal');
+const drillModal = getEl('drill-modal');
+const aboutModal = getEl('about-modal');
 
 // --- Match Setup Logic ---
-document.getElementById('save-setup-btn').addEventListener('click', () => {
-    gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
-    gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
-    gameState.raceTo = parseInt(document.getElementById('race-input').value) || 3;
+getEl('save-setup-btn')?.addEventListener('click', () => {
+    gameState.p1Name = (getEl('p1-input').value || "PLAYER 1").toUpperCase();
+    gameState.p2Name = (getEl('p2-input').value || "PLAYER 2").toUpperCase();
+    gameState.raceTo = parseInt(getEl('race-input').value) || 3;
     gameState.startTime = new Date();
 
-    document.getElementById('p1-name-display').innerText = gameState.p1Name;
-    document.getElementById('p2-name-display').innerText = gameState.p2Name;
-    document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
-    document.getElementById('lag-p2-btn').innerText = gameState.p2Name;
+    getEl('p1-name-display').innerText = gameState.p1Name;
+    getEl('p2-name-display').innerText = gameState.p2Name;
+    getEl('lag-p1-btn').innerText = gameState.p1Name;
+    getEl('lag-p2-btn').innerText = gameState.p2Name;
 
     setupModal.style.display = 'none';
     lagModal.style.display = 'flex';
@@ -114,8 +133,8 @@ document.getElementById('save-setup-btn').addEventListener('click', () => {
 });
 
 // --- Lag Logic ---
-document.getElementById('lag-p1-btn').addEventListener('click', () => startMatch('p1'));
-document.getElementById('lag-p2-btn').addEventListener('click', () => startMatch('p2'));
+getEl('lag-p1-btn')?.addEventListener('click', () => startMatch('p1'));
+getEl('lag-p2-btn')?.addEventListener('click', () => startMatch('p2'));
 
 function startMatch(winner) {
     gameState.lagWinner = winner;
@@ -125,8 +144,8 @@ function startMatch(winner) {
 }
 
 function updateBreakIndicator() {
-    const p1Dot = document.getElementById('p1-break-indicator');
-    const p2Dot = document.getElementById('p2-break-indicator');
+    const p1Dot = getEl('p1-break-indicator');
+    const p2Dot = getEl('p2-break-indicator');
     if (!gameState.lagWinner || !p1Dot || !p2Dot) return;
     const isP1Turn = (totalFramesPlayed % 2 === 0) ? (gameState.lagWinner === 'p1') : (gameState.lagWinner !== 'p1');
     p1Dot.style.visibility = isP1Turn ? 'visible' : 'hidden';
@@ -158,7 +177,7 @@ document.querySelectorAll('.dish-option').forEach(btn => {
     });
 });
 
-document.getElementById('cancel-dish-btn').addEventListener('click', () => dishModal.style.display = 'none');
+getEl('cancel-dish-btn')?.addEventListener('click', () => dishModal.style.display = 'none');
 
 // --- Winner Logic ---
 function checkWinner(newsEvent) {
@@ -174,21 +193,21 @@ function checkWinner(newsEvent) {
 }
 
 function showWinner(name) {
-    document.getElementById('winner-text').innerText = `${name} WINS THE RACE!`;
+    getEl('winner-text').innerText = `${name} WINS THE RACE!`;
     winnerModal.style.display = 'flex';
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
 }
 
 // --- UI Helpers ---
 function updateUI() {
-    document.getElementById('p1-score').innerText = gameState.p1Score;
-    document.getElementById('p2-score').innerText = gameState.p2Score;
-    document.getElementById('p1-matches').innerText = gameState.p1Matches;
-    document.getElementById('p2-matches').innerText = gameState.p2Matches;
-    document.getElementById('p1-dishes').innerText = gameState.p1Dishes;
-    document.getElementById('p1-rev-dishes').innerText = gameState.p1RevDishes;
-    document.getElementById('p2-dishes').innerText = gameState.p2Dishes;
-    document.getElementById('p2-rev-dishes').innerText = gameState.p2RevDishes;
+    getEl('p1-score').innerText = gameState.p1Score;
+    getEl('p2-score').innerText = gameState.p2Score;
+    getEl('p1-matches').innerText = gameState.p1Matches;
+    getEl('p2-matches').innerText = gameState.p2Matches;
+    getEl('p1-dishes').innerText = gameState.p1Dishes;
+    getEl('p1-rev-dishes').innerText = gameState.p1RevDishes;
+    getEl('p2-dishes').innerText = gameState.p2Dishes;
+    getEl('p2-rev-dishes').innerText = gameState.p2RevDishes;
 }
 
 function updateTicker(message) {
@@ -200,20 +219,20 @@ function updateTicker(message) {
 if (infoIcon) {
     infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
 }
-document.getElementById('close-info-btn').addEventListener('click', () => infoModal.style.display = 'none');
+getEl('close-info-btn')?.addEventListener('click', () => infoModal.style.display = 'none');
 
 // --- ABOUT & CACHE ---
-document.getElementById('open-about-btn').addEventListener('click', () => {
+getEl('open-about-btn')?.addEventListener('click', () => {
     infoModal.style.display = 'none'; 
     aboutModal.style.display = 'flex';
 });
 
-document.getElementById('close-about-btn').addEventListener('click', () => {
+getEl('close-about-btn')?.addEventListener('click', () => {
     aboutModal.style.display = 'none';
     infoModal.style.display = 'flex';
 });
 
-document.getElementById('clear-cache-btn').addEventListener('click', () => {
+getEl('clear-cache-btn')?.addEventListener('click', () => {
     if (confirm("Clear local cache and force-update images?")) {
         caches.keys().then((names) => {
             for (let name of names) caches.delete(name);
@@ -229,10 +248,10 @@ function recordFrame(winnerName, type) {
     matchHistory.push({ frame: totalFramesPlayed + 1, winner: winnerName, type: type });
 }
 
-document.getElementById('open-history-btn').addEventListener('click', () => {
-    const historyList = document.getElementById('history-list');
+getEl('open-history-btn')?.addEventListener('click', () => {
+    const historyList = getEl('history-list');
     infoModal.style.display = 'none';
-    const histModal = document.getElementById('history-modal');
+    const histModal = getEl('history-modal');
     if (histModal) histModal.style.display = 'flex';
     
     if (matchHistory.length === 0) {
