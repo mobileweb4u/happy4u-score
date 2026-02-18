@@ -1,4 +1,32 @@
 // ==========================================
+// --- VERSION CONTROL & AUTO-REFRESH ---
+// ==========================================
+// IMPORTANT: Change this number (e.g., to "2.3.2") whenever you push 
+// a new update to GitHub to force users' phones to refresh.
+const APP_VERSION = "2.3.1"; 
+
+function checkVersion() {
+    const savedVersion = localStorage.getItem('app_version');
+    if (savedVersion && savedVersion !== APP_VERSION) {
+        console.log("🚀 New version detected. Clearing old cache...");
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                for (let name of names) caches.delete(name);
+            }).then(() => {
+                localStorage.setItem('app_version', APP_VERSION);
+                // Hard reload to pull the fresh code from GitHub
+                window.location.reload(true);
+            });
+        }
+    } else {
+        localStorage.setItem('app_version', APP_VERSION);
+    }
+}
+
+// Execute version check immediately
+checkVersion();
+
+// ==========================================
 // --- 0. PWA & OFFLINE HEALTH CHECK ---
 // ==========================================
 async function runPWAHealthCheck() {
@@ -169,18 +197,20 @@ function updateTicker(message) {
 }
 
 // --- Menu Controls ---
-infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
+if (infoIcon) {
+    infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
+}
 document.getElementById('close-info-btn').addEventListener('click', () => infoModal.style.display = 'none');
 
-// --- ABOUT & CACHE (New Sections) ---
+// --- ABOUT & CACHE ---
 document.getElementById('open-about-btn').addEventListener('click', () => {
-    infoModal.style.display = 'none'; // Close menu
-    aboutModal.style.display = 'flex'; // Open about
+    infoModal.style.display = 'none'; 
+    aboutModal.style.display = 'flex';
 });
 
 document.getElementById('close-about-btn').addEventListener('click', () => {
     aboutModal.style.display = 'none';
-    infoModal.style.display = 'flex'; // Return to menu
+    infoModal.style.display = 'flex';
 });
 
 document.getElementById('clear-cache-btn').addEventListener('click', () => {
@@ -202,7 +232,9 @@ function recordFrame(winnerName, type) {
 document.getElementById('open-history-btn').addEventListener('click', () => {
     const historyList = document.getElementById('history-list');
     infoModal.style.display = 'none';
-    document.getElementById('history-modal').style.display = 'flex';
+    const histModal = document.getElementById('history-modal');
+    if (histModal) histModal.style.display = 'flex';
+    
     if (matchHistory.length === 0) {
         historyList.innerHTML = '<p style="color: #666; padding: 20px;">No frames recorded yet.</p>';
     } else {
@@ -215,16 +247,3 @@ document.getElementById('open-history-btn').addEventListener('click', () => {
         `).join('');
     }
 });
-
-// --- Drill Viewer ---
-const drillImages = ["Drill/drill1.png", "Drill/drill2.png", "Drill/drill3.png"]; // Add more as needed
-let currentDrillIndex = 0;
-
-document.getElementById('open-drills-btn').addEventListener('click', () => {
-    infoModal.style.display = 'none';
-    drillModal.style.display = 'flex';
-});
-
-document.getElementById('close-drills').addEventListener('click', () => drillModal.style.display = 'none');
-
-// (Keep your existing Sharing, QR, and PWA Install logic from here down...)
