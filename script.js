@@ -1,87 +1,3 @@
-// ==========================================
-// --- VERSION CONTROL & AUTO-REFRESH ---
-// ==========================================
-// IMPORTANT: Change this number whenever you push a new update to GitHub
-const APP_VERSION = "2.3.1"; 
-
-function checkVersion() {
-    const savedVersion = localStorage.getItem('app_version');
-    if (savedVersion && savedVersion !== APP_VERSION) {
-        console.log("🚀 New version detected. Clearing old cache...");
-        if ('caches' in window) {
-            caches.keys().then(names => {
-                for (let name of names) caches.delete(name);
-            }).then(() => {
-                localStorage.setItem('app_version', APP_VERSION);
-                window.location.reload(true);
-            });
-        }
-    } else {
-        localStorage.setItem('app_version', APP_VERSION);
-    }
-}
-checkVersion();
-
-// ==========================================
-// --- 0. PWA & OFFLINE HEALTH CHECK ---
-// ==========================================
-async function runPWAHealthCheck() {
-    console.log("🔍 Starting PWA Health Check...");
-    try {
-        const response = await fetch('./manifest.json');
-        const data = await response.json();
-        const hasMaskable = data.icons && data.icons.some(icon => icon.purpose.includes('maskable'));
-        console.log(hasMaskable ? "✅ MANIFEST: Maskable icons configured." : "⚠️ MANIFEST: Maskable icons missing.");
-    } catch (e) { console.warn("❌ MANIFEST: Could not read manifest.json"); }
-
-    if ('caches' in window) {
-        const cacheNames = await caches.keys();
-        if (cacheNames.length > 0) {
-            const cache = await caches.open(cacheNames[0]);
-            const cachedRequests = await cache.keys();
-            const cachedUrls = cachedRequests.map(req => req.url);
-            const drillsFound = cachedUrls.filter(url => url.includes('Drill/')).length;
-            console.log(`✅ CACHE: ${drillsFound} drill images found in offline storage.`);
-        }
-    }
-}
-window.addEventListener('load', runPWAHealthCheck);
-
-// ==========================================
-// --- 1. SERVICE WORKER REGISTRATION ---
-// ==========================================
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => {
-          console.log('✅ SERVICE WORKER: Registered!', reg);
-          
-          // Check for updates while app is open
-          reg.onupdatefound = () => {
-              const installingWorker = reg.installing;
-              installingWorker.onstatechange = () => {
-                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                      showUpdateToast();
-                  }
-              };
-          };
-      })
-      .catch(err => console.log('❌ SERVICE WORKER: Registration failed:', err));
-  });
-}
-
-// --- Update Notification Toast ---
-function showUpdateToast() {
-    const toast = document.createElement('div');
-    toast.innerHTML = `✨ Update Available! <button onclick="window.location.reload(true)" style="margin-left:10px; background:var(--neon-green); border:none; border-radius:3px; padding:2px 8px; cursor:pointer;">RELOAD</button>`;
-    Object.assign(toast.style, {
-        position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
-        backgroundColor: '#333', color: '#fff', padding: '12px 20px', borderRadius: '8px',
-        boxShadow: '0 0 15px var(--neon-green)', zIndex: '10001', fontSize: '14px'
-    });
-    document.body.appendChild(toast);
-}
-
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
@@ -104,37 +20,37 @@ let gameState = {
 };
 
 // --- DOM Elements ---
-const getEl = (id) => document.getElementById(id);
-const setupModal = getEl('setup-modal');
-const lagModal = getEl('lag-modal');
-const dishModal = getEl('dish-modal');
-const winnerModal = getEl('winner-modal');
-const tickerElement = getEl('news-ticker');
-const infoModal = getEl('info-modal');
+const setupModal = document.getElementById('setup-modal');
+const lagModal = document.getElementById('lag-modal');
+const dishModal = document.getElementById('dish-modal');
+const winnerModal = document.getElementById('winner-modal');
+const tickerElement = document.getElementById('news-ticker');
+const infoModal = document.getElementById('info-modal');
 const infoIcon = document.querySelector('.info-icon');
-const drillModal = getEl('drill-modal');
-const aboutModal = getEl('about-modal');
+const reportViewModal = document.getElementById('report-view-modal');
+const reportTextArea = document.getElementById('report-text-area');
 
-// --- Match Setup Logic ---
-getEl('save-setup-btn')?.addEventListener('click', () => {
-    gameState.p1Name = (getEl('p1-input').value || "PLAYER 1").toUpperCase();
-    gameState.p2Name = (getEl('p2-input').value || "PLAYER 2").toUpperCase();
-    gameState.raceTo = parseInt(getEl('race-input').value) || 3;
+// --- 1. Match Setup Logic (UPPERCASE ENFORCED) ---
+document.getElementById('save-setup-btn').addEventListener('click', () => {
+    gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
+    gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
+    gameState.raceTo = parseInt(document.getElementById('race-input').value) || 3;
     gameState.startTime = new Date();
 
-    getEl('p1-name-display').innerText = gameState.p1Name;
-    getEl('p2-name-display').innerText = gameState.p2Name;
-    getEl('lag-p1-btn').innerText = gameState.p1Name;
-    getEl('lag-p2-btn').innerText = gameState.p2Name;
+    document.getElementById('p1-name-display').innerText = gameState.p1Name;
+    document.getElementById('p2-name-display').innerText = gameState.p2Name;
+    document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
+    document.getElementById('lag-p2-btn').innerText = gameState.p2Name;
 
     setupModal.style.display = 'none';
     lagModal.style.display = 'flex';
+    
     updateTicker(`SETTING UP: ${gameState.p1Name} VS ${gameState.p2Name}`);
 });
 
-// --- Lag Logic ---
-getEl('lag-p1-btn')?.addEventListener('click', () => startMatch('p1'));
-getEl('lag-p2-btn')?.addEventListener('click', () => startMatch('p2'));
+// --- 2. Lag Logic ---
+document.getElementById('lag-p1-btn').addEventListener('click', () => startMatch('p1'));
+document.getElementById('lag-p2-btn').addEventListener('click', () => startMatch('p2'));
 
 function startMatch(winner) {
     gameState.lagWinner = winner;
@@ -143,16 +59,17 @@ function startMatch(winner) {
     updateTicker(`MATCH STARTED! ${gameState[winner+'Name']} WON THE LAG.`);
 }
 
+// --- 3. Break/Turn Indicator ---
 function updateBreakIndicator() {
-    const p1Dot = getEl('p1-break-indicator');
-    const p2Dot = getEl('p2-break-indicator');
-    if (!gameState.lagWinner || !p1Dot || !p2Dot) return;
+    const p1Dot = document.getElementById('p1-break-indicator');
+    const p2Dot = document.getElementById('p2-break-indicator');
+    if (!gameState.lagWinner) return;
     const isP1Turn = (totalFramesPlayed % 2 === 0) ? (gameState.lagWinner === 'p1') : (gameState.lagWinner !== 'p1');
     p1Dot.style.visibility = isP1Turn ? 'visible' : 'hidden';
     p2Dot.style.visibility = isP1Turn ? 'hidden' : 'visible';
 }
 
-// --- Scoring Logic ---
+// --- 4. Scoring Logic ---
 document.querySelectorAll('.btn-plus').forEach(btn => {
     btn.addEventListener('click', () => {
         activeScoringPlayer = btn.dataset.player;
@@ -173,13 +90,16 @@ document.querySelectorAll('.dish-option').forEach(btn => {
         dishModal.style.display = 'none';
         updateUI();
         updateBreakIndicator();
-        checkWinner(`${winnerName} ${type === 'normal' ? 'WON THE FRAME' : type.replace('-', ' ').toUpperCase() + '!'}`);
+        let newsEvent = `${winnerName} ${type === 'normal' ? 'WON THE FRAME' : type.replace('-', ' ').toUpperCase() + '!'}`;
+        checkWinner(newsEvent);
     });
 });
 
-getEl('cancel-dish-btn')?.addEventListener('click', () => dishModal.style.display = 'none');
+document.getElementById('cancel-dish-btn').addEventListener('click', () => {
+    dishModal.style.display = 'none';
+});
 
-// --- Winner Logic ---
+// --- 5. Winner Logic (UPDATED FOR YOUR MESSAGE) ---
 function checkWinner(newsEvent) {
     if (gameState.p1Score >= gameState.raceTo) {
         gameState.p1Matches++;
@@ -193,76 +113,213 @@ function checkWinner(newsEvent) {
 }
 
 function showWinner(name) {
-    getEl('winner-text').innerText = `${name} WINS THE RACE!`;
+    // New Congratulatory Message
+    const winText = document.getElementById('winner-text');
+    winText.innerHTML = `CONGRATULATIONS FINISH <span style="color:var(--neon-magenta);">${name}</span><br>` +
+                       `<small style="font-size: 0.7em; color: white;">YOU'VE WON THE RACE</small>`;
+    
     winnerModal.style.display = 'flex';
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
 }
 
-// --- UI Helpers ---
+// --- 6. Navigation / Reset ---
+document.getElementById('again-race-btn').addEventListener('click', () => {
+    gameState.p1Score = 0;
+    gameState.p2Score = 0;
+    winnerModal.style.display = 'none';
+    updateUI();
+    updateBreakIndicator();
+    updateTicker("NEW RACE STARTED!");
+});
+
+document.getElementById('new-race-btn').addEventListener('click', () => location.reload());
+
+document.querySelectorAll('.end-game').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if(confirm("End current match and reset everything?")) location.reload();
+    });
+});
+
+// --- 7. UI Update Helpers ---
 function updateUI() {
-    getEl('p1-score').innerText = gameState.p1Score;
-    getEl('p2-score').innerText = gameState.p2Score;
-    getEl('p1-matches').innerText = gameState.p1Matches;
-    getEl('p2-matches').innerText = gameState.p2Matches;
-    getEl('p1-dishes').innerText = gameState.p1Dishes;
-    getEl('p1-rev-dishes').innerText = gameState.p1RevDishes;
-    getEl('p2-dishes').innerText = gameState.p2Dishes;
-    getEl('p2-rev-dishes').innerText = gameState.p2RevDishes;
+    document.getElementById('p1-score').innerText = gameState.p1Score;
+    document.getElementById('p2-score').innerText = gameState.p2Score;
+    document.getElementById('p1-matches').innerText = gameState.p1Matches;
+    document.getElementById('p2-matches').innerText = gameState.p2Matches;
+    document.getElementById('p1-dishes').innerText = gameState.p1Dishes;
+    document.getElementById('p1-rev-dishes').innerText = gameState.p1RevDishes;
+    document.getElementById('p2-dishes').innerText = gameState.p2Dishes;
+    document.getElementById('p2-rev-dishes').innerText = gameState.p2RevDishes;
 }
 
 function updateTicker(message) {
     if (!tickerElement) return;
-    tickerElement.innerHTML = `<span>NEWS FLASH:</span> ${message.toUpperCase()} &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; RACE TO: ${gameState.raceTo}`;
+    const liveScore = `LIVE SCORE: ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
+    const raceToHighlight = `RACE TO: <span class="ticker-highlight">${gameState.raceTo}</span>`;
+    const p1Stats = `${gameState.p1Name} [Break Dishes: ${gameState.p1Dishes} | Reverse Dishes: ${gameState.p1RevDishes}]`;
+    const p2Stats = `${gameState.p2Name} [Break Dishes: ${gameState.p2Dishes} | Reverse Dishes: ${gameState.p2RevDishes}]`;
+    const racesWon = `RACES WON: ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})`;
+
+    tickerElement.innerHTML = `
+        <span>NEWS FLASH:</span> ${message.toUpperCase()} 
+        &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ${raceToHighlight}
+        &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ${liveScore} 
+        &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ${p1Stats} | ${p2Stats}
+        &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ${racesWon}
+    `;
 }
 
-// --- Menu Controls ---
-if (infoIcon) {
-    infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
-}
-getEl('close-info-btn')?.addEventListener('click', () => infoModal.style.display = 'none');
+// --- 8. Menu & Summary Logic ---
+infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
+document.getElementById('close-info-btn').addEventListener('click', () => infoModal.style.display = 'none');
 
-// --- ABOUT & CACHE ---
-getEl('open-about-btn')?.addEventListener('click', () => {
-    infoModal.style.display = 'none'; 
-    aboutModal.style.display = 'flex';
-});
-
-getEl('close-about-btn')?.addEventListener('click', () => {
-    aboutModal.style.display = 'none';
-    infoModal.style.display = 'flex';
-});
-
-getEl('clear-cache-btn')?.addEventListener('click', () => {
-    if (confirm("Clear local cache and force-update images?")) {
-        caches.keys().then((names) => {
-            for (let name of names) caches.delete(name);
-        }).then(() => {
-            alert("Cache cleared! App will now restart.");
-            window.location.reload(true);
-        });
-    }
-});
-
-// --- History & Reports ---
 function recordFrame(winnerName, type) {
-    matchHistory.push({ frame: totalFramesPlayed + 1, winner: winnerName, type: type });
+    matchHistory.push({
+        frame: totalFramesPlayed + 1,
+        winner: winnerName,
+        type: type
+    });
 }
 
-getEl('open-history-btn')?.addEventListener('click', () => {
-    const historyList = getEl('history-list');
+document.getElementById('open-history-btn').addEventListener('click', () => {
+    const historyList = document.getElementById('history-list');
     infoModal.style.display = 'none';
-    const histModal = getEl('history-modal');
-    if (histModal) histModal.style.display = 'flex';
-    
+    document.getElementById('history-modal').style.display = 'flex';
     if (matchHistory.length === 0) {
         historyList.innerHTML = '<p style="color: #666; padding: 20px;">No frames recorded yet.</p>';
     } else {
         historyList.innerHTML = matchHistory.slice().reverse().map(item => `
             <div class="history-row" style="display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 10px;">
                 <span style="color: #666;">F${item.frame}</span>
-                <span style="color: var(--neon-green);">${item.winner}</span>
-                <span style="color: var(--neon-magenta);">${item.type.toUpperCase()}</span>
+                <span style="color: var(--neon-green); font-weight: bold;">${item.winner}</span>
+                <span style="color: var(--neon-magenta); text-align: right;">${item.type.replace('-', ' ').toUpperCase()}</span>
             </div>
         `).join('');
     }
+});
+
+document.getElementById('close-history-btn').addEventListener('click', () => {
+    document.getElementById('history-modal').style.display = 'none';
+    infoModal.style.display = 'flex';
+});
+
+// --- 9. SYNCHRONIZED REPORT GENERATOR ---
+function generateReportText() {
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    let durationText = "00:00:00";
+    if (gameState.startTime) {
+        const diff = Math.abs(now - gameState.startTime);
+        const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
+        const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+        const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+        durationText = `${hours}:${minutes}:${seconds}`;
+    }
+    let report = `╔════════════════════════════════════════════════════╗\n`;
+    report += `║             HAPPY4U MATCH REPORT PREVIEW           ║\n`;
+    report += `╠════════════════════════════════════════════════════╣\n`;
+    report += `  DATE:     ${timestamp}\n`;
+    report += `  DURATION: ${durationText} (HH:MM:SS)\n`;
+    report += `  RACE TO:  ${gameState.raceTo}\n`;
+    report += `------------------------------------------------------\n`;
+    report += `  LIVE SCORE: ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})\n`;
+    report += `  RACES WON:  ${gameState.p1Name} [${gameState.p1Matches}] | ${gameState.p2Name} [${gameState.p2Matches}]\n`;
+    report += `------------------------------------------------------\n`;
+    report += `  PLAYER STATISTICS:\n`;
+    report += `  ${gameState.p1Name.padEnd(15)} [DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}]\n`;
+    report += `  ${gameState.p2Name.padEnd(15)} [DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}]\n`;
+    report += `------------------------------------------------------\n\n`;
+    report += `  MATCH PROGRESS LOG:\n`;
+    if (matchHistory.length === 0) report += `  > No frames recorded yet.\n`;
+    else {
+        matchHistory.forEach(item => {
+            const frameNum = `FRAME ${item.frame}`.padEnd(10);
+            const winner = item.winner.padEnd(15);
+            const type = item.type.replace('-', ' ').toUpperCase();
+            report += `  [✔] ${frameNum} | WINNER: ${winner} | TYPE: ${type}\n`;
+        });
+    }
+    report += `\n╚════════════════════════════════════════════════════╝\n`;
+    report += `           GENERATED BY Freddie Russell          `;
+    return report;
+}
+
+// --- 10. LISTENERS ---
+document.getElementById('save-match-btn').addEventListener('click', () => {
+    if (matchHistory.length === 0) return alert("No match data to save!");
+    const blob = new Blob([generateReportText()], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Match_Report_${gameState.p1Name}_vs_${gameState.p2Name}.txt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+});
+
+document.getElementById('view-report-btn').addEventListener('click', () => {
+    reportTextArea.innerText = generateReportText();
+    reportViewModal.style.display = 'flex';
+});
+
+document.getElementById('copy-report-btn').addEventListener('click', () => {
+    const text = generateReportText();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-report-btn');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ COPIED!";
+        setTimeout(() => btn.innerText = originalText, 2000);
+    });
+});
+
+document.getElementById('reset-history-btn').addEventListener('click', () => {
+    if (confirm("Clear frame history?")) {
+        matchHistory = [];
+        totalFramesPlayed = 0;
+        reportTextArea.innerText = generateReportText();
+        updateTicker("HISTORY RESET");
+    }
+});
+
+document.getElementById('close-report-view').addEventListener('click', () => {
+    reportViewModal.style.display = 'none';
+});
+
+document.getElementById('exit-btn').addEventListener('click', () => {
+    if (confirm("Are you sure you want to exit?")) {
+        window.close();
+        window.location.href = "about:blank"; 
+    }
+});
+
+// --- 11. DRILL VIEWER LOGIC ---
+const drillImages = ["Drill/drill1.png", "Drill/drill2.png", "Drill/drill3.png", "Drill/drill4.png", "Drill/drill5.png", "Drill/drill6.png", "Drill/drill7.png", "Drill/drill8.png", "Drill/drill9.png"]; 
+let currentDrillIndex = 0;
+const drillModal = document.getElementById('drill-modal');
+const drillDisplay = document.getElementById('drill-display');
+const drillName = document.getElementById('drill-name');
+
+document.getElementById('open-drills-btn').addEventListener('click', () => {
+    infoModal.style.display = 'none';
+    drillModal.style.display = 'flex';
+    showDrill(0);
+});
+
+function showDrill(index) {
+    if (drillImages.length === 0) { drillName.innerText = "No drills found."; return; }
+    currentDrillIndex = index;
+    drillDisplay.src = drillImages[index];
+    drillName.innerText = drillImages[index].replace('Drill/', '').replace('.png', '').toUpperCase();
+}
+
+document.getElementById('next-drill').addEventListener('click', () => {
+    currentDrillIndex = (currentDrillIndex + 1) % drillImages.length;
+    showDrill(currentDrillIndex);
+});
+
+document.getElementById('prev-drill').addEventListener('click', () => {
+    currentDrillIndex = (currentDrillIndex - 1 + drillImages.length) % drillImages.length;
+    showDrill(currentDrillIndex);
+});
+
+document.getElementById('close-drills').addEventListener('click', () => {
+    drillModal.style.display = 'none';
 });
