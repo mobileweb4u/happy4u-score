@@ -1,4 +1,10 @@
-const CACHE_NAME = 'happy4u-v2'; // Incrementing version to force browser update
+// ==========================================
+// --- SERVICE WORKER VERSION CONTROL ---
+// ==========================================
+// IMPORTANT: Every time you change script.js, update this name 
+// (e.g., 'happy4u-v2.3.1') to force the browser to update.
+const CACHE_NAME = 'happy4u-v2.3.1'; 
+
 const ASSETS = [
   './',
   './index.html',
@@ -22,11 +28,11 @@ const ASSETS = [
 
 // 1. Install Event - Saving files to cache
 self.addEventListener('install', (event) => {
-  // force the waiting service worker to become the active service worker
+  // Force the waiting service worker to become active immediately
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching all scoreboard assets...');
+      console.log('📦 PWA: Caching new scoreboard assets...');
       return cache.addAll(ASSETS);
     })
   );
@@ -37,13 +43,17 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
+        // Delete any cache that doesn't match the current CACHE_NAME
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
+    }).then(() => {
+      console.log('✅ PWA: Old cache cleared, version ' + CACHE_NAME + ' active!');
+      return self.clients.claim(); // Immediately take control of all open tabs
     })
   );
 });
 
-// 3. Fetch Event - This is what makes it work OFFLINE
+// 3. Fetch Event - Offline Support
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
