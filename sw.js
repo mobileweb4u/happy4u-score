@@ -1,21 +1,43 @@
-const GHPATH = '/happy4u-score';
 const CACHE_NAME = 'happy4u-v1';
-
 const ASSETS = [
-  `${GHPATH}/`,
-  `${GHPATH}/index.html`,
-  `${GHPATH}/style.css`,
-  `${GHPATH}/script.js`,
-  `${GHPATH}/manifest.json`,
-  `${GHPATH}/favicon.png`,
-  `${GHPATH}/icon-512.png`,
-  `${GHPATH}/Drill/drill1.png`,
-  `${GHPATH}/Drill/drill2.png`,
-  `${GHPATH}/Drill/drill3.png`,
-  `${GHPATH}/Drill/drill4.png`,
-  `${GHPATH}/Drill/drill5.png`,
-  `${GHPATH}/Drill/drill6.png`,
-  `${GHPATH}/Drill/drill7.png`,
-  `${GHPATH}/Drill/drill8.png`,
-  `${GHPATH}/Drill/drill9.png`
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json',
+  './favicon.png',
+  './icon-192.png',
+  './Drill/drill1.png', // Add all your drill images here
+  './Drill/drill2.png'
 ];
+
+// 1. Install Event - Saving files to cache
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Caching assets...');
+      return cache.addAll(ASSETS);
+    })
+  );
+});
+
+// 2. Activate Event - Cleaning up old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
+    })
+  );
+});
+
+// 3. Fetch Event - This is what makes it work OFFLINE
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Return cached file, or try to get it from network
+      return cachedResponse || fetch(event.request);
+    })
+  );
+});
