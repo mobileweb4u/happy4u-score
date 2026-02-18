@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HAPPY4U Pool Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Pool Scoreboard</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00ff44">
-    <meta name="mobile-web-app-capable" content="yes">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-192.png"> 
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -18,18 +20,19 @@
         /* NEW CSS TO CREATE THE 3-BUTTON ROW LAYOUT */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr); /* Forces exactly 3 columns */
+            gap: 10px; /* Space between buttons */
             width: 100%;
         }
 
         .menu-btn {
-            font-size: 0.7rem;
+            font-size: 0.7rem; /* Smaller font to ensure 3 fit on one line */
             padding: 10px 2px;
             text-align: center;
-            white-space: nowrap;
+            white-space: nowrap; /* Prevents text from wrapping */
         }
 
+        /* Forces the Close button to occupy its own line at the bottom */
         #close-info-btn {
             grid-column: span 3; 
             margin-top: 20px;
@@ -37,17 +40,6 @@
             border: none;
             color: gray;
             cursor: pointer;
-        }
-
-        /* Version Label Styling */
-        .version-label {
-            position: fixed;
-            bottom: 5px;
-            right: 10px;
-            font-size: 10px;
-            color: #444;
-            font-family: monospace;
-            z-index: 1000;
         }
     </style>
 </head>
@@ -104,15 +96,15 @@
         <div class="modal-content">
             <h2>MATCH SETUP</h2>
             <div class="input-group" style="margin-bottom: 15px;">
-                <label for="p1-input">PLAYER 1 NAME</label>
+                <label>PLAYER 1 NAME</label>
                 <input type="text" id="p1-input" placeholder="Enter Name">
             </div>
             <div class="input-group" style="margin-bottom: 15px;">
-                <label for="p2-input">PLAYER 2 NAME</label>
+                <label>PLAYER 2 NAME</label>
                 <input type="text" id="p2-input" placeholder="Enter Name">
             </div>
             <div class="input-group" style="margin-bottom: 20px;">
-                <label for="race-input">RACE TO</label>
+                <label>RACE TO</label>
                 <input type="number" id="race-input" value="3">
             </div>
             <div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
@@ -235,7 +227,6 @@
         <span class="nav-icon info-icon">ⓘ</span>
         <span class="nav-icon star-icon">★</span>
         <span class="nav-icon">👤</span>
-        <div class="version-label">v2.1.0-CLEAN</div>
     </footer>
 
     <script src="script.js"></script>
