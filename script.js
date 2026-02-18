@@ -1,9 +1,49 @@
-// Register Service Worker for PWA functionality
+// ==========================================
+// --- 0. PWA & OFFLINE HEALTH CHECK ---
+// ==========================================
+async function runPWAHealthCheck() {
+    console.log("🔍 Starting PWA Health Check...");
+
+    // 1. Check Manifest for Maskable Icons
+    try {
+        const response = await fetch('./manifest.json');
+        const data = await response.json();
+        const hasMaskable = data.icons && data.icons.some(icon => icon.purpose.includes('maskable'));
+        console.log(hasMaskable ? "✅ MANIFEST: Maskable icons configured." : "⚠️ MANIFEST: Maskable icons missing.");
+    } catch (e) { console.warn("❌ MANIFEST: Could not read manifest.json"); }
+
+    // 2. Check Cache for Offline Assets (Drills)
+    if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        if (cacheNames.length === 0) {
+            console.warn("⚠️ CACHE: No caches found. App might not work offline yet.");
+        } else {
+            const cache = await caches.open(cacheNames[0]);
+            const cachedRequests = await cache.keys();
+            const cachedUrls = cachedRequests.map(req => req.url);
+            
+            // Specifically check for Drills
+            const drillsFound = cachedUrls.filter(url => url.includes('Drill/')).length;
+            console.log(`✅ CACHE: ${drillsFound} drill images found in offline storage.`);
+            
+            if (drillsFound === 0) {
+                console.warn("⚠️ CACHE: Drills are NOT cached. Check your sw.js file paths!");
+            }
+        }
+    }
+}
+
+// Run health check on load
+window.addEventListener('load', runPWAHealthCheck);
+
+// ==========================================
+// --- 1. SERVICE WORKER REGISTRATION ---
+// ==========================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.worker = navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('Service Worker Registered!', reg))
-      .catch(err => console.log('Service Worker failed:', err));
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ SERVICE WORKER: Registered!', reg))
+      .catch(err => console.log('❌ SERVICE WORKER: Registration failed:', err));
   });
 }
 
@@ -39,7 +79,7 @@ const infoIcon = document.querySelector('.info-icon');
 const reportViewModal = document.getElementById('report-view-modal');
 const reportTextArea = document.getElementById('report-text-area');
 
-// --- 1. Match Setup Logic ---
+// --- Match Setup Logic ---
 document.getElementById('save-setup-btn').addEventListener('click', () => {
     gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
     gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
@@ -57,7 +97,7 @@ document.getElementById('save-setup-btn').addEventListener('click', () => {
     updateTicker(`SETTING UP: ${gameState.p1Name} VS ${gameState.p2Name}`);
 });
 
-// --- 2. Lag Logic ---
+// --- Lag Logic ---
 document.getElementById('lag-p1-btn').addEventListener('click', () => startMatch('p1'));
 document.getElementById('lag-p2-btn').addEventListener('click', () => startMatch('p2'));
 
@@ -68,7 +108,7 @@ function startMatch(winner) {
     updateTicker(`MATCH STARTED! ${gameState[winner+'Name']} WON THE LAG.`);
 }
 
-// --- 3. Break/Turn Indicator ---
+// --- Break/Turn Indicator ---
 function updateBreakIndicator() {
     const p1Dot = document.getElementById('p1-break-indicator');
     const p2Dot = document.getElementById('p2-break-indicator');
@@ -80,7 +120,7 @@ function updateBreakIndicator() {
     p2Dot.style.visibility = isP1Turn ? 'hidden' : 'visible';
 }
 
-// --- 4. Scoring Logic ---
+// --- Scoring Logic ---
 document.querySelectorAll('.btn-plus').forEach(btn => {
     btn.addEventListener('click', () => {
         activeScoringPlayer = btn.dataset.player;
@@ -115,7 +155,7 @@ document.getElementById('cancel-dish-btn').addEventListener('click', () => {
     dishModal.style.display = 'none';
 });
 
-// --- 5. Winner Logic ---
+// --- Winner Logic ---
 function checkWinner(newsEvent) {
     if (gameState.p1Score >= gameState.raceTo) {
         gameState.p1Matches++;
@@ -134,7 +174,7 @@ function showWinner(name) {
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
 }
 
-// --- 6. Navigation / Reset ---
+// --- Navigation / Reset ---
 document.getElementById('again-race-btn').addEventListener('click', () => {
     gameState.p1Score = 0;
     gameState.p2Score = 0;
@@ -152,7 +192,7 @@ document.querySelectorAll('.end-game').forEach(btn => {
     });
 });
 
-// --- 7. UI Update Helpers ---
+// --- UI Update Helpers ---
 function updateUI() {
     document.getElementById('p1-score').innerText = gameState.p1Score;
     document.getElementById('p2-score').innerText = gameState.p2Score;
@@ -181,7 +221,7 @@ function updateTicker(message) {
     `;
 }
 
-// --- 8. Menu & Summary Logic ---
+// --- Menu & Summary Logic ---
 infoIcon.addEventListener('click', () => infoModal.style.display = 'flex');
 document.getElementById('close-info-btn').addEventListener('click', () => infoModal.style.display = 'none');
 
@@ -216,7 +256,7 @@ document.getElementById('close-history-btn').addEventListener('click', () => {
     infoModal.style.display = 'flex';
 });
 
-// --- 9. REPORT GENERATOR ---
+// --- REPORT GENERATOR ---
 function generateReportText() {
     const now = new Date();
     const timestamp = now.toLocaleString();
@@ -259,7 +299,7 @@ function generateReportText() {
     return report;
 }
 
-// --- 10. LISTENERS ---
+// --- LISTENERS ---
 document.getElementById('save-match-btn').addEventListener('click', () => {
     if (matchHistory.length === 0) return alert("No match data to save!");
     const blob = new Blob([generateReportText()], { type: 'text/plain' });
@@ -294,7 +334,7 @@ document.getElementById('close-report-view').addEventListener('click', () => {
     reportViewModal.style.display = 'none';
 });
 
-// --- 11. DRILL VIEWER LOGIC ---
+// --- DRILL VIEWER LOGIC ---
 const drillImages = ["Drill/drill1.png", "Drill/drill2.png", "Drill/drill3.png", "Drill/drill4.png", "Drill/drill5.png", "Drill/drill6.png", "Drill/drill7.png", "Drill/drill8.png", "Drill/drill9.png"]; 
 let currentDrillIndex = 0;
 const drillModal = document.getElementById('drill-modal');
@@ -325,7 +365,7 @@ document.getElementById('prev-drill').addEventListener('click', () => {
 
 document.getElementById('close-drills').addEventListener('click', () => drillModal.style.display = 'none');
 
-// --- 12. CONNECTIVITY TOASTS ---
+// --- CONNECTIVITY TOASTS ---
 window.addEventListener('offline', () => showConnectivityToast("⚠️ OFFLINE MODE - SAVING LOCALLY"));
 window.addEventListener('online', () => showConnectivityToast("🌐 BACK ONLINE"));
 
@@ -341,7 +381,7 @@ function showConnectivityToast(message) {
     setTimeout(() => toast.remove(), 4000);
 }
 
-// --- 13. SHARING & QR LOGIC ---
+// --- SHARING & QR LOGIC ---
 document.getElementById('share-app-btn').addEventListener('click', async () => {
     try {
         if (navigator.share) {
@@ -361,17 +401,14 @@ document.getElementById('open-qr-btn').addEventListener('click', () => {
 });
 document.getElementById('close-qr-btn').addEventListener('click', () => qrModal.style.display = 'none');
 
-// ==========================================
-// --- 14. PWA INSTALL LOGIC (UPDATED) ---
-// ==========================================
+// --- PWA INSTALL LOGIC ---
 let deferredPrompt;
 const installBtn = document.getElementById('install-pwa-btn');
 
-// Android/Chrome Logic
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.style.display = 'block'; // Show button when ready
+    installBtn.style.display = 'block';
 });
 
 installBtn.addEventListener('click', async () => {
@@ -383,25 +420,15 @@ installBtn.addEventListener('click', async () => {
         }
         deferredPrompt = null;
     } else {
-        // Fallback for iOS users who click the button
-        alert("To install on iPhone: Tap the 'Share' icon (square with arrow) and select 'Add to Home Screen'.");
+        alert("To install on iPhone: Tap the 'Share' icon and select 'Add to Home Screen'.");
     }
 });
 
-// Hide button once installed
 window.addEventListener('appinstalled', () => {
-    console.log('App successfully installed');
     installBtn.style.display = 'none';
+    alert("Success! The Scoreboard is installed.");
 });
 
-// Check if already in standalone mode
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
   installBtn.style.display = 'none';
 }
-
-window.addEventListener('appinstalled', () => {
-  // Hide the install button
-  installBtn.style.display = 'none';
-  // Alert the user where to find it
-  alert("Success! The Scoreboard is installed. You can find it in your Start Menu or by typing 'chrome://apps' in your browser.");
-});
