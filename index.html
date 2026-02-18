@@ -18,19 +18,18 @@
         /* NEW CSS TO CREATE THE 3-BUTTON ROW LAYOUT */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Forces exactly 3 columns */
-            gap: 10px; /* Space between buttons */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             width: 100%;
         }
 
         .menu-btn {
-            font-size: 0.7rem; /* Smaller font to ensure 3 fit on one line */
+            font-size: 0.7rem;
             padding: 10px 2px;
             text-align: center;
-            white-space: nowrap; /* Prevents text from wrapping */
+            white-space: nowrap;
         }
 
-        /* Forces the Close button to occupy its own line at the bottom */
         #close-info-btn {
             grid-column: span 3; 
             margin-top: 20px;
@@ -105,15 +104,15 @@
         <div class="modal-content">
             <h2>MATCH SETUP</h2>
             <div class="input-group" style="margin-bottom: 15px;">
-                <label>PLAYER 1 NAME</label>
+                <label for="p1-input">PLAYER 1 NAME</label>
                 <input type="text" id="p1-input" placeholder="Enter Name">
             </div>
             <div class="input-group" style="margin-bottom: 15px;">
-                <label>PLAYER 2 NAME</label>
+                <label for="p2-input">PLAYER 2 NAME</label>
                 <input type="text" id="p2-input" placeholder="Enter Name">
             </div>
             <div class="input-group" style="margin-bottom: 20px;">
-                <label>RACE TO</label>
+                <label for="race-input">RACE TO</label>
                 <input type="number" id="race-input" value="3">
             </div>
             <div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
@@ -236,7 +235,7 @@
         <span class="nav-icon info-icon">ⓘ</span>
         <span class="nav-icon star-icon">★</span>
         <span class="nav-icon">👤</span>
-        <div class="version-label">v2.0.0-OFFLINE</div>
+        <div class="version-label">v2.1.0-CLEAN</div>
     </footer>
 
     <script src="script.js"></script>
