@@ -491,4 +491,25 @@ header {
 .menu-btn-small {
     padding: 10px !important;
     font-size: 0.9rem !important;
+}`    
+
+/* Landscape Mode Fix */
+@media (orientation: landscape) {
+    .scoreboard {
+        flex-direction: row; /* Keep players side-by-side */
+        height: auto;
+        padding-bottom: 80px; /* Space for the bottom nav */
+    }
+
+    .player-column {
+        padding: 5px;
+    }
+
+    .score-display {
+        font-size: 3rem; /* Make score smaller so it fits without scrolling */
+    }
+
+    header {
+        padding: 5px;
+    }
 }
