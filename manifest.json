@@ -1,8 +1,12 @@
 {
-  "name": "HAPPY4U Neon Pool Scoreboard",
-  "short_name": "HAPPY4U",
-  "start_url": ".",
+  "name": "HAPPY4U Pool Scoreboard",
+  "short_name": "Scoreboard",
+  "description": "Scoreboard with Match Reports and Drills.",
+  "id": "/happy4u-score/",
+  "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
+  "dir": "ltr",
   "background_color": "#000000",
   "theme_color": "#00ff44",
   "icons": [
@@ -15,7 +19,9 @@
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["sports", "utilities"]
 }
