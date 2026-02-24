@@ -1,7 +1,7 @@
 {
   "name": "HAPPY4U Pool Scoreboard",
   "short_name": "HAPPY4U",
-  "description": "Professional Pool & Billiards Scoreboard with Practice Drills",
+  "description": "Professional Pool & Practice Drills",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
