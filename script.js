@@ -406,3 +406,21 @@ window.addEventListener('load', () => {
     }
     updateStorageDisplay();
 });
+
+// --- Updated Match Setup Exit Logic ---
+const exitSetupBtn = document.querySelector('#setup-modal .btn-red') || document.querySelector('button[onclick*="exit"]');
+
+if (exitSetupBtn) {
+    exitSetupBtn.addEventListener('click', () => {
+        // Option A: If you want it to act like a 'Back' button to the Main Menu
+        setupModal.style.display = 'none';
+        
+        // Option B: Hard Reset (The cleanest "Exit" for a Scoreboard)
+        if(confirm("Exit setup and reset scoreboard?")) {
+            window.location.reload();
+        }
+    });
+}
+
+// Ensure the 'EXIT' button in your HTML has the correct ID
+// Example: <button id="exit-setup-btn" class="btn-red">EXIT</button>
