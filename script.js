@@ -397,14 +397,38 @@ window.addEventListener('load', () => {
     updateStorageDisplay();
 });
 
-// --- 13. FINALIZED EXIT LOGIC ---
-// This handles the 'EXIT' button in your Match Setup Modal
+// --- 13. EXIT LOGIC ---
 const exitSetupBtn = document.getElementById('exit-setup-btn');
-
 if (exitSetupBtn) {
     exitSetupBtn.addEventListener('click', () => {
         if(confirm("Exit match setup and reset scoreboard?")) {
             window.location.reload();
         }
+    });
+}
+
+// --- 14. NEW: QR MODAL LOGIC ---
+// Added Section 14 to handle the QR Sync Modal functionality
+const qrModal = document.getElementById('qr-modal');
+const qrImage = document.getElementById('qr-image');
+const openQrBtn = document.getElementById('open-qr-btn'); // Ensure this ID exists on your "Sync" button
+const closeQrBtn = document.getElementById('close-qr-btn');
+
+if (openQrBtn) {
+    openQrBtn.addEventListener('click', () => {
+        // Generate a QR code using a free API (GoQR.me) 
+        // It encodes the current URL so opponents can scan and see the same board
+        const currentUrl = window.location.href;
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
+        
+        infoModal.style.display = 'none';
+        qrModal.style.display = 'flex';
+    });
+}
+
+if (closeQrBtn) {
+    closeQrBtn.addEventListener('click', () => {
+        qrModal.style.display = 'none';
+        infoModal.style.display = 'flex';
     });
 }
