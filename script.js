@@ -2,6 +2,7 @@
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
+const APP_VERSION = "2.4.0"; // UPDATED TO MASTER VERSION
 
 let gameState = {
     p1Name: "PLAYER 1",
@@ -29,8 +30,15 @@ const infoModal = document.getElementById('info-modal');
 const infoIcon = document.querySelector('.info-icon');
 const reportViewModal = document.getElementById('report-view-modal');
 const reportTextArea = document.getElementById('report-text-area');
+const aboutModal = document.getElementById('about-modal');
 
-// --- 1. Match Setup Logic (UPPERCASE ENFORCED) ---
+// --- NEW: ORIENTATION FIX FOR TABLETS ---
+window.addEventListener('resize', () => {
+    console.log("🔄 Orientation Changed: " + window.innerWidth + "x" + window.innerHeight);
+    updateUI(); 
+});
+
+// --- 1. Match Setup Logic ---
 document.getElementById('save-setup-btn').addEventListener('click', () => {
     gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
     gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
@@ -99,7 +107,7 @@ document.getElementById('cancel-dish-btn').addEventListener('click', () => {
     dishModal.style.display = 'none';
 });
 
-// --- 5. Winner Logic (UPDATED FOR YOUR MESSAGE) ---
+// --- 5. Winner Logic ---
 function checkWinner(newsEvent) {
     if (gameState.p1Score >= gameState.raceTo) {
         gameState.p1Matches++;
@@ -113,7 +121,6 @@ function checkWinner(newsEvent) {
 }
 
 function showWinner(name) {
-    // New Congratulatory Message
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `CONGRATULATIONS FINISH <span style="color:var(--neon-magenta);">${name}</span><br>` +
                        `<small style="font-size: 0.7em; color: white;">YOU'VE WON THE RACE</small>`;
@@ -156,8 +163,8 @@ function updateTicker(message) {
     if (!tickerElement) return;
     const liveScore = `LIVE SCORE: ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
     const raceToHighlight = `RACE TO: <span class="ticker-highlight">${gameState.raceTo}</span>`;
-    const p1Stats = `${gameState.p1Name} [Break Dishes: ${gameState.p1Dishes} | Reverse Dishes: ${gameState.p1RevDishes}]`;
-    const p2Stats = `${gameState.p2Name} [Break Dishes: ${gameState.p2Dishes} | Reverse Dishes: ${gameState.p2RevDishes}]`;
+    const p1Stats = `${gameState.p1Name} [D: ${gameState.p1Dishes} | R: ${gameState.p1RevDishes}]`;
+    const p2Stats = `${gameState.p2Name} [D: ${gameState.p2Dishes} | R: ${gameState.p2RevDishes}]`;
     const racesWon = `RACES WON: ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})`;
 
     tickerElement.innerHTML = `
@@ -189,10 +196,10 @@ document.getElementById('open-history-btn').addEventListener('click', () => {
         historyList.innerHTML = '<p style="color: #666; padding: 20px;">No frames recorded yet.</p>';
     } else {
         historyList.innerHTML = matchHistory.slice().reverse().map(item => `
-            <div class="history-row" style="display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 10px;">
-                <span style="color: #666;">F${item.frame}</span>
-                <span style="color: var(--neon-green); font-weight: bold;">${item.winner}</span>
-                <span style="color: var(--neon-magenta); text-align: right;">${item.type.replace('-', ' ').toUpperCase()}</span>
+            <div class="history-row">
+                <span class="history-frame">F${item.frame}</span>
+                <span class="history-winner">${item.winner}</span>
+                <span class="history-type">${item.type.replace('-', ' ').toUpperCase()}</span>
             </div>
         `).join('');
     }
@@ -203,7 +210,7 @@ document.getElementById('close-history-btn').addEventListener('click', () => {
     infoModal.style.display = 'flex';
 });
 
-// --- 9. SYNCHRONIZED REPORT GENERATOR ---
+// --- 9. REPORT GENERATOR ---
 function generateReportText() {
     const now = new Date();
     const timestamp = now.toLocaleString();
@@ -283,14 +290,7 @@ document.getElementById('close-report-view').addEventListener('click', () => {
     reportViewModal.style.display = 'none';
 });
 
-document.getElementById('exit-btn').addEventListener('click', () => {
-    if (confirm("Are you sure you want to exit?")) {
-        window.close();
-        window.location.href = "about:blank"; 
-    }
-});
-
-// --- 11. DRILL VIEWER LOGIC ---
+// --- 11. DRILL VIEWER ---
 const drillImages = ["Drill/drill1.png", "Drill/drill2.png", "Drill/drill3.png", "Drill/drill4.png", "Drill/drill5.png", "Drill/drill6.png", "Drill/drill7.png", "Drill/drill8.png", "Drill/drill9.png"]; 
 let currentDrillIndex = 0;
 const drillModal = document.getElementById('drill-modal');
@@ -322,4 +322,81 @@ document.getElementById('prev-drill').addEventListener('click', () => {
 
 document.getElementById('close-drills').addEventListener('click', () => {
     drillModal.style.display = 'none';
+});
+
+// --- 12. STORAGE, PULSE & RESET LOGIC ---
+
+// Function to calculate storage usage
+async function updateStorageDisplay() {
+    if (navigator.storage && navigator.storage.estimate) {
+        const {usage} = await navigator.storage.estimate();
+        const usageInMB = (usage / (1024 * 1024)).toFixed(2);
+        document.getElementById('storage-info').innerText = `Storage: ${usageInMB} MB`;
+    }
+}
+
+// Handling the About modal opening
+document.getElementById('open-about-btn').addEventListener('click', () => {
+    infoModal.style.display = 'none';
+    aboutModal.style.display = 'flex';
+    updateStorageDisplay();
+});
+
+document.getElementById('close-about-btn').addEventListener('click', () => {
+    aboutModal.style.display = 'none';
+    infoModal.style.display = 'flex';
+});
+
+// The "Nuclear" Factory Reset
+document.getElementById('factory-reset-btn').addEventListener('click', async () => {
+    if (confirm("WARNING: This will wipe all saved data, history, and the offline cache. The app will restart. Proceed?")) {
+        // Clear Caches
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        // Clear LocalStorage
+        localStorage.clear();
+        // Unregister Service Workers
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let reg of registrations) { await reg.unregister(); }
+        // Hard Reload
+        window.location.href = window.location.pathname;
+    }
+});
+
+// Manual Update Button
+document.getElementById('update-app-btn').addEventListener('click', () => {
+    const btn = document.getElementById('update-app-btn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPDATING...';
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+                registration.update();
+            }
+        });
+    }
+
+    setTimeout(() => {
+        // Redirect with a flag to trigger the pulse on reload
+        window.location.href = window.location.pathname + "?updated=true";
+    }, 2000);
+});
+
+// On Load: Check for Pulse and Storage
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('updated')) {
+        // Target both badges if they exist
+        const headerBadge = document.getElementById('header-v-badge');
+        const aboutBadge = document.getElementById('about-v-badge');
+        
+        if (headerBadge) headerBadge.classList.add('update-success');
+        if (aboutBadge) aboutBadge.classList.add('update-success');
+        
+        setTimeout(() => {
+            if (headerBadge) headerBadge.classList.remove('update-success');
+            if (aboutBadge) aboutBadge.classList.remove('update-success');
+        }, 8000);
+    }
+    updateStorageDisplay();
 });
