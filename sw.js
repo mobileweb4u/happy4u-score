@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER VERSION CONTROL ---
+// --- SERVICE WORKER MASTER VERSION v2.4.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v2.3.1'; 
+const CACHE_NAME = 'happy4u-v2.4.0'; 
 
 const ASSETS = [
   './',
@@ -23,49 +23,40 @@ const ASSETS = [
   './Drill/drill9.png'
 ];
 
-// 1. INSTALL: Pre-cache all files
+// 1. INSTALL: Pre-cache all files and force immediate takeover
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  // Forces this new service worker to become the active one immediately
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Use "addAll" but catch errors if a file is missing
       return cache.addAll(ASSETS).catch(err => {
-        console.error("❌ PWA: Failed to cache some assets. Check file paths!", err);
+        console.error("❌ PWA: Asset caching failed", err);
       });
     })
   );
 });
 
-// 2. ACTIVATE: Purge old versions immediately
+// 2. ACTIVATE: The "Uninstaller" - Deletes any cache that isn't v2.4.0
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
+        // This logic searches for and destroys any old versions (v2.3.1, etc.)
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      // Ensures the new SW controls the page without a reload
+      // Ensures that the new version takes control of the website right now
       return self.clients.claim();
     })
   );
 });
 
-// 3. FETCH: "Cache First, then Network" Strategy
+// 3. FETCH: Standard Cache-First Strategy
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Return from cache OR fetch from web and update cache
-      return cachedResponse || fetch(event.request).then(response => {
-        return caches.open(CACHE_NAME).then(cache => {
-          // Only cache valid GET requests (prevents errors with analytics/external APIs)
-          if (event.request.url.startsWith('http') && event.request.method === 'GET') {
-             cache.put(event.request, response.clone());
-          }
-          return response;
-        });
-      });
-    }).catch(() => {
-        // If offline and file isn't in cache, you could return an offline page here
+      // Returns the cached version for speed, otherwise goes to the internet
+      return cachedResponse || fetch(event.request);
     })
   );
 });
