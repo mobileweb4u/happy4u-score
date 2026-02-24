@@ -29,6 +29,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      console.log("🛠️ PWA: Pre-caching v2.4.0 Assets");
       return cache.addAll(ASSETS).catch(err => {
         console.error("❌ PWA: Asset caching failed", err);
       });
@@ -45,6 +46,7 @@ self.addEventListener('activate', (event) => {
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
+      console.log("✅ PWA: v2.4.0 Activated and Old Caches Cleared");
       // Ensures that the new version takes control of the website right now
       return self.clients.claim();
     })
