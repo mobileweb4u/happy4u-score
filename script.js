@@ -123,7 +123,7 @@ function checkWinner(newsEvent) {
 function showWinner(name) {
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `CONGRATULATIONS FINISH <span style="color:var(--neon-magenta);">${name}</span><br>` +
-                       `<small style="font-size: 0.7em; color: white;">YOU'VE WON THE RACE</small>`;
+                        `<small style="font-size: 0.7em; color: white;">YOU'VE WON THE RACE</small>`;
     
     winnerModal.style.display = 'flex';
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
@@ -223,7 +223,7 @@ function generateReportText() {
         durationText = `${hours}:${minutes}:${seconds}`;
     }
     let report = `╔════════════════════════════════════════════════════╗\n`;
-    report += `║             HAPPY4U MATCH REPORT PREVIEW           ║\n`;
+    report += `║            HAPPY4U MATCH REPORT PREVIEW            ║\n`;
     report += `╠════════════════════════════════════════════════════╣\n`;
     report += `  DATE:     ${timestamp}\n`;
     report += `  DURATION: ${durationText} (HH:MM:SS)\n`;
@@ -331,62 +331,66 @@ async function updateStorageDisplay() {
     if (navigator.storage && navigator.storage.estimate) {
         const {usage} = await navigator.storage.estimate();
         const usageInMB = (usage / (1024 * 1024)).toFixed(2);
-        document.getElementById('storage-info').innerText = `Storage: ${usageInMB} MB`;
+        const storageInfo = document.getElementById('storage-info');
+        if (storageInfo) storageInfo.innerText = `Storage: ${usageInMB} MB`;
     }
 }
 
 // Handling the About modal opening
-document.getElementById('open-about-btn').addEventListener('click', () => {
-    infoModal.style.display = 'none';
-    aboutModal.style.display = 'flex';
-    updateStorageDisplay();
-});
+const openAboutBtn = document.getElementById('open-about-btn');
+if (openAboutBtn) {
+    openAboutBtn.addEventListener('click', () => {
+        infoModal.style.display = 'none';
+        aboutModal.style.display = 'flex';
+        updateStorageDisplay();
+    });
+}
 
-document.getElementById('close-about-btn').addEventListener('click', () => {
-    aboutModal.style.display = 'none';
-    infoModal.style.display = 'flex';
-});
+const closeAboutBtn = document.getElementById('close-about-btn');
+if (closeAboutBtn) {
+    closeAboutBtn.addEventListener('click', () => {
+        aboutModal.style.display = 'none';
+        infoModal.style.display = 'flex';
+    });
+}
 
 // The "Nuclear" Factory Reset
-document.getElementById('factory-reset-btn').addEventListener('click', async () => {
-    if (confirm("WARNING: This will wipe all saved data, history, and the offline cache. The app will restart. Proceed?")) {
-        // Clear Caches
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
-        // Clear LocalStorage
-        localStorage.clear();
-        // Unregister Service Workers
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        for (let reg of registrations) { await reg.unregister(); }
-        // Hard Reload
-        window.location.href = window.location.pathname;
-    }
-});
+const factoryBtn = document.getElementById('factory-reset-btn');
+if (factoryBtn) {
+    factoryBtn.addEventListener('click', async () => {
+        if (confirm("WARNING: This will wipe all saved data, history, and the offline cache. The app will restart. Proceed?")) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+            localStorage.clear();
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let reg of registrations) { await reg.unregister(); }
+            window.location.href = window.location.pathname;
+        }
+    });
+}
 
 // Manual Update Button
-document.getElementById('update-app-btn').addEventListener('click', () => {
-    const btn = document.getElementById('update-app-btn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPDATING...';
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            for (let registration of registrations) {
-                registration.update();
-            }
-        });
-    }
-
-    setTimeout(() => {
-        // Redirect with a flag to trigger the pulse on reload
-        window.location.href = window.location.pathname + "?updated=true";
-    }, 2000);
-});
+const updateBtn = document.getElementById('update-app-btn');
+if (updateBtn) {
+    updateBtn.addEventListener('click', () => {
+        updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPDATING...';
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.update();
+                }
+            });
+        }
+        setTimeout(() => {
+            window.location.href = window.location.pathname + "?updated=true";
+        }, 2000);
+    });
+}
 
 // On Load: Check for Pulse and Storage
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('updated')) {
-        // Target both badges if they exist
         const headerBadge = document.getElementById('header-v-badge');
         const aboutBadge = document.getElementById('about-v-badge');
         
@@ -396,6 +400,8 @@ window.addEventListener('load', () => {
         setTimeout(() => {
             if (headerBadge) headerBadge.classList.remove('update-success');
             if (aboutBadge) aboutBadge.classList.remove('update-success');
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
         }, 8000);
     }
     updateStorageDisplay();
