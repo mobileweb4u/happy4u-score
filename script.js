@@ -326,7 +326,6 @@ document.getElementById('close-drills').addEventListener('click', () => {
 
 // --- 12. STORAGE, PULSE & RESET LOGIC ---
 
-// Function to calculate storage usage
 async function updateStorageDisplay() {
     if (navigator.storage && navigator.storage.estimate) {
         const {usage} = await navigator.storage.estimate();
@@ -336,7 +335,6 @@ async function updateStorageDisplay() {
     }
 }
 
-// Handling the About modal opening
 const openAboutBtn = document.getElementById('open-about-btn');
 if (openAboutBtn) {
     openAboutBtn.addEventListener('click', () => {
@@ -354,11 +352,10 @@ if (closeAboutBtn) {
     });
 }
 
-// The "Nuclear" Factory Reset
 const factoryBtn = document.getElementById('factory-reset-btn');
 if (factoryBtn) {
     factoryBtn.addEventListener('click', async () => {
-        if (confirm("WARNING: This will wipe all saved data, history, and the offline cache. The app will restart. Proceed?")) {
+        if (confirm("WARNING: This will wipe all saved data. Proceed?")) {
             const cacheNames = await caches.keys();
             await Promise.all(cacheNames.map(name => caches.delete(name)));
             localStorage.clear();
@@ -369,16 +366,13 @@ if (factoryBtn) {
     });
 }
 
-// Manual Update Button
 const updateBtn = document.getElementById('update-app-btn');
 if (updateBtn) {
     updateBtn.addEventListener('click', () => {
         updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPDATING...';
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.update();
-                }
+                for (let registration of registrations) { registration.update(); }
             });
         }
         setTimeout(() => {
@@ -387,40 +381,30 @@ if (updateBtn) {
     });
 }
 
-// On Load: Check for Pulse and Storage
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('updated')) {
         const headerBadge = document.getElementById('header-v-badge');
         const aboutBadge = document.getElementById('about-v-badge');
-        
         if (headerBadge) headerBadge.classList.add('update-success');
         if (aboutBadge) aboutBadge.classList.add('update-success');
-        
         setTimeout(() => {
             if (headerBadge) headerBadge.classList.remove('update-success');
             if (aboutBadge) aboutBadge.classList.remove('update-success');
-            // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }, 8000);
     }
     updateStorageDisplay();
 });
 
-// --- Updated Match Setup Exit Logic ---
-const exitSetupBtn = document.querySelector('#setup-modal .btn-red') || document.querySelector('button[onclick*="exit"]');
+// --- 13. FINALIZED EXIT LOGIC ---
+// This handles the 'EXIT' button in your Match Setup Modal
+const exitSetupBtn = document.getElementById('exit-setup-btn');
 
 if (exitSetupBtn) {
     exitSetupBtn.addEventListener('click', () => {
-        // Option A: If you want it to act like a 'Back' button to the Main Menu
-        setupModal.style.display = 'none';
-        
-        // Option B: Hard Reset (The cleanest "Exit" for a Scoreboard)
-        if(confirm("Exit setup and reset scoreboard?")) {
+        if(confirm("Exit match setup and reset scoreboard?")) {
             window.location.reload();
         }
     });
 }
-
-// Ensure the 'EXIT' button in your HTML has the correct ID
-// Example: <button id="exit-setup-btn" class="btn-red">EXIT</button>
