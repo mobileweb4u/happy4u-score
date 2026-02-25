@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HAPPY4U Scoreboard v2.4.1</title>
+<title>HAPPY4U Scoreboard v2.4.2</title>
 
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.json">
@@ -32,7 +32,6 @@ text-align: center;
 white-space: nowrap;
 }
 
-/* Forces the Close button to occupy its own line at the bottom */
 #close-info-btn {
 grid-column: span 3;
 margin-top: 20px;
@@ -42,7 +41,6 @@ color: gray;
 cursor: pointer;
 }
 
-/* ROTATION WARNING ELEMENT */
 #rotation-warning {
 display: none;
 position: fixed;
@@ -61,34 +59,34 @@ padding: 20px;
 #rotation-warning { display: flex; }
 }
 
-/* Version Badge Styling */
+/* --- UPDATED: Version Badge Styling to match Ticker --- */
 .version-badge {
-font-size: 0.5rem;
+font-size: 0.8rem; /* Made bigger */
 vertical-align: middle;
-opacity: 0.7;
-background: var(--neon-magenta);
-color: white;
-padding: 2px 4px;
-border-radius: 3px;
-margin-left: 5px;
+background: rgba(57, 255, 20, 0.1); /* Very faint green tint background */
+color: #39ff14; /* Neon Green exactly like the ticker */
+padding: 3px 8px;
+border: 1px solid #39ff14; /* Added a thin border for visibility */
+border-radius: 4px;
+margin-left: 8px;
+font-weight: bold;
+text-shadow: 0 0 5px #39ff14; /* Neon Glow */
 transition: all 0.3s ease;
 }
 
-/* NEW: Pulsing Animation for the Version Badge */
 @keyframes pulse-green {
-0% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0.7); }
-70% { box-shadow: 0 0 0 10px rgba(0, 255, 68, 0); }
-100% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0); }
+0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); }
+70% { box-shadow: 0 0 0 10px rgba(57, 255, 20, 0); }
+100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
 }
 
 .update-success {
 animation: pulse-green 2s infinite;
-background-color: var(--neon-green) !important;
+background-color: #39ff14 !important;
 color: #000 !important;
-font-weight: bold;
+text-shadow: none;
 }
 
-/* NEW: Red Reset Button Styling */
 .reset-storage-btn {
 background: none;
 border: 1px solid #ff4444;
@@ -115,7 +113,7 @@ color: white;
 </div>
 
 <header>
-<h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v2.4.1</span></h1>
+<h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v2.4.2</span></h1>
 <h1 class="title" id="main-title">Race To</h1>
 <button id="end-game-btn" class="end-game">END GAME</button>
 </header>
@@ -208,7 +206,7 @@ RACE TO 3 IN PROGRESS...
 <div id="about-modal" class="modal-overlay" style="display:none;">
 <div class="modal-content">
 <h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
-<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">2.4.1</span></p>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v2.4.2</span></p>
 
 <div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
 <span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
