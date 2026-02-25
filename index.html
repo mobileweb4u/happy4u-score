@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>HAPPY4U Scoreboard v2.4.4</title>
+<title>HAPPY4U Scoreboard v2.4.9</title>
 
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff44">
+
+<meta name="theme-color" content="#000000">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,37 +18,38 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-/* --- UNIVERSAL RESPONSIVE FIXES v2.4.4 --- */
+/* --- UNIVERSAL RESPONSIVE FIXES v2.4.9 --- */
 :root {
-    /* Clamped values: (min, preferred, max) - This makes text scale perfectly */
     --text-main: clamp(0.8rem, 2vw, 1.2rem);
     --text-score: clamp(4rem, 15vw, 10rem);
     --text-btn: clamp(0.7rem, 1.5vw, 1rem);
 }
 
+/* Hardcoded black background to prevent white flash */
 body {
     display: flex;
     flex-direction: column;
     height: 100vh;
     margin: 0;
-    overflow: hidden; /* Stops the whole page from bouncing */
-    background: #000;
+    overflow: hidden; 
+    background: #000 !important;
 }
 
 header { 
     flex-shrink: 0; 
     padding: 10px;
+    background: #000;
 }
 
-/* Brand scaling */
 .brand { font-size: clamp(1rem, 3vw, 2rem) !important; }
 .title { font-size: clamp(1.2rem, 4vw, 2.5rem) !important; }
 
 .scoreboard {
-    flex: 1; /* Fills the middle space */
+    flex: 1;
     display: flex;
-    overflow-y: auto; /* Allows scrolling inside the score area if screen is too short */
+    overflow-y: auto;
     padding-bottom: 80px; 
+    background: #000;
 }
 
 .player-column {
@@ -58,13 +60,11 @@ header {
     justify-content: center;
 }
 
-/* Responsive Scores */
 .score-display {
     font-size: var(--text-score) !important;
     line-height: 1;
 }
 
-/* Responsive Buttons */
 .btn-plus {
     font-size: var(--text-btn);
     padding: clamp(10px, 2vh, 20px) clamp(20px, 4vw, 40px);
@@ -72,13 +72,12 @@ header {
     max-width: 300px;
 }
 
-/* PINNED BOTTOM NAVIGATION */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: clamp(60px, 8vh, 80px); /* Taller on tablets */
+    height: clamp(60px, 8vh, 80px);
     background: rgba(0, 0, 0, 0.95);
     display: flex !important;
     justify-content: space-around;
@@ -90,10 +89,9 @@ header {
 
 .nav-icon {
     font-size: clamp(1.2rem, 3vw, 2rem);
-    padding: 15px; /* Larger invisible tap area for fingers */
+    padding: 15px;
 }
 
-/* Version Badge */
 .version-badge {
     font-size: clamp(0.6rem, 1.5vw, 0.9rem);
     background: rgba(57, 255, 20, 0.1);
@@ -139,7 +137,7 @@ header {
 </div>
 
 <header>
-<h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v2.4.4</span></h1>
+<h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v2.4.9</span></h1>
 <h1 class="title" id="main-title">Race To</h1>
 <button id="end-game-btn" class="end-game">END GAME</button>
 </header>
@@ -229,7 +227,7 @@ RACE TO 3 IN PROGRESS...
 <div id="about-modal" class="modal-overlay" style="display:none;">
 <div class="modal-content">
 <h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
-<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v2.4.4</span></p>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v2.4.9</span></p>
 <div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
 <span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
 <button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
