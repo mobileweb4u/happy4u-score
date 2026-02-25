@@ -1,3 +1,7 @@
+/* ==========================================
+   --- STYLE MASTER VERSION v2.4.8 ---
+   ========================================== */
+
 :root {
     --neon-green: #39FF14;
     --neon-magenta: #FF00FF;
@@ -6,25 +10,28 @@
     --cyber-cyan: #00f2ff;
 }
 
-/* --- RESET & FULL SCREEN --- */
+/* --- THE FIX: ANTI-WHITE FLASH --- */
+html, body {
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000 !important; /* Forces black immediately */
+    color: var(--neon-green);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- RESET --- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html, body {
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--bg-black);
-    color: var(--neon-green);
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden; 
-    display: flex;
-    flex-direction: column;
-}
-
-/* --- HEADER (Flexible Height) --- */
+/* --- HEADER --- */
 header {
     height: 12vh;
     display: flex;
@@ -32,6 +39,7 @@ header {
     align-items: center;
     padding: 0 5vw;
     border-bottom: 1px solid rgba(255, 0, 255, 0.2);
+    background-color: #000000;
 }
 
 .brand, .title {
@@ -59,6 +67,7 @@ header {
     gap: 10px;
     padding: 10px;
     height: 75vh; 
+    background-color: #000000;
 }
 
 .player-column {
@@ -92,7 +101,7 @@ header {
     color: var(--neon-magenta);
 }
 
-/* --- THE SCORE BOX (Responsive Scaling) --- */
+/* --- THE SCORE BOX --- */
 .score-box {
     background: var(--dark-grey);
     border: 4px solid var(--neon-green);
@@ -160,7 +169,7 @@ header {
     }
 
     .score-display {
-        font-size: clamp(4rem, 25vh, 10rem); /* Optimized for horizontal space */
+        font-size: clamp(4rem, 25vh, 11rem); 
     }
 
     header {
@@ -169,7 +178,7 @@ header {
     }
 }
 
-/* --- PORTRAIT ENFORCEMENT (The "Please Rotate" Screen) --- */
+/* --- PORTRAIT ENFORCEMENT --- */
 @media screen and (orientation: portrait) {
     body::after {
         content: "PLEASE ROTATE YOUR DEVICE TO LANDSCAPE MODE";
@@ -212,7 +221,7 @@ header {
     flex-direction: column;
     max-height: 90vh;
     box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
-    transform: scale(1.1); /* Slight boost for readability */
+    transform: scale(1.1); 
 }
 
 /* --- REPORT TERMINAL --- */
@@ -228,38 +237,4 @@ header {
     overflow-y: auto;
     white-space: pre;
     margin-bottom: 15px;
-}
-
-/* --- BUTTONS & NAV --- */
-.menu-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.menu-btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    background: transparent;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.menu-btn:hover {
-    background: var(--neon-magenta);
-    color: black;
-    box-shadow: 0 0 20px var(--neon-magenta);
-}
-
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px;
-    font-size: 1.5rem;
 }
