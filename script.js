@@ -1,12 +1,12 @@
 // ==========================================
-// --- SCRIPT MASTER VERSION v2.4.4 ---
+// --- SCRIPT MASTER VERSION v2.4.9 ---
 // ==========================================
 
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "2.4.4"; 
+const APP_VERSION = "2.4.9"; 
 
 let gameState = {
     p1Name: "PLAYER 1",
@@ -36,20 +36,17 @@ const reportViewModal = document.getElementById('report-view-modal');
 const reportTextArea = document.getElementById('report-text-area');
 const aboutModal = document.getElementById('about-modal');
 
-// --- 1. Match Setup Logic (THE FIX IS HERE) ---
+// --- 1. Match Setup Logic ---
 document.getElementById('save-setup-btn').addEventListener('click', () => {
-    // 1. Capture the values from inputs
     const input1 = document.getElementById('p1-input').value.trim();
     const input2 = document.getElementById('p2-input').value.trim();
     const inputRace = document.getElementById('race-input').value;
 
-    // 2. Update the Game State
     gameState.p1Name = (input1 || "PLAYER 1").toUpperCase();
     gameState.p2Name = (input2 || "PLAYER 2").toUpperCase();
     gameState.raceTo = parseInt(inputRace) || 3;
     gameState.startTime = new Date();
 
-    // 3. Update the UI Immediately
     document.getElementById('p1-name-display').innerText = gameState.p1Name;
     document.getElementById('p2-name-display').innerText = gameState.p2Name;
     document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
@@ -62,10 +59,8 @@ document.getElementById('save-setup-btn').addEventListener('click', () => {
         mainTitle.style.textShadow = "0 0 10px #39ff14"; 
     }
 
-    // 4. Save to Local Storage so it's bulletproof
     localStorage.setItem('happy4u_state', JSON.stringify(gameState));
 
-    // 5. Switch Modals
     setupModal.style.display = 'none';
     lagModal.style.display = 'flex';
     
