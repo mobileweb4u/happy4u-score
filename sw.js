@@ -1,8 +1,8 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v2.4.3 ---
+// --- SERVICE WORKER MASTER VERSION v2.4.4 ---
 // ==========================================
 // Bumping the version below is what forces the PWA to update its files
-const CACHE_NAME = 'happy4u-v2.4.3'; 
+const CACHE_NAME = 'happy4u-v2.4.4'; 
 
 const ASSETS = [
   './',
