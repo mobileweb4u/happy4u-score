@@ -38,7 +38,7 @@ window.addEventListener('resize', () => {
     updateUI(); 
 });
 
-// --- 1. Match Setup Logic ---
+// --- 1. Match Setup Logic (UPDATED FOR DYNAMIC RACE TO TITLE) ---
 document.getElementById('save-setup-btn').addEventListener('click', () => {
     gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
     gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
@@ -49,6 +49,14 @@ document.getElementById('save-setup-btn').addEventListener('click', () => {
     document.getElementById('p2-name-display').innerText = gameState.p2Name;
     document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
     document.getElementById('lag-p2-btn').innerText = gameState.p2Name;
+
+    // --- ADDED: Update the Main Title "Race To" text and color ---
+    const mainTitle = document.getElementById('main-title');
+    if (mainTitle) {
+        mainTitle.innerText = `RACE TO ${gameState.raceTo}`;
+        mainTitle.style.color = "#39ff14"; // Neon green to match ticker
+        mainTitle.style.textShadow = "0 0 10px #39ff14"; // Subtle glow
+    }
 
     setupModal.style.display = 'none';
     lagModal.style.display = 'flex';
@@ -407,17 +415,14 @@ if (exitSetupBtn) {
     });
 }
 
-// --- 14. NEW: QR MODAL LOGIC ---
-// Added Section 14 to handle the QR Sync Modal functionality
+// --- 14. QR SYNC & DYNAMIC TITLE LOGIC ---
 const qrModal = document.getElementById('qr-modal');
 const qrImage = document.getElementById('qr-image');
-const openQrBtn = document.getElementById('open-qr-btn'); // Ensure this ID exists on your "Sync" button
+const openQrBtn = document.getElementById('open-qr-btn'); 
 const closeQrBtn = document.getElementById('close-qr-btn');
 
 if (openQrBtn) {
     openQrBtn.addEventListener('click', () => {
-        // Generate a QR code using a free API (GoQR.me) 
-        // It encodes the current URL so opponents can scan and see the same board
         const currentUrl = window.location.href;
         qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
         
