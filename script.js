@@ -411,19 +411,15 @@ if (exitSetupBtn) {
 }
 
 // --- 14. NEW: QR MODAL LOGIC ---
-// Added Section 14 to handle the QR Sync Modal functionality
 const qrModal = document.getElementById('qr-modal');
 const qrImage = document.getElementById('qr-image');
-const openQrBtn = document.getElementById('open-qr-btn'); // Ensure this ID exists on your "Sync" button
+const openQrBtn = document.getElementById('open-qr-btn'); 
 const closeQrBtn = document.getElementById('close-qr-btn');
 
 if (openQrBtn) {
     openQrBtn.addEventListener('click', () => {
-        // Generate a QR code using a free API (GoQR.me) 
-        // It encodes the current URL so opponents can scan and see the same board
         const currentUrl = window.location.href;
         qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
-        
         infoModal.style.display = 'none';
         qrModal.style.display = 'flex';
     });
@@ -433,5 +429,37 @@ if (closeQrBtn) {
     closeQrBtn.addEventListener('click', () => {
         qrModal.style.display = 'none';
         infoModal.style.display = 'flex';
+    });
+}
+
+// --- 15. NEW: VIEW PROGRESS LOGIC ---
+// This handles the Star Icon click to show the ASCII progress log
+const progressModal = document.getElementById('progress-modal');
+const progressLogArea = document.getElementById('progress-log-area');
+const viewProgressBtn = document.getElementById('view-progress-btn');
+const closeProgressBtn = document.getElementById('close-progress-btn');
+const copyProgressBtn = document.getElementById('copy-progress-btn');
+
+if (viewProgressBtn) {
+    viewProgressBtn.addEventListener('click', () => {
+        progressLogArea.textContent = generateReportText(); // Reuse your report generator logic
+        progressModal.style.display = 'flex';
+    });
+}
+
+if (closeProgressBtn) {
+    closeProgressBtn.addEventListener('click', () => {
+        progressModal.style.display = 'none';
+    });
+}
+
+if (copyProgressBtn) {
+    copyProgressBtn.addEventListener('click', () => {
+        const text = progressLogArea.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = copyProgressBtn.innerText;
+            copyProgressBtn.innerText = "✅ COPIED!";
+            setTimeout(() => copyProgressBtn.innerText = originalText, 2000);
+        });
     });
 }
