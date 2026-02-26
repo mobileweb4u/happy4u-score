@@ -432,8 +432,7 @@ if (closeQrBtn) {
     });
 }
 
-// --- 15. NEW: VIEW PROGRESS LOGIC ---
-// This handles the Star Icon click to show the ASCII progress log
+// --- 15. NEW: VIEW PROGRESS LOGIC WITH AUTO-SCROLL ---
 const progressModal = document.getElementById('progress-modal');
 const progressLogArea = document.getElementById('progress-log-area');
 const viewProgressBtn = document.getElementById('view-progress-btn');
@@ -442,8 +441,14 @@ const copyProgressBtn = document.getElementById('copy-progress-btn');
 
 if (viewProgressBtn) {
     viewProgressBtn.addEventListener('click', () => {
-        progressLogArea.textContent = generateReportText(); // Reuse your report generator logic
+        // 1. Generate text from current game data
+        progressLogArea.textContent = generateReportText(); 
+        // 2. Display the modal
         progressModal.style.display = 'flex';
+        // 3. AUTO-SCROLL: Wait for a tiny moment so the text renders, then jump to the bottom
+        setTimeout(() => {
+            progressLogArea.scrollTop = progressLogArea.scrollHeight;
+        }, 10);
     });
 }
 
