@@ -1,4 +1,59 @@
 
+HAPPY4U v2.4.1 this is working 
+
+ ==============================
+Race To 5 this is working
+I want whatever the user value enter and save
+ to show up in Race To box here
+ <h1 class="title" id="main-title">Race To</h1>
+ The color of the font would be the same as what's in the news ticker
+
+ ==============================
+
+
+ABOUT SCOREBOARD with 2 button  this is working
+
+ ==============================
+
+I want a button In my about page This button should name 'install-PWA' 
+this Button will allow the user to download pwa version,
+this Button shoud be on the same line as 'check for updates
+PWA: Service Workers for offline caching and home-screen installation.
+How can I make this available When a user is on my GitHub site
+I want this To be a stand-alone That is available when the 
+players got no internet At all times
+Explain how you'd Implement a fix for this?
+Let me know what file you want me to upload when you are ready?
+
+ ==============================
+
+
+
+working now
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 TODO:
 Would you like me to add a button that allows you to "Download" the QR code as a 
 picture so you can print it out for the pool hall wall?
