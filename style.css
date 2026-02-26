@@ -154,19 +154,9 @@ header {
         height: auto;
         padding-bottom: 20px;
     }
-
-    .player-column {
-        padding: 5px;
-    }
-
-    .score-display {
-        font-size: clamp(4rem, 25vh, 10rem);
-    }
-
-    header {
-        height: 10vh;
-        padding: 5px 5vw;
-    }
+    .player-column { padding: 5px; }
+    .score-display { font-size: clamp(4rem, 25vh, 10rem); }
+    header { height: 10vh; padding: 5px 5vw; }
 }
 
 /* --- PORTRAIT ENFORCEMENT --- */
@@ -198,7 +188,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000; /* Increased to stay above Nav */
 }
 
 .modal-content {
@@ -214,27 +204,8 @@ header {
     box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
 }
 
-/* --- REPORT TERMINAL --- */
-#report-text-area {
-    flex-grow: 1;
-    background: #000000 !important;
-    color: var(--cyber-cyan) !important;
-    font-family: 'Courier New', monospace !important;
-    padding: 15px !important;
-    border: 1px solid var(--cyber-cyan) !important;
-    font-size: clamp(0.8rem, 1.5vh, 1.1rem);
-    line-height: 1.3;
-    overflow-y: auto;
-    white-space: pre;
-    margin-bottom: 15px;
-}
-
 /* --- BUTTONS & NAV --- */
-.menu-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+.menu-grid { display: flex; flex-direction: column; gap: 15px; }
 
 .menu-btn {
     width: 100%;
@@ -256,37 +227,37 @@ header {
     box-shadow: 0 0 20px var(--neon-magenta);
 }
 
-/* --- UPDATED BOTTOM NAV --- */
+/* --- UPDATED BOTTOM NAV FIX --- */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
     padding: 15px;
     font-size: 1.5rem;
+    background: var(--bg-black);
     position: relative;
-    overflow: visible !important; /* Critical for showing tooltips above */
+    overflow: visible !important; 
+    z-index: 10; /* Keeps it above ticker but below modals */
 }
 
-/* --- UPDATED TOOLTIP LOGIC --- */
-
 .nav-icon {
-    position: relative; /* Anchor for the tooltip */
+    position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-block;
+    pointer-events: auto !important; /* Forces clickability */
 }
 
-/* Style the icon itself on hover */
 .nav-icon:hover {
     color: var(--cyber-cyan) !important;
     transform: scale(1.4);
     text-shadow: 0 0 15px var(--cyber-cyan);
 }
 
-/* Show the tooltip box ONLY if the icon has the data-tooltip attribute */
+/* Tooltip Logic */
 .nav-icon[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 150%; /* Position higher above icon */
+    bottom: 150%;
     left: 50%;
     transform: translateX(-50%);
     background: var(--dark-grey);
@@ -300,6 +271,9 @@ header {
     box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
     pointer-events: none;
     z-index: 9999;
-    visibility: visible;
-    opacity: 1;
+}
+
+/* Hides any old floating buttons that might block the Nav */
+#view-progress-btn:not(.nav-icon) {
+    display: none !important;
 }
