@@ -256,44 +256,50 @@ header {
     box-shadow: 0 0 20px var(--neon-magenta);
 }
 
+/* --- UPDATED BOTTOM NAV --- */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
     padding: 15px;
     font-size: 1.5rem;
+    position: relative;
+    overflow: visible !important; /* Critical for showing tooltips above */
 }
 
-/* --- SHARED NAV ICON TOOLTIPS & HOVERS --- */
+/* --- UPDATED TOOLTIP LOGIC --- */
 
 .nav-icon {
-    position: relative;
+    position: relative; /* Anchor for the tooltip */
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-block;
 }
 
-/* Glow and Scale effect for any nav icon on hover */
+/* Style the icon itself on hover */
 .nav-icon:hover {
     color: var(--cyber-cyan) !important;
     transform: scale(1.4);
     text-shadow: 0 0 15px var(--cyber-cyan);
 }
 
-/* Tooltip creation logic */
-.nav-icon:hover::after {
-    content: attr(data-tooltip); /* Grabs text from index.html */
+/* Show the tooltip box ONLY if the icon has the data-tooltip attribute */
+.nav-icon[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
     position: absolute;
-    bottom: 130%; /* Sit above the icon */
+    bottom: 150%; /* Position higher above icon */
     left: 50%;
     transform: translateX(-50%);
     background: var(--dark-grey);
     color: white;
-    font-size: 0.65rem;
-    padding: 5px 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 6px 12px;
     border: 1px solid var(--cyber-cyan);
-    border-radius: 4px;
+    border-radius: 5px;
     white-space: nowrap;
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
     pointer-events: none;
-    z-index: 999;
+    z-index: 9999;
+    visibility: visible;
+    opacity: 1;
 }
