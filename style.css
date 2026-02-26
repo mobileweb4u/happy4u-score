@@ -263,37 +263,37 @@ header {
     font-size: 1.5rem;
 }
 
-/* --- NEW STAR ICON HOVER & TOOLTIP (Section Added) --- */
+/* --- SHARED NAV ICON TOOLTIPS & HOVERS --- */
 
-#view-progress-btn {
+.nav-icon {
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-block;
-    color: var(--neon-green);
 }
 
-/* The Glow Effect */
-#view-progress-btn:hover {
-    color: var(--cyber-cyan);
+/* Glow and Scale effect for any nav icon on hover */
+.nav-icon:hover {
+    color: var(--cyber-cyan) !important;
     transform: scale(1.4);
     text-shadow: 0 0 15px var(--cyber-cyan);
 }
 
-/* The Tooltip Box */
-#view-progress-btn:hover::after {
-    content: attr(data-tooltip);
+/* Tooltip creation logic */
+.nav-icon:hover::after {
+    content: attr(data-tooltip); /* Grabs text from index.html */
     position: absolute;
-    bottom: 120%; /* Sits above the star */
+    bottom: 130%; /* Sit above the icon */
     left: 50%;
     transform: translateX(-50%);
     background: var(--dark-grey);
     color: white;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     padding: 5px 10px;
     border: 1px solid var(--cyber-cyan);
     border-radius: 4px;
     white-space: nowrap;
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
-    z-index: 100;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+    pointer-events: none;
+    z-index: 999;
 }
