@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v2.4.1 ---
+// --- SERVICE WORKER MASTER VERSION v2.4.2 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v2.4.1'; // BUMPED VERSION TO FORCE UPDATE
+const CACHE_NAME = 'happy4u-v2.4.2'; // BUMPED VERSION TO FORCE UPDATE
 
 const ASSETS = [
   './',
