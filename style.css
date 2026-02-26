@@ -160,7 +160,7 @@ header {
     }
 
     .score-display {
-        font-size: clamp(4rem, 25vh, 10rem); /* Optimized for horizontal space */
+        font-size: clamp(4rem, 25vh, 10rem);
     }
 
     header {
@@ -169,7 +169,7 @@ header {
     }
 }
 
-/* --- PORTRAIT ENFORCEMENT (The "Please Rotate" Screen) --- */
+/* --- PORTRAIT ENFORCEMENT --- */
 @media screen and (orientation: portrait) {
     body::after {
         content: "PLEASE ROTATE YOUR DEVICE TO LANDSCAPE MODE";
@@ -212,7 +212,6 @@ header {
     flex-direction: column;
     max-height: 90vh;
     box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
-    transform: scale(1.1); /* Slight boost for readability */
 }
 
 /* --- REPORT TERMINAL --- */
@@ -262,4 +261,39 @@ header {
     justify-content: space-around;
     padding: 15px;
     font-size: 1.5rem;
+}
+
+/* --- NEW STAR ICON HOVER & TOOLTIP (Section Added) --- */
+
+#view-progress-btn {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    color: var(--neon-green);
+}
+
+/* The Glow Effect */
+#view-progress-btn:hover {
+    color: var(--cyber-cyan);
+    transform: scale(1.4);
+    text-shadow: 0 0 15px var(--cyber-cyan);
+}
+
+/* The Tooltip Box */
+#view-progress-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%; /* Sits above the star */
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-grey);
+    color: white;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    border: 1px solid var(--cyber-cyan);
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+    z-index: 100;
 }
