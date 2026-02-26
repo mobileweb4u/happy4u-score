@@ -1,0 +1,12 @@
+{
+  "name": "happy4u-score",
+  "version": "2.4.0",
+  "description": "Happy4U Scoreboard application for tracking matches and frame wins.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "mobileweb4u",
+  "license": "ISC"
+}
