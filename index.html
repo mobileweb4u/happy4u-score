@@ -116,24 +116,23 @@ color: white;
     background-color: #000;
     border-top: 1px solid #333;
     border-bottom: 1px solid #333;
-    height: 35px; /* Slightly taller for bigger text */
+    height: 40px; 
     display: flex;
     align-items: center;
 }
 
 .ticker {
-    font-size: 1.1rem; /* INCREASED SIZE */
+    font-size: 1.1rem; 
     font-weight: 500;
     color: #fff;
     white-space: nowrap;
-    line-height: 35px;
+    line-height: 40px;
 }
 
 .ticker-highlight {
     color: var(--neon-green);
     font-weight: bold;
 }
-/* --- END TICKER UPDATE --- */
 
 </style>
 </head>
@@ -247,12 +246,16 @@ RACE TO 3 IN PROGRESS...
 
 <p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Created by Freddie Russell</p>
 
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<button id="update-app-btn" class="menu-btn" style="border-color: var(--neon-green); color: var(--neon-green);">
-<i class="fas fa-sync-alt"></i> CHECK FOR UPDATES
-</button>
-<button id="close-about-btn" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">CLOSE</button>
+<div style="display: flex; gap: 10px; width: 100%;">
+    <button id="update-app-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">
+        <i class="fas fa-sync-alt"></i> UPDATES
+    </button>
+    <button id="pwa-install-trigger" class="menu-btn" style="flex: 1; display: none; border-color: #00f2ff; color: #00f2ff;">
+        <i class="fas fa-download"></i> INSTALL PWA
+    </button>
 </div>
+
+<button id="close-about-btn" class="menu-btn" style="margin-top: 10px; width: 100%; border-color: #ff4444; color: #ff4444;">CLOSE</button>
 </div>
 </div>
 
@@ -351,5 +354,30 @@ RACE TO 3 IN PROGRESS...
 </footer>
 
 <script src="script.js"></script>
+
+<script>
+    let deferredPrompt;
+    const pwaBtn = document.getElementById('pwa-install-trigger');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        pwaBtn.style.display = 'block'; // Only show button if installable
+    });
+
+    pwaBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') pwaBtn.style.display = 'none';
+            deferredPrompt = null;
+        }
+    });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log("HAPPY4U Offline Engine: Active"));
+    }
+</script>
 </body>
 </html>
