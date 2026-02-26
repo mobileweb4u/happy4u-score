@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v2.4.0 ---
+// --- SERVICE WORKER MASTER VERSION v2.4.1 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v2.4.0'; 
+const CACHE_NAME = 'happy4u-v2.4.1'; // BUMPED VERSION TO FORCE UPDATE
 
 const ASSETS = [
   './',
@@ -25,11 +25,10 @@ const ASSETS = [
 
 // 1. INSTALL: Pre-cache all files and force immediate takeover
 self.addEventListener('install', (event) => {
-  // Forces this new service worker to become the active one immediately
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("🛠️ PWA: Pre-caching v2.4.0 Assets");
+      console.log("🛠️ PWA: Pre-caching v2.4.1 Assets");
       return cache.addAll(ASSETS).catch(err => {
         console.error("❌ PWA: Asset caching failed", err);
       });
@@ -37,17 +36,15 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVATE: The "Uninstaller" - Deletes any cache that isn't v2.4.0
+// 2. ACTIVATE: Deletes old caches (v2.4.0) and takes control
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        // This logic searches for and destroys any old versions (v2.3.1, etc.)
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log("✅ PWA: v2.4.0 Activated and Old Caches Cleared");
-      // Ensures that the new version takes control of the website right now
+      console.log("✅ PWA: v2.4.1 Activated and Old Caches Cleared");
       return self.clients.claim();
     })
   );
@@ -57,7 +54,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Returns the cached version for speed, otherwise goes to the internet
       return cachedResponse || fetch(event.request);
     })
   );
