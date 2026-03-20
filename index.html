@@ -1,226 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HAPPY4U Scoreboard v3.5.0</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HAPPY4U Scoreboard v3.5.0</title>
 
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00ff44">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff44">
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
-        /* 3-BUTTON ROW LAYOUT */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
+<style>
+/* 3-BUTTON ROW LAYOUT */
+.menu-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+width: 100%;
+}
 
-        .menu-btn {
-            font-size: 0.7rem;
-            padding: 10px 2px;
-            text-align: center;
-            white-space: nowrap;
-        }
+.menu-btn {
+font-size: 0.7rem;
+padding: 10px 2px;
+text-align: center;
+white-space: nowrap;
+}
 
-        #close-info-btn {
-            grid-column: span 3;
-            margin-top: 20px;
-            background: none;
-            border: none;
-            color: gray;
-            cursor: pointer;
-        }
+/* Forces the Close button to occupy its own line at the bottom */
+#close-info-btn {
+grid-column: span 3;
+margin-top: 20px;
+background: none;
+border: none;
+color: gray;
+cursor: pointer;
+}
 
-        /* ROTATION WARNING */
-        #rotation-warning {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            color: #39FF14;
-            z-index: 99999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
+/* ROTATION WARNING ELEMENT */
+#rotation-warning {
+display: none;
+position: fixed;
+inset: 0;
+background: #000;
+color: #39FF14;
+z-index: 99999;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+padding: 20px;
+}
 
-        @media (orientation: portrait) {
-            #rotation-warning { display: flex; }
-        }
+@media (orientation: portrait) {
+#rotation-warning { display: flex; }
+}
 
-        .version-badge {
-            font-size: 0.75rem;
-            vertical-align: middle;
-            opacity: 0.9;
-            background: var(--neon-green);
-            color: #000; 
-            padding: 3px 6px;
-            border-radius: 3px;
-            margin-left: 8px;
-            font-weight: bold;
-            display: inline-block;
-        }
+/* Version Badge Styling */
+.version-badge {
+font-size: 0.75rem;
+vertical-align: middle;
+opacity: 0.9;
+background: var(--neon-green);
+color: #000; 
+padding: 3px 6px;
+border-radius: 3px;
+margin-left: 8px;
+transition: all 0.3s ease;
+font-weight: bold;
+display: inline-block;
+line-height: 1;
+}
 
-        /* TICKER STYLING */
-        .ticker-wrap {
-            width: 100%;
-            overflow: hidden;
-            background-color: #000 !important;
-            border-top: 1px solid #333;
-            border-bottom: 1px solid #333;
-            height: 48px !important;
-            display: flex;
-            align-items: center;
-        }
+@keyframes pulse-green {
+0% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0.7); }
+70% { box-shadow: 0 0 0 10px rgba(0, 255, 68, 0); }
+100% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0); }
+}
 
-        .ticker {
-            font-size: 1.3rem !important;
-            font-weight: 800 !important;
-            color: #00ff44 !important;
-            white-space: nowrap;
-            line-height: 48px;
-        }
+.update-success {
+animation: pulse-green 2s infinite;
+background-color: var(--neon-green) !important;
+color: #000 !important;
+font-weight: bold;
+}
 
-        .ticker span { color: #ff00ff !important; }
+.reset-storage-btn {
+background: none;
+border: 1px solid #ff4444;
+color: #ff4444;
+font-size: 0.6rem;
+padding: 2px 8px;
+border-radius: 4px;
+cursor: pointer;
+margin-left: 10px;
+transition: 0.3s;
+}
 
-        /* Setup Elements */
-        .setup-rules-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 15px 0;
-            color: var(--neon-green);
-            font-size: 0.9rem;
-            text-align: left;
-        }
+.reset-storage-btn:hover {
+background: #ff4444;
+color: white;
+}
 
-        .golden-break-row { display: none; }
+/* --- FIXED TICKER STYLING --- */
+.ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    background-color: #000 !important;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    height: 48px !important;
+    display: flex;
+    align-items: center;
+}
 
-        #undo-btn {
-            border: 2px solid #ffaa00 !important;
-            color: #ffaa00 !important;
-            margin-bottom: 10px;
-            background: #222;
-            padding: 12px;
-        }
-    </style>
+.ticker {
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    color: #00ff44 !important;
+    white-space: nowrap;
+    line-height: 48px;
+}
+
+.ticker span {
+    color: #ff00ff !important;
+    font-weight: bold;
+}
+
+.ticker-highlight {
+    color: #00ff44 !important;
+    font-weight: bold;
+}
+
+/* MODIFIED: Checkbox styling for Setup Screen */
+.setup-rules-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 15px 0;
+    color: var(--neon-green);
+    font-family: Arial, sans-serif;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+/* NEW: Logic for Golden Break Toggle Visibility */
+.golden-break-row {
+    display: none; /* Hidden by default - Script will show this if active */
+}
+
+/* UNDO BUTTON STYLING */
+#undo-btn {
+    border: 2px solid #ffaa00 !important;
+    color: #ffaa00 !important;
+    margin-bottom: 10px;
+    background: #222;
+    padding: 12px;
+}
+
+</style>
 </head>
 <body>
-    <div id="rotation-warning">
-        <i class="fas fa-sync-alt fa-3x" style="margin-bottom: 20px;"></i>
-        <h2>PLEASE ROTATE DEVICE</h2>
-        <p>Landscape mode is required.</p>
-    </div>
+<div id="rotation-warning">
+<i class="fas fa-sync-alt fa-3x" style="margin-bottom: 20px;"></i>
+<h2>PLEASE ROTATE DEVICE</h2>
+<p>Landscape mode is required for the scoreboard.</p>
+</div>
 
-    <header>
-        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v3.5.0</span></h1>
-        <h1 class="title" id="main-title">Race To <span id="race-goal-display" style="color: var(--neon-green);">3</span></h1>
-        <button id="end-game-btn" class="end-game">END GAME</button>
-    </header>
+<header>
+<h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v3.5.0</span></h1>
+<h1 class="title" id="main-title">Race To <span id="race-goal-display" style="color: var(--neon-green);">3</span></h1>
+<button id="end-game-btn" class="end-game">END GAME</button>
+</header>
 
-    <div class="ticker-wrap">
-        <div class="ticker" id="news-ticker">
-            <span>NEWS FLASH:</span> MATCH STARTING...
+<div class="ticker-wrap">
+<div class="ticker" id="news-ticker">
+<span>NEWS FLASH:</span> MATCH STARTING...
+&nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;
+RACE TO 3 IN PROGRESS...
+</div>
+</div>
+
+<main class="scoreboard">
+<section class="player-column" id="p1-section">
+<h2 class="player-name">
+<span id="p1-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-right: 10px;">★ BREAK</span>
+<span id="p1-name-display">Player 1</span>
+</h2>
+<div class="match-wins">Races Won: <span id="p1-matches">0</span></div>
+<div class="score-box" id="p1-box">
+<div class="score-display" id="p1-score">0</div>
+</div>
+<div class="dish-stats golden-break-row">Golden Break: <span id="p1-golden-breaks">0</span></div>
+<div class="dish-stats">Break Dishes: <span id="p1-dishes">0</span></div>
+<div class="dish-stats">Reverse Dishes: <span id="p1-rev-dishes">0</span></div>
+
+<div style="margin-top: 20px;">
+<button class="btn-plus" data-player="p1">WIN FRAME</button>
+</div>
+</section>
+
+<section class="player-column" id="p2-section">
+<h2 class="player-name">
+<span id="p2-name-display">Player 2</span>
+<span id="p2-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-left: 10px;">★ BREAK</span>
+</h2>
+<div class="match-wins">Races Won: <span id="p2-matches">0</span></div>
+<div class="score-box" id="p2-box">
+<div class="score-display" id="p2-score">0</div>
+</div>
+<div class="dish-stats golden-break-row">Golden Break: <span id="p2-golden-breaks">0</span></div>
+<div class="dish-stats">Break Dishes: <span id="p2-dishes">0</span></div>
+<div class="dish-stats">Reverse Dishes: <span id="p2-rev-dishes">0</span></div>
+<div style="margin-top: 20px;">
+<button class="btn-plus" data-player="p2">WIN FRAME</button>
+</div>
+</section>
+</main>
+
+<div id="progress-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="width: 95%; max-width: 600px;">
+        <h2 style="color: var(--neon-green); margin-bottom: 15px;">VIEW PROGRESS</h2>
+        <pre id="progress-log-area" style="background: #000; color: #00ff44; padding: 15px; border-radius: 5px; text-align: left; font-family: monospace; overflow-x: auto; font-size: 0.7rem; border: 1px solid #333; line-height: 1.2;"></pre>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="copy-progress-btn" class="menu-btn" style="flex: 1;">COPY LOG</button>
+            <button id="close-progress-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;">CLOSE</button>
         </div>
     </div>
+</div>
 
-    <main class="scoreboard">
-        <section class="player-column" id="p1-section">
-            <h2 class="player-name">
-                <span id="p1-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-right: 10px;">★ BREAK</span>
-                <span id="p1-name-display">Player 1</span>
-            </h2>
-            <div class="match-wins">Races Won: <span id="p1-matches">0</span></div>
-            <div class="score-box"><div class="score-display" id="p1-score">0</div></div>
-            <div class="dish-stats golden-break-row">Golden Break: <span id="p1-golden-breaks">0</span></div>
-            <div class="dish-stats">Break Dishes: <span id="p1-dishes">0</span></div>
-            <div class="dish-stats">Reverse Dishes: <span id="p1-rev-dishes">0</span></div>
-            <div style="margin-top: 20px;"><button class="btn-plus" data-player="p1">WIN FRAME</button></div>
-        </section>
+<div id="setup-modal" class="modal-overlay">
+<div class="modal-content">
+<h2>MATCH SETUP</h2>
+<div class="input-group" style="margin-bottom: 15px;">
+<label>PLAYER 1 NAME</label>
+<input type="text" id="p1-input" placeholder="Enter Name">
+</div>
+<div class="input-group" style="margin-bottom: 15px;">
+<label>PLAYER 2 NAME</label>
+<input type="text" id="p2-input" placeholder="Enter Name">
+</div>
+<div class="input-group" style="margin-bottom: 20px;">
+<label>RACE TO</label>
+<input type="number" id="race-input" value="3">
+</div>
+<div class="setup-rules-container">
+    <label><input type="checkbox" id="leagueMode"> League Match (Race to 12)</label>
+    <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
+</div>
+<div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
+<button id="save-setup-btn" class="menu-btn" style="flex: 1;">SAVE & START</button>
+<button id="exit-setup-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;">EXIT</button>
+</div>
+</div>
+</div>
 
-        <section class="player-column" id="p2-section">
-            <h2 class="player-name">
-                <span id="p2-name-display">Player 2</span>
-                <span id="p2-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-left: 10px;">★ BREAK</span>
-            </h2>
-            <div class="match-wins">Races Won: <span id="p2-matches">0</span></div>
-            <div class="score-box"><div class="score-display" id="p2-score">0</div></div>
-            <div class="dish-stats golden-break-row">Golden Break: <span id="p2-golden-breaks">0</span></div>
-            <div class="dish-stats">Break Dishes: <span id="p2-dishes">0</span></div>
-            <div class="dish-stats">Reverse Dishes: <span id="p2-rev-dishes">0</span></div>
-            <div style="margin-top: 20px;"><button class="btn-plus" data-player="p2">WIN FRAME</button></div>
-        </section>
-    </main>
+<div id="info-modal" class="modal-overlay" style="display:none;">
+<div class="modal-content info-menu">
+<h2 style="color: var(--neon-magenta); margin-bottom: 20px;">MAIN MENU</h2>
+<div class="menu-grid">
+<button class="menu-btn">GAME MODE</button>
+<button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
+<button class="menu-btn" id="open-history-btn">SUMMARY</button>
+<button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
+<button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
+<button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
+<button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button>
+<button class="menu-btn">SHOT CLOCK</button>
+<button class="menu-btn" id="open-about-btn">ABOUT</button>
+<button id="close-info-btn">CLOSE</button>
+</div>
+</div>
+</div>
 
-    <div id="setup-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2>MATCH SETUP</h2>
-            <div class="input-group"><label>PLAYER 1</label><input type="text" id="p1-input"></div>
-            <div class="input-group"><label>PLAYER 2</label><input type="text" id="p2-input"></div>
-            <div class="input-group"><label>RACE TO</label><input type="number" id="race-input" value="3"></div>
-            <div class="setup-rules-container">
-                <label><input type="checkbox" id="leagueMode"> League Match (Race to 12)</label>
-                <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
-            </div>
-            <div style="display: flex; gap: 10px;"><button id="save-setup-btn" class="menu-btn" style="flex:1">START</button><button id="exit-setup-btn" class="menu-btn" style="flex:1">EXIT</button></div>
+<div id="about-modal" class="modal-overlay" style="display:none;">
+<div class="modal-content">
+<h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">3.5.0</span></p>
+<div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
+<span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
+<button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
+</div>
+<p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Created by Freddie Russell</p>
+<div style="display: flex; gap: 10px; width: 100%;">
+    <button id="update-app-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">
+        <i class="fas fa-sync-alt"></i> UPDATES
+    </button>
+    <button id="pwa-install-trigger" class="menu-btn" style="flex: 1; display: none; border-color: #00f2ff; color: #00f2ff;">
+        <i class="fas fa-download"></i> INSTALL PWA
+    </button>
+</div>
+<button id="close-about-btn" class="menu-btn" style="margin-top: 10px; width: 100%; border-color: #ff4444; color: #ff4444;">CLOSE</button>
+</div>
+</div>
+
+<div id="qr-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="text-align: center;"><h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2><div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"><img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;"></div><p style="color: #888; margin-top: 15px; font-size: 0.8rem;">Point opponent's camera at this code</p><button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button></div></div>
+<div id="lag-modal" class="modal-overlay" style="display:none;"><div class="modal-content"><h2>WHO WON THE LAG?</h2><div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;"><button id="lag-p1-btn" class="menu-btn">P1</button><button id="lag-p2-btn" class="menu-btn">P2</button></div></div></div>
+
+<div id="dish-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2 id="dish-modal-title">DID YOU DISH?</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            <button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button>
+            <button class="dish-option menu-btn" data-type="break-dish">★ BREAK & DISH</button>
+            <button class="dish-option menu-btn" data-type="reverse-dish" style="background: transparent; border: 1px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button>
+            <button class="dish-option menu-btn" data-type="normal" style="background: #333; color: white;">NORMAL WIN</button>
+            <button id="cancel-dish-btn" style="background:none; border:none; color: gray; cursor:pointer; margin-top: 10px;">CANCEL</button>
         </div>
     </div>
+</div>
 
-    <div id="info-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content info-menu">
-            <h2 style="color: var(--neon-magenta);">MAIN MENU</h2>
-            <div class="menu-grid">
-                <button class="menu-btn" id="open-setup-from-menu">SETUP</button>
-                <button class="menu-btn" id="open-history-btn">SUMMARY</button>
-                <button class="menu-btn" id="open-drills-btn">DRILLS</button>
-                <button class="menu-btn" id="open-qr-btn">QR SYNC</button>
-                <button class="menu-btn" id="open-about-btn">ABOUT</button>
-                <button id="close-info-btn">CLOSE</button>
-            </div>
+<div id="winner-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 600px;"><h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2><div style="display: flex; flex-direction: column; gap: 15px;"><div style="display: flex; gap: 10px; width: 100%;"><button id="again-race-btn" class="menu-btn" style="flex: 1; font-size: 0.8rem;">AGAIN RACE</button><button class="end-game menu-btn" style="flex: 1; background: #ff4444; font-size: 0.8rem;">END MATCH</button><button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green); font-size: 0.8rem;">NEW RACE</button></div><div style="display: flex; gap: 10px; width: 100%;"><button id="save-match-btn" class="menu-btn" style="flex: 1; background: #222; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button><button id="view-report-btn" class="menu-btn" style="flex: 1; background: #111; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button></div></div></div></div>
+
+<div id="report-view-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="width: 90%; max-width: 900px;">
+        <h2 style="color: gold; margin-bottom: 15px;">MATCH REPORT PREVIEW</h2>
+        <pre id="report-text-area"></pre>
+        <div class="menu-grid" style="margin-top: 20px; grid-template-columns: repeat(4, 1fr);">
+            <button id="copy-report-btn" class="menu-btn">📋 COPY</button>
+            <button id="reset-history-btn" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">⚠️ RESET</button>
+            <button id="again-race-report-btn" class="menu-btn">AGAIN RACE</button>
+            <button id="close-report-view" class="menu-btn">CLOSE</button>
         </div>
     </div>
+</div>
 
-    <div id="dish-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content">
-            <h2>DID YOU DISH?</h2>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button>
-                <button class="dish-option menu-btn" data-type="break-dish">★ BREAK & DISH</button>
-                <button class="dish-option menu-btn" data-type="reverse-dish">REVERSE DISH</button>
-                <button class="dish-option menu-btn" data-type="normal">NORMAL WIN</button>
-                <button id="cancel-dish-btn">CANCEL</button>
-            </div>
+<div id="drill-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 800px;"><h2 style="color: var(--neon-green); margin-bottom: 10px;">PRACTICE DRILLS</h2><div id="drill-container" style="background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333;"><img id="drill-display" src="" alt="Drill Image" style="width: 100%; height: auto; max-height: 55vh; object-fit: contain; border: 1px solid var(--neon-green);"><p id="drill-name" style="margin-top: 10px; font-weight: bold; color: #00f2ff; letter-spacing: 2px;"></p></div><div class="menu-grid" style="margin-top: 15px;"><button id="prev-drill" class="menu-btn">⬅ PREV</button><button id="next-drill" class="menu-btn">NEXT ➡</button><button id="close-drills" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">CLOSE</button></div></div></div>
+
+<div id="history-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content info-menu">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">MATCH SUMMARY</h2>
+        <div id="history-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 20px;">
+            <p style="color: #666;">No frames played yet.</p>
         </div>
+        <button id="undo-btn" class="menu-btn" style="width: 100%; font-weight: bold;">↩ UNDO LAST FRAME</button>
+        <button id="close-history-btn" class="menu-btn" style="width: 100%; border-color: #444; margin-top: 5px;">BACK TO MENU</button>
     </div>
+</div>
 
-    <div id="history-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content">
-            <h2>SUMMARY</h2>
-            <div id="history-list"></div>
-            <button id="undo-btn" class="menu-btn">UNDO LAST</button>
-            <button id="close-history-btn" class="menu-btn">CLOSE</button>
-        </div>
-    </div>
+<footer class="bottom-nav">
+<span class="nav-icon">🏠</span>
+<span class="nav-icon info-icon">ⓘ</span>
+<span class="nav-icon star-icon" id="view-progress-btn">★</span>
+<span class="nav-icon">👤</span>
+</footer>
 
-    <footer class="bottom-nav">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-icon info-icon">ⓘ</span>
-        <span class="nav-icon star-icon">★</span>
-        <span class="nav-icon">👤</span>
-    </footer>
+<script src="script.js"></script>
 
-    <script src="script.js"></script>
+<script>
+    let deferredPrompt;
+    const pwaBtn = document.getElementById('pwa-install-trigger');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        pwaBtn.style.display = 'block'; 
+    });
+
+    pwaBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') pwaBtn.style.display = 'none';
+            deferredPrompt = null;
+        }
+    });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log("HAPPY4U Offline Engine: Active"));
+    }
+</script>
 </body>
 </html>
