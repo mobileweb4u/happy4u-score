@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v3.5.0 ---
+// --- SERVICE WORKER MASTER VERSION v3.6.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v3.5.0';
+const CACHE_NAME = 'happy4u-v3.6.0';
 
 const ASSETS = [
   'index.html',
@@ -27,8 +27,8 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("🛠️ PWA: Pre-caching v3.5.0 Assets");
-      // Using map to catch individual file errors so one missing file doesn't kill the install
+      // UPDATED LOG MESSAGE TO v3.6.0
+      console.log("🛠️ PWA: Pre-caching v3.6.0 Assets");
       return Promise.all(
         ASSETS.map(url => {
           return cache.add(url).catch(err => console.error(`❌ Failed to cache: ${url}`, err));
@@ -46,7 +46,8 @@ self.addEventListener('activate', (event) => {
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log("✅ PWA: v3.5.0 Activated");
+      // UPDATED LOG MESSAGE TO v3.6.0
+      console.log("✅ PWA: v3.6.0 Activated");
       return self.clients.claim();
     })
   );
