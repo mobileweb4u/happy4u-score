@@ -2,11 +2,12 @@
   "name": "HAPPY4U Pool Scoreboard",
   "short_name": "HAPPY4U",
   "description": "Professional Pool & Practice Drills",
-  "start_url": "./index.html",
+  "id": "/happy4u-score/",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#00ff44",
-  "orientation": "any",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "icon-192.png",
