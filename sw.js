@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v3.6.0 ---
+// --- SERVICE WORKER MASTER VERSION v3.6.1 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v3.6.0';
+const CACHE_NAME = 'happy4u-v3.6.1';
 
 const ASSETS = [
   'index.html',
