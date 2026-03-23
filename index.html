@@ -77,12 +77,6 @@ display: inline-block;
 line-height: 1;
 }
 
-@keyframes pulse-green {
-0% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0.7); }
-70% { box-shadow: 0 0 0 10px rgba(0, 255, 68, 0); }
-100% { box-shadow: 0 0 0 0 rgba(0, 255, 68, 0); }
-}
-
 .update-success {
 animation: pulse-green 2s infinite;
 background-color: var(--neon-green) !important;
@@ -182,6 +176,28 @@ color: white;
     padding: 12px;
 }
 
+/* NEW: PWA INSTALL BUTTON STYLING */
+.pwa-install-main {
+    display: none; /* Hidden until browser gives prompt */
+    background-color: #00ff44;
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 15px; /* Space between install and end game */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
 </style>
 </head>
 <body>
@@ -194,7 +210,13 @@ color: white;
 <header>
 <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v3.5.0</span></h1>
 <h1 class="title" id="main-title">Race To <span id="race-goal-display" style="color: var(--neon-green);">3</span></h1>
-<button id="end-game-btn" class="end-game">END GAME</button>
+
+<div style="display: flex; align-items: center;">
+    <button id="main-pwa-install-btn" class="pwa-install-main">
+        <i class="fas fa-download"></i> INSTALL PWA
+    </button>
+    <button id="end-game-btn" class="end-game">END GAME</button>
+</div>
 </header>
 
 <div class="ticker-wrap">
@@ -373,26 +395,65 @@ RACE TO 3 IN PROGRESS...
 
 <script>
     let deferredPrompt;
-    const pwaBtn = document.getElementById('pwa-install-trigger');
+    
+    // Select all potential install buttons (the one in header and any others you have)
+    const mainInstallBtn = document.getElementById('main-pwa-install-btn');
+    const menuInstallBtn = document.getElementById('install-pwa-btn'); // From your original code
+    const aboutInstallBtn = document.getElementById('pwa-install-trigger'); // From your original code
 
     window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
+        // Stash the event so it can be triggered later.
         deferredPrompt = e;
-        pwaBtn.style.display = 'block'; 
+        
+        // Show the buttons now that we know the PWA can be installed
+        if (mainInstallBtn) mainInstallBtn.style.display = 'block';
+        if (menuInstallBtn) menuInstallBtn.style.display = 'block';
+        if (aboutInstallBtn) aboutInstallBtn.style.display = 'block';
     });
 
-    pwaBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') pwaBtn.style.display = 'none';
-            deferredPrompt = null;
+    // Helper function to handle the click logic
+    async function handleInstallClick() {
+        if (!deferredPrompt) return;
+        
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        
+        if (outcome === 'accepted') {
+            // Hide all install buttons if user accepted
+            [mainInstallBtn, menuInstallBtn, aboutInstallBtn].forEach(btn => {
+                if(btn) btn.style.display = 'none';
+            });
         }
+        deferredPrompt = null;
+    }
+
+    // Attach listeners
+    if (mainInstallBtn) mainInstallBtn.addEventListener('click', handleInstallClick);
+    if (menuInstallBtn) menuInstallBtn.addEventListener('click', handleInstallClick);
+    if (aboutInstallBtn) aboutInstallBtn.addEventListener('click', handleInstallClick);
+
+    // Hide everything if already installed
+    window.addEventListener('appinstalled', () => {
+        [mainInstallBtn, menuInstallBtn, aboutInstallBtn].forEach(btn => {
+            if(btn) btn.style.display = 'none';
+        });
+        deferredPrompt = null;
+        console.log('PWA was installed');
     });
 
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log("HAPPY4U Offline Engine: Active"));
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js') // Using 'sw.js' as per your original script
+              .then(() => console.log("HAPPY4U Offline Engine: Active"))
+              .catch(err => console.log("Service Worker Registration Failed", err));
+        });
     }
 </script>
 </body>
