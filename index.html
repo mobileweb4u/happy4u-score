@@ -137,6 +137,25 @@ color: white;
     font-weight: bold;
 }
 
+/* PROFESSIONAL UPDATED: Dish Modal Option Styling */
+.dish-option {
+    font-size: 1.8rem !important; 
+    font-weight: 900 !important;
+    padding: 20px !important;
+    margin-bottom: 12px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#dish-modal-title {
+    font-size: 2rem;
+    color: var(--neon-magenta);
+    text-align: center;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
 /* MODIFIED: Checkbox styling for Setup Screen */
 .setup-rules-container {
     display: flex;
@@ -305,10 +324,10 @@ RACE TO 3 IN PROGRESS...
 <div id="dish-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
         <h2 id="dish-modal-title">DID YOU DISH?</h2>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
             <button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button>
-            <button class="dish-option menu-btn" data-type="break-dish">★ BREAK & DISH</button>
-            <button class="dish-option menu-btn" data-type="reverse-dish" style="background: transparent; border: 1px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button>
+            <button class="dish-option menu-btn" data-type="break-dish" style="border-color: var(--neon-green); color: var(--neon-green);">★ BREAK & DISH</button>
+            <button class="dish-option menu-btn" data-type="reverse-dish" style="background: transparent; border: 2px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button>
             <button class="dish-option menu-btn" data-type="normal" style="background: #333; color: white;">NORMAL WIN</button>
             <button id="cancel-dish-btn" style="background:none; border:none; color: gray; cursor:pointer; margin-top: 10px;">CANCEL</button>
         </div>
