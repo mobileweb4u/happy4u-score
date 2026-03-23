@@ -1,42 +1,44 @@
 // ==========================================
 // --- SERVICE WORKER MASTER VERSION v3.5.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v3.5.0'; // BUMPED VERSION TO FORCE UPDATE
+const CACHE_NAME = 'happy4u-v3.5.0';
 
 const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  './favicon.png',
-  './icon-192.png',
-  './icon-512.png',
-  './Drill/drill1.png',
-  './Drill/drill2.png',
-  './Drill/drill3.png',
-  './Drill/drill4.png',
-  './Drill/drill5.png',
-  './Drill/drill6.png',
-  './Drill/drill7.png',
-  './Drill/drill8.png',
-  './Drill/drill9.png'
+  'index.html',
+  'style.css',
+  'script.js',
+  'manifest.json',
+  'favicon.png',
+  'icon-192.png',
+  'icon-512.png',
+  'Drill/drill1.png',
+  'Drill/drill2.png',
+  'Drill/drill3.png',
+  'Drill/drill4.png',
+  'Drill/drill5.png',
+  'Drill/drill6.png',
+  'Drill/drill7.png',
+  'Drill/drill8.png',
+  'Drill/drill9.png'
 ];
 
-// 1. INSTALL: Pre-cache all files and force immediate takeover
+// 1. INSTALL: Resilient Pre-caching
 self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("🛠️ PWA: Pre-caching v3.5.0 Assets");
-      return cache.addAll(ASSETS).catch(err => {
-        console.error("❌ PWA: Asset caching failed", err);
-      });
+      // Using map to catch individual file errors so one missing file doesn't kill the install
+      return Promise.all(
+        ASSETS.map(url => {
+          return cache.add(url).catch(err => console.error(`❌ Failed to cache: ${url}`, err));
+        })
+      );
     })
   );
 });
 
-// 2. ACTIVATE: Deletes old caches (v3.5.0) and takes control
+// 2. ACTIVATE: Cleanup
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -44,17 +46,17 @@ self.addEventListener('activate', (event) => {
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log("✅ PWA: v3.5.0 Activated and Old Caches Cleared");
+      console.log("✅ PWA: v3.5.0 Activated");
       return self.clients.claim();
     })
   );
 });
 
-// 3. FETCH: Standard Cache-First Strategy
+// 3. FETCH: Network-First (Best for scoreboards to stay live)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
