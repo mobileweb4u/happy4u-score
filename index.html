@@ -300,7 +300,7 @@ RACE TO 3 IN PROGRESS...
 <div id="about-modal" class="modal-overlay" style="display:none;">
 <div class="modal-content">
 <h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
-<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">3.5.0</span></p>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">3.6.0</span></p>
 <div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
 <span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
 <button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
@@ -318,50 +318,6 @@ RACE TO 3 IN PROGRESS...
 </div>
 </div>
 
-<div id="qr-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="text-align: center;"><h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2><div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"><img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;"></div><p style="color: #888; margin-top: 15px; font-size: 0.8rem;">Point opponent's camera at this code</p><button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button></div></div>
-<div id="lag-modal" class="modal-overlay" style="display:none;"><div class="modal-content"><h2>WHO WON THE LAG?</h2><div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;"><button id="lag-p1-btn" class="menu-btn">P1</button><button id="lag-p2-btn" class="menu-btn">P2</button></div></div></div>
-
-<div id="dish-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <h2 id="dish-modal-title">DID YOU DISH?</h2>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button>
-            <button class="dish-option menu-btn" data-type="break-dish" style="border-color: var(--neon-green); color: var(--neon-green);">★ BREAK & DISH</button>
-            <button class="dish-option menu-btn" data-type="reverse-dish" style="background: transparent; border: 2px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button>
-            <button class="dish-option menu-btn" data-type="normal" style="background: #333; color: white;">NORMAL WIN</button>
-            <button id="cancel-dish-btn" style="background:none; border:none; color: gray; cursor:pointer; margin-top: 10px;">CANCEL</button>
-        </div>
-    </div>
-</div>
-
-<div id="winner-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 600px;"><h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2><div style="display: flex; flex-direction: column; gap: 15px;"><div style="display: flex; gap: 10px; width: 100%;"><button id="again-race-btn" class="menu-btn" style="flex: 1; font-size: 0.8rem;">AGAIN RACE</button><button class="end-game menu-btn" style="flex: 1; background: #ff4444; font-size: 0.8rem;">END MATCH</button><button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green); font-size: 0.8rem;">NEW RACE</button></div><div style="display: flex; gap: 10px; width: 100%;"><button id="save-match-btn" class="menu-btn" style="flex: 1; background: #222; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button><button id="view-report-btn" class="menu-btn" style="flex: 1; background: #111; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button></div></div></div></div>
-
-<div id="report-view-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content" style="width: 90%; max-width: 900px;">
-        <h2 style="color: gold; margin-bottom: 15px;">MATCH REPORT PREVIEW</h2>
-        <pre id="report-text-area"></pre>
-        <div class="menu-grid" style="margin-top: 20px; grid-template-columns: repeat(4, 1fr);">
-            <button id="copy-report-btn" class="menu-btn">📋 COPY</button>
-            <button id="reset-history-btn" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">⚠️ RESET</button>
-            <button id="again-race-report-btn" class="menu-btn">AGAIN RACE</button>
-            <button id="close-report-view" class="menu-btn">CLOSE</button>
-        </div>
-    </div>
-</div>
-
-<div id="drill-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 800px;"><h2 style="color: var(--neon-green); margin-bottom: 10px;">PRACTICE DRILLS</h2><div id="drill-container" style="background: #111; padding: 10px; border-radius: 10px; border: 1px solid #333;"><img id="drill-display" src="" alt="Drill Image" style="width: 100%; height: auto; max-height: 55vh; object-fit: contain; border: 1px solid var(--neon-green);"><p id="drill-name" style="margin-top: 10px; font-weight: bold; color: #00f2ff; letter-spacing: 2px;"></p></div><div class="menu-grid" style="margin-top: 15px;"><button id="prev-drill" class="menu-btn">⬅ PREV</button><button id="next-drill" class="menu-btn">NEXT ➡</button><button id="close-drills" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">CLOSE</button></div></div></div>
-
-<div id="history-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content info-menu">
-        <h2 style="color: var(--neon-green); margin-bottom: 20px;">MATCH SUMMARY</h2>
-        <div id="history-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 20px;">
-            <p style="color: #666;">No frames played yet.</p>
-        </div>
-        <button id="undo-btn" class="menu-btn" style="width: 100%; font-weight: bold;">↩ UNDO LAST FRAME</button>
-        <button id="close-history-btn" class="menu-btn" style="width: 100%; border-color: #444; margin-top: 5px;">BACK TO MENU</button>
-    </div>
-</div>
-
 <footer class="bottom-nav">
 <span class="nav-icon">🏠</span>
 <span class="nav-icon info-icon">ⓘ</span>
@@ -375,25 +331,47 @@ RACE TO 3 IN PROGRESS...
     let deferredPrompt;
     const pwaBtn = document.getElementById('pwa-install-trigger');
 
+    // 1. MONITOR FOR UPDATES
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    // Check if new version is fully installed and control is available
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        if (confirm("New Version (v3.6.0) Found! Update now for latest features?")) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    // 2. HANDLE PWA INSTALLATION PROMPT
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        pwaBtn.style.display = 'block'; 
+        if(pwaBtn) pwaBtn.style.display = 'block'; 
+        console.log("✅ PWA Install Prompt Ready");
     });
 
-    pwaBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') pwaBtn.style.display = 'none';
-            deferredPrompt = null;
-        }
-    });
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log("HAPPY4U Offline Engine: Active"));
+    if(pwaBtn) {
+        pwaBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') pwaBtn.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
     }
+
+    window.addEventListener('appinstalled', () => {
+        alert("HAPPY4U Scoreboard Installed Successfully!");
+        if(pwaBtn) pwaBtn.style.display = 'none';
+        deferredPrompt = null;
+    });
 </script>
 </body>
 </html>
