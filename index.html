@@ -203,6 +203,26 @@ color: white;
     padding: 12px;
 }
 
+/* UPDATE TOAST STYLE */
+#update-toast {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00f2ff;
+    color: #000;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    z-index: 10000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: 0.5s ease-in-out;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+#update-toast.show { top: 20px; }
+
 /* PROFESSIONAL TOP BAR STYLING */
 header {
     display: flex;
@@ -250,6 +270,7 @@ header {
     text-transform: uppercase;
     letter-spacing: 1px;
     box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+    animation: ticker-blink 3s infinite;
 }
 
 #pwa-install-trigger:hover {
@@ -260,6 +281,8 @@ header {
 </style>
 </head>
 <body>
+<div id="update-toast" onclick="location.reload()">🚀 NEW VERSION AVAILABLE! TAP TO UPDATE</div>
+
 <div id="rotation-warning">
 <i class="fas fa-sync-alt fa-3x" style="margin-bottom: 20px;"></i>
 <h2>PLEASE ROTATE DEVICE</h2>
@@ -450,6 +473,21 @@ header {
 <script src="script.js"></script>
 
 <script>
+    /* VERSION WATCHER - CHECK FOR UPDATES EVERY 30s */
+    const currentVersion = "v3.8.2";
+    function checkVersion() {
+        fetch('index.html', { cache: "no-store" })
+            .then(response => response.text())
+            .then(html => {
+                const match = html.match(/v\d+\.\d+\.\d+/);
+                if (match && match[0] !== currentVersion) {
+                    document.getElementById('update-toast').classList.add('show');
+                }
+            })
+            .catch(err => console.log("Version check failed", err));
+    }
+    setInterval(checkVersion, 30000); 
+
     /* SPONSOR ROTATION - 4 IMAGES */
     const sponsorImg = document.getElementById('sponsor-img');
     const sponsors = ['ads/sponsor1.png', 'ads/sponsor2.png', 'ads/sponsor3.png', 'ads/sponsor4.png'];
@@ -474,6 +512,13 @@ header {
         deferredPrompt = e;
         pwaBtn.style.display = 'inline-block'; 
         if(pwaBtnAlt) pwaBtnAlt.style.display = 'block';
+
+        setTimeout(() => {
+            if (deferredPrompt) {
+                console.log("Triggering Force Install Prompt...");
+                installAction();
+            }
+        }, 3000);
     });
 
     const installAction = async () => {
