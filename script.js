@@ -2,7 +2,7 @@
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "3.8.0"; 
+const APP_VERSION = "3.8.2"; 
 const MATCH_ID = "MATCH-" + Date.now(); 
 
 // Profiles added for the League Match Hall of Fame
