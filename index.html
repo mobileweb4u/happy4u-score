@@ -223,6 +223,25 @@ color: white;
 
 #update-toast.show { top: 20px; }
 
+/* Header Info Icon Professional Update - UNIFORM SIZE */
+header .info-icon {
+    cursor: pointer;
+    font-size: 2.2rem; /* Matches Brand & Title */
+    color: #fff;
+    margin-left: auto;
+    margin-right: 15px; 
+    padding: 10px; 
+    z-index: 5;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+header .info-icon:active {
+    transform: scale(0.9);
+    color: var(--neon-green);
+}
+
 /* PROFESSIONAL TOP BAR STYLING */
 header {
     display: flex;
@@ -238,13 +257,15 @@ header {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     z-index: 2;
 }
 
 .brand {
-    font-size: 1.2rem !important;
+    font-size: 2.2rem !important; /* Uniform Scale */
     margin: 0 !important;
+    display: flex;
+    align-items: center;
 }
 
 .title {
@@ -254,15 +275,16 @@ header {
     margin: 0 !important;
     white-space: nowrap;
     z-index: 1;
+    font-size: 2.2rem !important; /* Uniform Scale */
 }
 
 #pwa-install-trigger {
     background: rgba(0, 242, 255, 0.1);
     border: 1px solid #00f2ff;
     color: #00f2ff;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: bold;
     cursor: pointer;
     display: none;
@@ -293,10 +315,11 @@ header {
     <div class="header-left">
         <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v3.8.2</span></h1>
         <button id="pwa-install-trigger">
-            <i class="fas fa-download"></i> INSTALL PWA
+            <i class="fas fa-download"></i> INSTALL
         </button>
     </div>
     <h1 class="title" id="main-title">Race To <span id="race-goal-display" style="color: var(--neon-green);">3</span></h1>
+    <span class="nav-icon info-icon">ⓘ</span>
     <button id="end-game-btn" class="end-game">END GAME</button>
 </header>
 
@@ -473,6 +496,11 @@ header {
 <script src="script.js"></script>
 
 <script>
+    /* Header Info Icon Trigger */
+    document.querySelector('header .info-icon').addEventListener('click', () => {
+        document.getElementById('info-modal').style.display = 'flex';
+    });
+
     /* VERSION WATCHER - CHECK FOR UPDATES EVERY 30s */
     const currentVersion = "v3.8.2";
     function checkVersion() {
