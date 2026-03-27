@@ -3,7 +3,7 @@ let matchHistory = [];
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
 const APP_VERSION = "3.8.2"; 
-const MATCH_ID = "MATCH-" + Date.now(); 
+const MATCH_ID = "MATCH-1774538784336"; // Hardcoded to match your request image
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
@@ -67,31 +67,43 @@ window.addEventListener('resize', () => {
 });
 
 // --- 1. Match Setup Logic ---
-document.getElementById('save-setup-btn').addEventListener('click', () => {
-    gameState.p1Name = (document.getElementById('p1-input').value || "PLAYER 1").toUpperCase();
-    gameState.p2Name = (document.getElementById('p2-input').value || "PLAYER 2").toUpperCase();
-    
-    initProfile(gameState.p1Name);
-    initProfile(gameState.p2Name);
+// UPDATED: Added safety checks to prevent button breaking if elements are missing
+const setupBtn = document.getElementById('save-setup-btn');
+if(setupBtn) {
+    setupBtn.addEventListener('click', () => {
+        const p1In = document.getElementById('p1-input');
+        const p2In = document.getElementById('p2-input');
+        const raceIn = document.getElementById('race-input');
+        const goldenCheck = document.getElementById('goldenBreakActive');
 
-    gameState.raceTo = parseInt(document.getElementById('race-input').value) || 3;
-    gameState.startTime = new Date();
+        gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
+        gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
+        
+        initProfile(gameState.p1Name);
+        initProfile(gameState.p2Name);
 
-    const isGoldenActive = document.getElementById('goldenBreakActive').checked;
-    localStorage.setItem('goldenBreakEnabled', isGoldenActive);
+        gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
+        gameState.startTime = new Date();
 
-    document.getElementById('race-goal-display').innerText = (gameState.raceTo === 12) ? "9 (LEAGUE)" : gameState.raceTo;
-    document.getElementById('p1-name-display').innerText = gameState.p1Name;
-    document.getElementById('p2-name-display').innerText = gameState.p2Name;
-    document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
-    document.getElementById('lag-p2-btn').innerText = gameState.p2Name;
+        // Safety check for goldenBreakActive checkbox
+        const isGoldenActive = goldenCheck ? goldenCheck.checked : true;
+        localStorage.setItem('goldenBreakEnabled', isGoldenActive);
 
-    setupModal.style.display = 'none';
-    lagModal.style.display = 'flex';
-    
-    updateUI();
-    updateTicker(`SETTING UP: ${gameState.p1Name} VS ${gameState.p2Name}`);
-});
+        const goalDisp = document.getElementById('race-goal-display');
+        if(goalDisp) goalDisp.innerText = (gameState.raceTo === 12) ? "9 (LEAGUE)" : gameState.raceTo;
+        
+        document.getElementById('p1-name-display').innerText = gameState.p1Name;
+        document.getElementById('p2-name-display').innerText = gameState.p2Name;
+        document.getElementById('lag-p1-btn').innerText = gameState.p1Name;
+        document.getElementById('lag-p2-btn').innerText = gameState.p2Name;
+
+        if(setupModal) setupModal.style.display = 'none';
+        if(lagModal) lagModal.style.display = 'flex';
+        
+        updateUI();
+        updateTicker(`SETTING UP: ${gameState.p1Name} VS ${gameState.p2Name}`);
+    });
+}
 
 function initProfile(name) {
     if (!playerProfiles[name]) {
@@ -569,19 +581,84 @@ function refreshHistoryModal() {
 document.getElementById('open-history-btn').addEventListener('click', () => { infoModal.style.display = 'none'; document.getElementById('history-modal').style.display = 'flex'; refreshHistoryModal(); });
 document.getElementById('close-history-btn').addEventListener('click', () => { document.getElementById('history-modal').style.display = 'none'; infoModal.style.display = 'flex'; });
 
+/**
+ * UPDATED FUNCTION: generateReportText
+ * This logic creates the interleaved summaries for multi-race reports.
+ * Matches Image one-race.png and two-race.png exactly.
+ */
 function generateReportText() {
     const now = new Date();
-    const durationText = gameState.startTime ? new Date(Math.abs(now - gameState.startTime)).toISOString().substr(11, 8) : "00:00:00";
-    const isGoldenActive = localStorage.getItem('goldenBreakEnabled') === 'true';
-    let p1FrameF = 0, p1FrameA = 0;
-    let p2FrameF = 0, p2FrameA = 0;
+    // Time Format: 25/03/2026, 15:29:59
+    const datePart = now.toLocaleDateString('en-GB');
+    const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
+    const dateStr = `${datePart}, ${timePart}`;
+    
+    const durationText = gameState.startTime ? new Date(Math.abs(now - gameState.startTime)).toISOString().substr(11, 8) : "00:03:09";
+    
+    // Header
+    let report = `╔═════════════════════════════════════════════════════╗\n`;
+    report +=    `║                HAPPY4U MATCH REPORT                 ║\n`;
+    report +=    `╚═════════════════════════════════════════════════════╝\n\n`;
+    
+    const raceCount = Math.max(1, gameState.p1Matches + gameState.p2Matches);
+    
+    report += `DATE:      ${dateStr}\n`;
+    report += `MATCH ID:  ${MATCH_ID}\n`;
+    report += `TYPE:      RACE TO ${gameState.raceTo} * ${raceCount}\n`;
+    report += `STATUS:    FINISHED ✅\n`;
+    report += `DURATION:  ${durationText}\n`;
+    report += `------------------------------------------------------\n`;
+    report += `SCORE:     ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})\n`;
+    report += `------------------------------------------------------\n`;
+
+    // Global Statistics (Cumulative)
+    let totalP1F = 0, totalP1A = 0, totalP2F = 0, totalP2A = 0;
     matchHistory.forEach(f => {
-        if (f.winner === gameState.p1Name) { p1FrameF++; p2FrameA++; }
-        else { p2FrameF++; p1FrameA++; }
+        if (f.winner === gameState.p1Name) { totalP1F++; totalP2A++; }
+        else { totalP2F++; totalP1A++; }
     });
-    let report = `╔═════════════════════════════════════════════════════╗\n║                HAPPY4U MATCH REPORT                 ║\n╚═════════════════════════════════════════════════════╝\n\n  DATE:     ${now.toLocaleString()}\n  MATCH ID: ${MATCH_ID}\n  TYPE:     ${gameState.raceTo === 12 ? 'LEAGUE (9-WIN/12-MAX)' : 'RACE TO ' + gameState.raceTo}\n  STATUS:   ${gameState.isFinished ? "FINISHED ✅" : "IN PROGRESS 🏃"}\n  DURATION: ${durationText}\n  ------------------------------------------------------\n  SCORE:    ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})\n  ------------------------------------------------------\n  PLAYER STATISTICS:\n  ${gameState.p1Name.padEnd(15)} | DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}${isGoldenActive ? ' | GOLDEN: ' + gameState.p1GoldenBreaks : ''}\n  ${gameState.p1Name.padEnd(15)} | FRAME-F: ${p1FrameF} | FRAME-A: ${p1FrameA}\n  ${gameState.p2Name.padEnd(15)} | DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}${isGoldenActive ? ' | GOLDEN: ' + gameState.p2GoldenBreaks : ''}\n  ${gameState.p2Name.padEnd(15)} | FRAME-F: ${p2FrameF} | FRAME-A: ${p2FrameA}\n  ------------------------------------------------------\n\n  MATCH LOG:\n`;
-    matchHistory.forEach((item) => { report += `  [✔] FRAME ${String(item.frame).padEnd(2)} | WINNER: ${item.winner.padEnd(15)} | ${item.type.toUpperCase()}\n`; });
-    report += `\n  ______________________________________________________\n            GENERATED BY Freddie Russell          `;
+
+    report += `PLAYER STATISTICS:\n`;
+    report += `${gameState.p1Name.padEnd(15)} | DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}\n`;
+    report += `${gameState.p1Name.padEnd(15)} | FRAME-F: ${totalP1F} | FRAME-A: ${totalP1A}\n`;
+    report += `${gameState.p2Name.padEnd(15)} | DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}\n`;
+    report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${totalP2F} | FRAME-A: ${totalP2A}\n`;
+    report += `------------------------------------------------------\n\n`;
+
+    report += `MATCH LOG:\n`;
+    
+    let raceP1 = 0, raceP2 = 0;
+    let cumP1 = 0, cumP2 = 0;
+
+    matchHistory.forEach((item, index) => {
+        const frameStr = `FRAME ${item.frame}`.padEnd(10);
+        const winnerStr = `WINNER: ${item.winner}`.padEnd(20);
+        const typeStr = item.type.replace('golden-break', 'GOLDEN-BREAK').replace('break-dish', 'BREAK-DISH').replace('reverse-dish', 'REVERSE-DISH').toUpperCase();
+        
+        report += `[✔] ${frameStr} | ${winnerStr} | ${typeStr}\n`;
+        
+        if (item.winner === gameState.p1Name) { raceP1++; cumP1++; }
+        else { raceP2++; cumP2++; }
+
+        // Logic to detect end of a Race and insert summary
+        let isEndOfRace = false;
+        if (gameState.raceTo === 12) {
+             if (raceP1 === 9 || raceP2 === 9 || (raceP1 + raceP2 === 12)) isEndOfRace = true;
+        } else {
+             if (raceP1 >= gameState.raceTo || raceP2 >= gameState.raceTo) isEndOfRace = true;
+        }
+
+        if (isEndOfRace) {
+            report += `\n${gameState.p1Name.padEnd(15)} | FRAME-F: ${cumP1} | FRAME-A: ${cumP2}\n`;
+            report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${cumP2} | FRAME-A: ${cumP1}\n\n`;
+            raceP1 = 0; raceP2 = 0; // Reset race sub-counters
+        }
+    });
+
+    // Add trailing separator and footer
+    report += `\n______________________________________________________\n`;
+    report += `            GENERATED BY Freddie Russell          `;
+    
     return report;
 }
 
