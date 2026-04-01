@@ -17,6 +17,12 @@ const ASSETS = [
   'ads/sponsor2.png',
   'ads/sponsor3.png',
   'ads/sponsor4.png',
+  'ads/sponsor5.png',
+  'ads/sponsor6.png',
+  'ads/sponsor7.png',
+  'ads/sponsor8.png',
+  'ads/sponsor9.png',
+  'ads/sponsor10.png',
   // Practice Drills
   'Drill/drill1.png',
   'Drill/drill2.png',

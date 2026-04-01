@@ -3,7 +3,6 @@ let matchHistory = [];
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
 const APP_VERSION = "3.8.2"; 
-const MATCH_ID = "MATCH-1774538784336"; // Hardcoded to match your request image
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
@@ -26,8 +25,17 @@ let gameState = {
     raceTo: 3,
     lagWinner: null,
     startTime: null,
-    isFinished: false 
+    isFinished: false,
+    matchID: null 
 };
+
+// Helper for Duration Calculation
+function getDuration() {
+    if (!gameState.startTime) return "00:00:00";
+    const now = new Date();
+    const diff = Math.abs(now - gameState.startTime);
+    return new Date(diff).toISOString().substr(11, 8);
+}
 
 // --- PERSISTENCE: SAVE & LOAD ---
 function saveData() {
@@ -67,7 +75,6 @@ window.addEventListener('resize', () => {
 });
 
 // --- 1. Match Setup Logic ---
-// UPDATED: Added safety checks to prevent button breaking if elements are missing
 const setupBtn = document.getElementById('save-setup-btn');
 if(setupBtn) {
     setupBtn.addEventListener('click', () => {
@@ -84,8 +91,8 @@ if(setupBtn) {
 
         gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
         gameState.startTime = new Date();
+        gameState.matchID = "MATCH-" + Date.now(); 
 
-        // Safety check for goldenBreakActive checkbox
         const isGoldenActive = goldenCheck ? goldenCheck.checked : true;
         localStorage.setItem('goldenBreakEnabled', isGoldenActive);
 
@@ -136,11 +143,6 @@ function updateRivalryStats(p1, p2, winnerName) {
         };
     }
     
-    if (!rivalryHistory[rivalryKey].trend) rivalryHistory[rivalryKey].trend = [];
-    if (!rivalryHistory[rivalryKey].dishes) rivalryHistory[rivalryKey].dishes = { [pair[0]]: 0, [pair[1]]: 0 };
-    if (!rivalryHistory[rivalryKey].revDishes) rivalryHistory[rivalryKey].revDishes = { [pair[0]]: 0, [pair[1]]: 0 };
-    if (!rivalryHistory[rivalryKey].goldenBreaks) rivalryHistory[rivalryKey].goldenBreaks = { [pair[0]]: 0, [pair[1]]: 0 };
-
     if (winnerName) {
         rivalryHistory[rivalryKey][winnerName]++;
         rivalryHistory[rivalryKey].trend.unshift({ winner: winnerName });
@@ -162,11 +164,19 @@ function updateRivalryStats(p1, p2, winnerName) {
 function updateCareerStats(winnerName, loserName, isDraw = false) {
     const recordResult = (pName, result, score, opponent) => {
         if (!playerProfiles[pName].history) playerProfiles[pName].history = [];
+        
+        const raceCount = Math.max(1, gameState.p1Matches + gameState.p2Matches);
+        const matchType = `RACE TO ${gameState.raceTo} * ${raceCount}`;
+        const matchDuration = getDuration();
+
         playerProfiles[pName].history.unshift({ 
             result, 
             score, 
             opponent, 
-            date: new Date().toLocaleDateString() 
+            date: new Date().toLocaleString('en-GB'),
+            matchID: gameState.matchID, 
+            type: matchType,           
+            duration: matchDuration    
         });
         if (playerProfiles[pName].history.length > 5) playerProfiles[pName].history.pop();
     };
@@ -174,8 +184,8 @@ function updateCareerStats(winnerName, loserName, isDraw = false) {
     updateRivalryStats(gameState.p1Name, gameState.p2Name, isDraw ? null : winnerName);
 
     if (isDraw) {
-        playerProfiles[gameState.p1Name].draws++;
-        playerProfiles[gameState.p2Name].draws++;
+        playerProfiles[gameState.p1Name].draws = (playerProfiles[gameState.p1Name].draws || 0) + 1;
+        playerProfiles[gameState.p2Name].draws = (playerProfiles[gameState.p2Name].draws || 0) + 1;
         recordResult(gameState.p1Name, "DRAW", `${gameState.p1Score}-${gameState.p2Score}`, gameState.p2Name);
         recordResult(gameState.p2Name, "DRAW", `${gameState.p2Score}-${gameState.p1Score}`, gameState.p1Name);
     } else {
@@ -367,6 +377,7 @@ document.getElementById('again-race-btn').addEventListener('click', () => {
 });
 
 document.getElementById('new-race-btn').addEventListener('click', () => {
+    recordFinalSessionResult(); 
     localStorage.removeItem('happy4u_data');
     location.reload();
 });
@@ -374,11 +385,20 @@ document.getElementById('new-race-btn').addEventListener('click', () => {
 document.querySelectorAll('.end-game').forEach(btn => {
     btn.addEventListener('click', () => {
         if(confirm("End current match and reset everything?")) {
+            recordFinalSessionResult(); 
             localStorage.removeItem('happy4u_data');
-            location.reload();
+            window.location.reload();
         }
     });
 });
+
+function recordFinalSessionResult() {
+    if (gameState.p1Matches > 0 || gameState.p2Matches > 0) {
+        if (gameState.p1Matches === gameState.p2Matches) {
+            updateCareerStats(null, null, true);
+        }
+    }
+}
 
 // --- 8. UI Update Helpers ---
 function updateUI() {
@@ -427,24 +447,15 @@ if (infoIcon) {
 }
 document.getElementById('close-info-btn').addEventListener('click', () => infoModal.style.display = 'none');
 
-/**
- * UPDATED FUNCTION: addBackupButtons
- * Matches Image 2 UI with a Grid Layout and Live Data Badges
- */
 function addBackupButtons() {
     const infoContent = infoModal.querySelector('.modal-content');
-    
-    // Clear any old containers first to avoid duplicates
     const oldContainer = document.getElementById('backup-btn-container');
     if (oldContainer) oldContainer.remove();
 
-    // Create the Main Menu Grid (Matches Image 2)
     const container = document.createElement('div');
     container.id = 'backup-btn-container';
-    container.className = 'main-menu-grid-container'; 
     container.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;";
 
-    // Helper to create the large icon buttons with subtext badges
     const createMenuBtn = (text, icon, color, action, badgeText = "", className = "") => {
         const btn = document.createElement('button');
         btn.className = `menu-btn ${className}`;
@@ -469,38 +480,32 @@ function addBackupButtons() {
         return btn;
     };
 
-    // Calculate dynamic badge data
     const sortedPlayers = Object.keys(playerProfiles).sort((a,b) => playerProfiles[b].matchesWon - playerProfiles[a].matchesWon);
     const topPlayer = sortedPlayers.length > 0 ? sortedPlayers[0] : "NO DATA";
     const lastBackup = localStorage.getItem('happy4u_last_backup') || "NEVER";
 
-    // 1. League Match (Primary Action)
     const leagueBtn = createMenuBtn("LEAGUE MATCH", "🏆", "var(--neon-cyan)", () => {
         infoModal.style.display = 'none';
         setupModal.style.display = 'flex';
     }, "START NEW RACE", "league-btn");
 
-    // 2. Practice Drills
     const drillsBtn = createMenuBtn("PRACTICE DRILLS", "🎱", "var(--neon-magenta)", () => {
         infoModal.style.display = 'none';
         drillModal.style.display = 'flex';
         showDrill(0);
     }, `${drillImages.length} DRILLS LOADED`);
 
-    // 3. Hall of Fame (Shows current #1 player)
     const fameBtn = createMenuBtn("HALL OF FAME", "👑", "#FFD700", () => {
         infoModal.style.display = 'none';
         openHallOfFame(); 
     }, `TOP RANK: ${topPlayer}`);
 
-    // 4. Cloud Backup (Shows last backup time)
     const backupBtn = createMenuBtn("CLOUD BACKUP", "☁️", "var(--neon-blue)", () => {
         exportData();
         localStorage.setItem('happy4u_last_backup', new Date().toLocaleDateString());
-        addBackupButtons(); // Refresh UI to show new date
+        addBackupButtons(); 
     }, `LAST: ${lastBackup}`);
 
-    // Append all to grid
     container.appendChild(leagueBtn);
     container.appendChild(drillsBtn);
     container.appendChild(fameBtn);
@@ -581,21 +586,13 @@ function refreshHistoryModal() {
 document.getElementById('open-history-btn').addEventListener('click', () => { infoModal.style.display = 'none'; document.getElementById('history-modal').style.display = 'flex'; refreshHistoryModal(); });
 document.getElementById('close-history-btn').addEventListener('click', () => { document.getElementById('history-modal').style.display = 'none'; infoModal.style.display = 'flex'; });
 
-/**
- * UPDATED FUNCTION: generateReportText
- * This logic creates the interleaved summaries for multi-race reports.
- * Matches Image one-race.png and two-race.png exactly.
- */
 function generateReportText() {
     const now = new Date();
-    // Time Format: 25/03/2026, 15:29:59
     const datePart = now.toLocaleDateString('en-GB');
     const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
     const dateStr = `${datePart}, ${timePart}`;
+    const durationText = getDuration();
     
-    const durationText = gameState.startTime ? new Date(Math.abs(now - gameState.startTime)).toISOString().substr(11, 8) : "00:03:09";
-    
-    // Header
     let report = `╔═════════════════════════════════════════════════════╗\n`;
     report +=    `║                HAPPY4U MATCH REPORT                 ║\n`;
     report +=    `╚═════════════════════════════════════════════════════╝\n\n`;
@@ -603,7 +600,7 @@ function generateReportText() {
     const raceCount = Math.max(1, gameState.p1Matches + gameState.p2Matches);
     
     report += `DATE:      ${dateStr}\n`;
-    report += `MATCH ID:  ${MATCH_ID}\n`;
+    report += `MATCH ID:  ${gameState.matchID || 'SESSION-ACTIVE'}\n`; 
     report += `TYPE:      RACE TO ${gameState.raceTo} * ${raceCount}\n`;
     report += `STATUS:    FINISHED ✅\n`;
     report += `DURATION:  ${durationText}\n`;
@@ -611,7 +608,6 @@ function generateReportText() {
     report += `SCORE:     ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})\n`;
     report += `------------------------------------------------------\n`;
 
-    // Global Statistics (Cumulative)
     let totalP1F = 0, totalP1A = 0, totalP2F = 0, totalP2A = 0;
     matchHistory.forEach(f => {
         if (f.winner === gameState.p1Name) { totalP1F++; totalP2A++; }
@@ -640,7 +636,6 @@ function generateReportText() {
         if (item.winner === gameState.p1Name) { raceP1++; cumP1++; }
         else { raceP2++; cumP2++; }
 
-        // Logic to detect end of a Race and insert summary
         let isEndOfRace = false;
         if (gameState.raceTo === 12) {
              if (raceP1 === 9 || raceP2 === 9 || (raceP1 + raceP2 === 12)) isEndOfRace = true;
@@ -651,11 +646,10 @@ function generateReportText() {
         if (isEndOfRace) {
             report += `\n${gameState.p1Name.padEnd(15)} | FRAME-F: ${cumP1} | FRAME-A: ${cumP2}\n`;
             report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${cumP2} | FRAME-A: ${cumP1}\n\n`;
-            raceP1 = 0; raceP2 = 0; // Reset race sub-counters
+            raceP1 = 0; raceP2 = 0; 
         }
     });
 
-    // Add trailing separator and footer
     report += `\n______________________________________________________\n`;
     report += `            GENERATED BY Freddie Russell          `;
     
@@ -666,7 +660,7 @@ document.getElementById('save-match-btn').addEventListener('click', () => {
     const blob = new Blob([generateReportText()], { type: 'text/plain' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Match_Report_${MATCH_ID}.txt`;
+    link.download = `Match_Report_${gameState.matchID}.txt`;
     link.click();
 });
 document.getElementById('view-report-btn').addEventListener('click', () => { reportTextArea.innerText = generateReportText(); reportViewModal.style.display = 'flex'; });
@@ -742,7 +736,10 @@ async function updateStorageDisplay() {
     }
 }
 
-// --- UPDATED PROFESSIONAL PLAYER HISTORY MODAL ---
+/**
+ * UPDATED viewPlayerHistory: Recent Performance Log
+ * 8 Stats Grid, Pipe separators, and "SUMMARY" link.
+ */
 window.viewPlayerHistory = function(name) {
     const p = playerProfiles[name];
     if (!p.history || p.history.length === 0) return alert(`No match history for ${name} yet.`);
@@ -755,61 +752,112 @@ window.viewPlayerHistory = function(name) {
         document.body.appendChild(profModal);
     }
 
-    const isGoldenActive = localStorage.getItem('goldenBreakEnabled') === 'true';
-
     let historyHtml = "";
     p.history.forEach((h, i) => {
-        const statusColor = h.result === "WIN" ? "var(--neon-green)" : h.result === "LOSS" ? "var(--neon-magenta)" : "#888";
+        const statusColor = h.result === "WIN" ? "#00ff00" : h.result === "LOSS" ? "#ff00ff" : "#888";
         const oppLabel = h.opponent ? `VS ${h.opponent}` : "VS OPPONENT";
         
+        let scores = h.score.split('-');
+        let mainScore = h.result === "WIN" ? scores[0] : scores[1];
+        let oppScore = h.result === "WIN" ? scores[1] : scores[0];
+
         historyHtml += `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 15px; border-left: 5px solid ${statusColor};">
-                <div style="flex: 1;">
-                    <div style="font-size: 0.7rem; color: #777; margin-bottom: 4px; font-weight: bold; letter-spacing: 1px;">${h.date}</div>
-                    <div style="font-weight: 900; color: ${statusColor}; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">${h.result}</div>
-                    <div style="font-size: 0.85rem; color: #fff; margin-top: 4px; font-weight: bold; text-transform: uppercase;">${oppLabel}</div>
+            <div style="background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 15px; margin-bottom: 15px; padding: 20px; border-left: 5px solid ${statusColor}; position: relative; overflow: hidden;">
+                <div style="color: ${statusColor}; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+                    ${h.result} <span style="font-family: 'Consolas', monospace; font-size: 0.7rem; color: #555; font-weight: bold;">| MATCH ID:${h.matchID || 'N/A'} | TYPE: ${h.type || 'N/A'}</span>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 1.6rem; font-weight: 900; color: #fff; font-family: 'Courier New', monospace; letter-spacing: -1px; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${h.score}</div>
+                
+                <div style="display: flex; align-items: center; font-size: 0.9rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <span style="color: #ffe100;">${name} (${mainScore})</span> 
+                    <span style="color: #333; margin: 0 15px;">|</span> 
+                    <span>VS</span> 
+                    <span style="color: #333; margin: 0 15px;">|</span> 
+                    <span>${oppLabel} (${oppScore})</span> 
+                    <span style="color: #333; margin: 0 15px;">|</span> 
+                    <span style="color: #aaaaaa; font-size: 0.75rem;">DURATION: ${h.duration || '00:00:00'}</span> 
+                    <span style="color: #333; margin: 0 15px;">|</span> 
+                    <span style="color: #aaaaaa; font-size: 0.75rem;">STATUS: FINISHED ✅</span>
                 </div>
             </div>
         `;
     });
 
+    const latestOpponent = p.history[0].opponent || "";
+
     profModal.innerHTML = `
-        <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 500px; padding: 35px; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
-            <div style="text-align: center; margin-bottom: 25px;">
-                <h2 style="color: #FFD700; margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 4px; font-weight: 900;">${name}</h2>
-                <div style="color: #555; font-size: 0.8rem; margin-top: 8px; font-weight: bold; letter-spacing: 2px;">RECENT PERFORMANCE LOG</div>
+        <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 920px; padding: 35px; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #ffe100, transparent); box-shadow: 0 0 15px #ffe100;"></div>
+            <div style="text-align: center; margin-bottom: 35px;"><h2 style="color: #ffe100; margin: 0; font-size: 2.8rem; text-transform: uppercase; letter-spacing: 4px; font-weight: 900;">${name}</h2><div style="color: #777777; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; margin-top: 10px; text-transform: uppercase;">RECENT PERFORMANCE LOG</div></div>
+            <div style="background-color: rgba(20, 15, 0, 0.4); border-radius: 15px; border: 1px solid #1a1500; padding: 25px 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 10px; text-align: center; margin-bottom: 35px;">
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Races Won</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.matchesWon}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Golden Break</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.totalGoldenBreaks || 0}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Break Dishes</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.totalDishes || 0}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Reverse Dishes</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.totalRevDishes || 0}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Draws</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.draws || 0}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">FRAME-F</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesWon}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">FRAME-A</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">0</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Total Frames</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesWon}</span></div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; background: rgba(255,215,0,0.05); border: 1px solid #222; padding: 15px; border-radius: 12px;">
-                <div style="text-align: center;"><div style="color: #666; font-size: 0.6rem; font-weight: 900;">RACES WON</div><div style="color: #FFD700; font-size: 1.2rem; font-weight: 900;">${p.matchesWon}</div></div>
-                <div style="text-align: center;"><div style="color: #666; font-size: 0.6rem; font-weight: 900;">BREAK DISHES</div><div style="color: #fff; font-size: 1.2rem; font-weight: 900;">${p.totalDishes || 0}</div></div>
-                <div style="text-align: center;"><div style="color: #666; font-size: 0.6rem; font-weight: 900;">REVERSE DISHES</div><div style="color: #fff; font-size: 1.2rem; font-weight: 900;">${p.totalRevDishes || 0}</div></div>
-                ${isGoldenActive ? `<div style="text-align: center;"><div style="color: #666; font-size: 0.6rem; font-weight: 900;">GOLDEN BREAKS</div><div style="color: var(--neon-cyan); font-size: 1.2rem; font-weight: 900;">${p.totalGoldenBreaks || 0}</div></div>` : ''}
+            <div style="margin-bottom: 15px; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px;">
+                <span style="background-color: #0044ff; color: white; padding: 4px 12px; font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Last 5 Match Form</span>
             </div>
 
             <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-                <div style="color: #444; font-size: 0.7rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 2px; border-bottom: 1px solid #222; padding-bottom: 8px;">LAST 5 MATCH FORM</div>
                 ${historyHtml}
             </div>
-            <button onclick="document.getElementById('prof-history-modal').style.display='none'" 
-                    style="width: 100%; margin-top: 25px; padding: 22px; background: transparent; border: 2px solid #333; color: #888; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; font-size: 0.9rem; transition: all 0.2s;">
-                EXIT PERFORMANCE
-            </button>
+            
+            <div style="display: flex; justify-content: space-between; gap: 15px; margin-top: 20px;">
+                <button onclick="reportViewModal.style.zIndex='10000'; reportTextArea.innerText = generateReportText(); reportViewModal.style.display = 'flex';" 
+                    style="display: block !important; flex: 1; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; padding: 20px; font-weight: 900; font-size: 1.1rem; border: none; background-color: #00f2ff; color: black;">
+                    SUMMARY
+                </button>
+                <!-- LOAD BUTTON UPDATED TO CALL loadMatchFromHistory -->
+                <button onclick="loadMatchFromHistory('${name}', '${latestOpponent}')" 
+                    style="flex: 1; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; padding: 20px; font-weight: 900; font-size: 1.1rem; border: none; background-color: #00f2ff; color: black;">
+                    Load
+                </button>
+                <button onclick="document.getElementById('prof-history-modal').style.display='none'" 
+                    style="flex: 1; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; padding: 20px; font-weight: 900; font-size: 1.1rem; border: none; background-color: #ffe100; color: black;">
+                    Exit Performance
+                </button>
+            </div>
         </div>
     `;
     profModal.style.display = 'flex';
 }
 
-// --- UPDATED PROFESSIONAL RIVALRY MODAL ---
+/**
+ * NEW: loadMatchFromHistory
+ * Populates Match Setup with names from the history record.
+ */
+window.loadMatchFromHistory = function(p1, p2) {
+    // Close everything currently open
+    const profModal = document.getElementById('prof-history-modal');
+    if(profModal) profModal.style.display = 'none';
+    const hofModal = document.getElementById('hall-fame-modal');
+    if(hofModal) hofModal.style.display = 'none';
+    const infoM = document.getElementById('info-modal');
+    if(infoM) infoM.style.display = 'none';
+
+    // Populate Setup screen inputs
+    const p1In = document.getElementById('p1-input');
+    const p2In = document.getElementById('p2-input');
+    if(p1In && p2In) {
+        p1In.value = p1;
+        p2In.value = p2;
+    }
+
+    // Open Match Setup
+    if(setupModal) setupModal.style.display = 'flex';
+};
+
+/**
+ * RE-ALIGNEDviewRivalries Carousel view preserved below...
+ */
 window.viewRivalries = function(name) {
-    let rivalsFound = false;
-    let recordsHtml = "";
-    const isGoldenActive = localStorage.getItem('goldenBreakEnabled') === 'true';
-    
+    let rivalKeys = Object.keys(rivalryHistory).filter(key => key.includes(name));
+    let rivalIndex = 0;
     let rivModal = document.getElementById('rivalry-modal');
     if (!rivModal) {
         rivModal = document.createElement('div');
@@ -817,67 +865,30 @@ window.viewRivalries = function(name) {
         rivModal.style.cssText = "display: flex; position: fixed; z-index: 7000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; backdrop-filter: blur(12px); font-family: 'Segoe UI', Roboto, sans-serif;";
         document.body.appendChild(rivModal);
     }
-
-    Object.keys(rivalryHistory).forEach(key => {
-        if (key.includes(name)) {
-            rivalsFound = true;
-            const opponent = key.replace(name, '').replace('_vs_', '');
-            const stats = rivalryHistory[key];
-            const total = stats[name] + stats[opponent] + (stats.draws || 0);
-            const winPct = total > 0 ? Math.round((stats[name] / total) * 100) : 0;
-
-            let trendHtml = "";
-            if (stats.trend && stats.trend.length > 0) {
-                stats.trend.slice(0, 3).forEach(t => {
-                    let color = "#444"; let label = "D";
-                    if (t.winner === name) { color = "var(--neon-green)"; label = "W"; }
-                    else if (t.winner === opponent) { color = "var(--neon-magenta)"; label = "L"; }
-                    trendHtml += `<span style="background:${color}; color:#000; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.75rem; font-weight:900; margin-left:6px; box-shadow: 0 0 8px ${color}66;">${label}</span>`;
-                });
-            }
-
-            recordsHtml += `
-                <div style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #FFD700;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <div>
-                            <span style="color: var(--neon-cyan); font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px;">vs ${opponent}</span>
-                            <div style="font-size: 0.7rem; color: #888; margin-top: 6px; font-weight: bold; letter-spacing: 1px;">RECENT FORM: ${trendHtml || 'N/A'}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <span style="background: #FFD700; color: #000; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; box-shadow: 0 0 15px rgba(255,215,0,0.3);">${winPct}% WIN RATE</span>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
-                        <div><div style="font-size: 0.6rem; color: #666; font-weight: 900;">RIVALRY WINS</div><div style="font-size: 1.3rem; color: #fff; font-weight: 900;">${stats[name]}</div></div>
-                        <div><div style="font-size: 0.6rem; color: #666; font-weight: 900;">DISHES</div><div style="font-size: 1.3rem; color: var(--neon-blue); font-weight: 900;">${(stats.dishes && stats.dishes[name]) || 0}</div></div>
-                        <div><div style="font-size: 0.6rem; color: #666; font-weight: 900;">REV DISHES</div><div style="font-size: 1.3rem; color: var(--neon-magenta); font-weight: 900;">${(stats.revDishes && stats.revDishes[name]) || 0}</div></div>
-                        ${isGoldenActive ? `<div style="grid-column: span 3; border-top: 1px solid #222; padding-top: 5px; margin-top: 5px;"><div style="font-size: 0.6rem; color: #666; font-weight: 900;">GOLDEN BREAKS IN RIVALRY: <span style="color: var(--neon-cyan); font-size: 0.9rem;">${(stats.goldenBreaks && stats.goldenBreaks[name]) || 0}</span></div></div>` : ''}
-                    </div>
-                    
-                    <div style="height: 8px; background: #111; border-radius: 4px; display: flex; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);">
-                        <div style="width: ${winPct}%; background: var(--neon-blue); height: 100%; box-shadow: 0 0 10px var(--neon-blue);"></div>
-                        <div style="width: ${100 - winPct}%; background: var(--neon-magenta); height: 100%; box-shadow: 0 0 10px var(--neon-magenta);"></div>
-                    </div>
-                </div>`;
+    const renderRivalCard = () => {
+        if (rivalKeys.length === 0) {
+            rivModal.innerHTML = `<div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 500px; padding: 35px; border-radius: 20px; text-align: center;"><div style="color:#333; padding: 60px; font-size: 1rem; font-weight: 900; letter-spacing: 1px;">NO DATA RECORDED</div><button onclick="document.getElementById('rivalry-modal').style.display='none'" style="width: 100%; padding: 20px; background: #ffe100; border: none; color: #000; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase;">EXIT RECORDS</button></div>`;
+            return;
         }
-    });
-
-    rivModal.innerHTML = `
-        <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 500px; padding: 35px; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #FFD700, transparent);"></div>
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color: #FFD700; margin: 0; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 5px; font-weight: 900;">HEAD-TO-HEAD</h2>
-                <div style="color: var(--neon-green); font-size: 0.8rem; margin-top: 8px; font-weight: bold; letter-spacing: 2px;">OFFICIAL PERFORMANCE METRICS: ${name}</div>
-            </div>
-            <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;">
-                ${rivalsFound ? recordsHtml : '<div style="text-align:center; color:#333; padding: 60px; font-size: 1rem; font-weight: 900; letter-spacing: 1px;">NO DATA RECORDED</div>'}
-            </div>
-            <button onclick="document.getElementById('rivalry-modal').style.display='none'" 
-                    style="width: 100%; margin-top: 30px; padding: 22px; background: #FFD700; border: none; color: #000; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; font-size: 0.9rem;">
-                EXIT RECORDS
-            </button>
-        </div>`;
+        const key = rivalKeys[rivalIndex];
+        const opponent = key.replace(name, '').replace('_vs_', '');
+        const stats = rivalryHistory[key];
+        const total = stats[name] + stats[opponent] + (stats.draws || 0);
+        const winPct = total > 0 ? Math.round((stats[name] / total) * 100) : 0;
+        let trendHtml = "";
+        if (stats.trend) {
+            stats.trend.slice(0, 5).forEach(t => {
+                let color = "#333"; let label = "D";
+                if (t.winner === name) { color = "#00ff00"; label = "W"; } else if (t.winner === opponent) { color = "#ff00ff"; label = "L"; }
+                trendHtml += `<span style="background:${color}; color:#000; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.8rem; font-weight:900; margin-left:8px;">${label}</span>`;
+            });
+        }
+        rivModal.innerHTML = `
+            <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 600px; padding: 35px; border-radius: 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #ffe100, transparent); box-shadow: 0 0 15px #ffe100;"></div><div style="text-align: center; margin-bottom: 30px;"><div style="background: #1e51ff; display: inline-block; padding: 5px 30px; margin-bottom: 10px;"><h2 style="color: #fff; margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 5px; font-weight: 900;">HEAD-TO-HEAD</h2></div><div style="color: #00ff00; font-size: 0.85rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">OFFICIAL PERFORMANCE METRICS: ${name}</div></div><div style="background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px; border-left: 5px solid #ffe100; margin-bottom: 30px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><span style="color: #00ff00; font-weight: 900; font-size: 1.8rem; text-transform: uppercase;">VS ${opponent}</span><span style="background: #ffe100; color: #000; padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 0 15px rgba(241,196,15,0.3);">${winPct}% WIN RATE</span></div><div style="display: flex; align-items: center; margin-bottom: 30px;"><span style="color: #777; font-size: 0.8rem; font-weight: 800;">RECENT FORM:</span>${trendHtml}</div><div style="background: #050505; padding: 20px 10px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 10px; text-align: center;"><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">RIVALRY WINS</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${stats[name]}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">GOLDEN BREAK</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${(stats.goldenBreaks && stats.goldenBreaks[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">BREAK DISHES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${(stats.dishes && stats.dishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">REVERSE DISHES</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${(stats.revDishes && stats.revDishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">DRAWS</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${stats.draws || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-F</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${playerProfiles[name].framesWon || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-A</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">0</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">TOTAL FRAMES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${playerProfiles[name].framesWon || 0}</div></div></div></div><div style="display: flex; gap: 15px;"><button id="riv-pre" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">PRE</button><button id="riv-next" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">NEXT</button><button onclick="document.getElementById('rivalry-modal').style.display='none'" style="flex: 2; padding: 20px; background: #ffe100; border: none; color: #000; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem;">EXIT RECORDS</button></div></div>`;
+        document.getElementById('riv-pre').onclick = () => { rivalIndex = (rivalIndex - 1 + rivalKeys.length) % rivalKeys.length; renderRivalCard(); };
+        document.getElementById('riv-next').onclick = () => { rivalIndex = (rivalIndex + 1) % rivalKeys.length; renderRivalCard(); };
+    };
+    renderRivalCard();
     rivModal.style.display = 'flex';
 }
 
@@ -888,49 +899,22 @@ window.openHallOfFame = function() {
         hofModal.id = 'hall-fame-modal';
         hofModal.className = 'modal'; 
         hofModal.style.cssText = "display: flex; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; backdrop-filter: blur(8px);";
-        hofModal.innerHTML = `
-            <div class="modal-content" style="border: 2px solid #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); max-width: 650px; width: 95%; background: #0a0a0a; padding: 25px;">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <h2 style="color: #FFD700; text-transform: uppercase; letter-spacing: 3px; margin: 0; font-size: 1.5rem;">🏆 LEAGUE HALL OF FAME</h2>
-                    <div style="height: 1px; background: linear-gradient(90deg, transparent, #FFD700, transparent); margin-top: 15px;"></div>
-                </div>
-                <div id="hof-list-container" style="max-height: 450px; overflow-y: auto; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px solid #222;">
-                    <div style="display: grid; grid-template-columns: 0.4fr 1.5fr 1fr 0.6fr 1.8fr 0.8fr; padding: 12px 10px; border-bottom: 2px solid #333; font-size: 0.65rem; color: #888; font-weight: bold; text-transform: uppercase; text-align: center;">
-                        <div>#</div><div style="text-align: left;">PLAYER</div><div>W-L-D</div><div>GB</div><div>LOG</div><div>VS</div>
-                    </div>
-                    <div id="hof-rows"></div>
-                </div>
-                <button id="close-hof-btn" style="width: 100%; margin-top: 25px; padding: 18px; background: transparent; border: 1px solid #FFD700; color: #FFD700; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">CLOSE</button>
-            </div>
-        `;
+        hofModal.innerHTML = `<div class="modal-content" style="border: 2px solid #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); max-width: 650px; width: 95%; background: #0a0a0a; padding: 25px; border-radius:15px; border:2px solid #ff00ff;"><div style="text-align: center; margin-bottom: 25px;"><h2 style="color: #fff; text-transform: uppercase; letter-spacing: 3px; margin: 0; font-size: 1.5rem; background: #1e51ff; display:inline-block; padding:5px 20px;">🏆 LEAGUE HALL OF FAME</h2><div style="height: 1px; background: linear-gradient(90deg, transparent, #FFD700, transparent); margin-top: 15px;"></div></div><div id="hof-list-container" style="max-height: 450px; overflow-y: auto; background: rgba(255,255,255,0.02); border-radius: 4px; border: 1px solid #222;"><div style="display: grid; grid-template-columns: 0.4fr 1.5fr 1fr 0.6fr 1.8fr 0.8fr; padding: 12px 10px; border-bottom: 2px solid #333; font-size: 0.65rem; color: #888; font-weight: bold; text-transform: uppercase; text-align: center;"><div>#</div><div style="text-align: left;">PLAYER</div><div>W-L-D</div><div>GB</div><div>LOG</div><div>VS</div></div><div id="hof-rows"></div></div><button id="close-hof-btn" style="width: 100%; margin-top: 25px; padding: 18px; background: transparent; border: 1px solid #FFD700; color: #FFD700; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">CLOSE</button></div>`;
         document.body.appendChild(hofModal);
     }
-    
-    document.getElementById('close-hof-btn').onclick = () => {
-        hofModal.style.display = 'none';
-    };
-
+    document.getElementById('close-hof-btn').onclick = () => { hofModal.style.display = 'none'; };
     const rowsContainer = document.getElementById('hof-rows');
-    const sortedNames = Object.keys(playerProfiles).sort((a,b) => playerProfiles[b].matchesWon - playerProfiles[a].matchesWon);
+    const sortedNames = Object.keys(playerProfiles).sort((a,b) => {
+        const scoreA = (playerProfiles[a].matchesWon * 3) + (playerProfiles[a].draws || 0);
+        const scoreB = (playerProfiles[b].matchesWon * 3) + (playerProfiles[b].draws || 0);
+        return scoreB - scoreA;
+    });
     let html = "";
-    if (sortedNames.length === 0) {
-        html = `<p style="text-align:center; color:#555; padding: 30px;">NO LEAGUE DATA RECORDED</p>`;
-    } else {
+    if (sortedNames.length === 0) { html = `<p style="text-align:center; color:#555; padding: 30px;">NO LEAGUE DATA RECORDED</p>`; } else {
         sortedNames.forEach((name, index) => {
             const p = playerProfiles[name];
             const rankIcon = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : (index + 1);
-            html += `
-                <div style="display: grid; grid-template-columns: 0.4fr 1.5fr 1fr 0.6fr 1.8fr 0.8fr; padding: 15px 10px; border-bottom: 1px solid #1a1a1a; align-items: center; text-align: center;">
-                    <div style="font-weight: bold; color: #FFD700; font-size: 0.8rem;">${rankIcon}</div>
-                    <div style="text-align: left; color: var(--neon-blue); font-weight: bold; font-size: 0.8rem;">${name}</div>
-                    <div style="font-family: monospace; color: #aaa; font-size: 0.8rem;">${p.matchesWon}-${p.matchesLost}-${p.draws || 0}</div>
-                    <div style="color: #FFD700; font-family: monospace; font-size: 0.8rem;">${p.totalGoldenBreaks || 0}</div>
-                    <div style="display: flex; gap: 5px; justify-content: center; padding: 0 5px;">
-                        <button onclick="viewPlayerHistory('${name}')" style="background:transparent; border:1px solid #444; color:#fff; font-size:0.55rem; padding:5px 0; cursor:pointer; flex: 1; border-radius: 3px;">LAST 5</button>
-                        <button onclick="viewRivalries('${name}')" style="background:transparent; border:1px solid #444; color:#fff; font-size:0.55rem; padding:5px 0; cursor:pointer; flex: 1; border-radius: 3px;">VIEW</button>
-                    </div>
-                    <div><button onclick="viewRivalries('${name}')" style="background:transparent; border:1px solid var(--neon-blue); color:var(--neon-blue); font-size:0.6rem; padding:5px; cursor:pointer; font-weight:bold; width: 100%; border-radius: 3px;">RIVALS</button></div>
-                </div>`;
+            html += `<div style="display: grid; grid-template-columns: 0.4fr 1.5fr 1fr 0.6fr 1.8fr 0.8fr; padding: 15px 10px; border-bottom: 1px solid #1a1a1a; align-items: center; text-align: center;"><div style="font-weight: bold; color: #FFD700; font-size: 0.8rem;">${rankIcon}</div><div style="text-align: left; color: var(--neon-green); font-weight: bold; font-size: 0.8rem;">${name}</div><div style="font-family: monospace; color: #aaa; font-size: 0.8rem;">${p.matchesWon}-${p.matchesLost}-${p.draws || 0}</div><div style="color: #FFD700; font-family: monospace; font-size: 0.8rem;">${p.totalGoldenBreaks || 0}</div><div style="display: flex; gap: 5px; justify-content: center; padding: 0 5px;"><button onclick="viewPlayerHistory('${name}')" style="background:transparent; border:1px solid #444; color:#fff; font-size:0.55rem; padding:5px 0; cursor:pointer; flex: 1; border-radius: 3px;">LAST 5</button><button onclick="viewPlayerHistory('${name}')" style="background:transparent; border:1px solid #444; color:#fff; font-size:0.55rem; padding:5px 0; cursor:pointer; flex: 1; border-radius: 3px;">VIEW</button></div><div><button onclick="viewRivalries('${name}')" style="background:transparent; border:1px solid var(--neon-green); color:var(--neon-green); font-size:0.6rem; padding:5px; cursor:pointer; font-weight:bold; width: 100%; border-radius: 3px;">RIVALS</button></div></div>`;
         });
     }
     rowsContainer.innerHTML = html;
@@ -938,62 +922,16 @@ window.openHallOfFame = function() {
 }
 
 // --- GLOBAL EVENT LISTENERS ---
-
-document.getElementById('open-about-btn').addEventListener('click', () => {
-    infoModal.style.display = 'none';
-    aboutModal.style.display = 'flex';
-    updateStorageDisplay();
-});
-
-document.getElementById('close-about-btn').addEventListener('click', () => {
-    aboutModal.style.display = 'none';
-    infoModal.style.display = 'flex';
-});
-
+document.getElementById('open-about-btn').addEventListener('click', () => { infoModal.style.display = 'none'; aboutModal.style.display = 'flex'; updateStorageDisplay(); });
+document.getElementById('close-about-btn').addEventListener('click', () => { aboutModal.style.display = 'none'; infoModal.style.display = 'flex'; });
 const factoryBtn = document.getElementById('factory-reset-btn');
-if (factoryBtn) {
-    factoryBtn.addEventListener('click', async () => {
-        if (confirm("Wipe all data?")) {
-            localStorage.clear();
-            window.location.reload();
-        }
-    });
-}
-
-window.addEventListener('load', () => {
-    loadData(); 
-    updateUI();
-    updateBreakIndicator();
-    updateStorageDisplay();
-});
-
+if (factoryBtn) { factoryBtn.addEventListener('click', async () => { if (confirm("Wipe all data?")) { localStorage.clear(); window.location.reload(); } }); }
+window.addEventListener('load', () => { loadData(); updateUI(); updateBreakIndicator(); updateStorageDisplay(); });
 const exitSetupBtn = document.getElementById('exit-setup-btn');
-if (exitSetupBtn) {
-    exitSetupBtn.addEventListener('click', () => {
-        if(confirm("Exit match setup?")) {
-            localStorage.removeItem('happy4u_data');
-            window.location.reload();
-        }
-    });
-}
-
+if (exitSetupBtn) { exitSetupBtn.addEventListener('click', () => { if(confirm("Exit match setup?")) { localStorage.removeItem('happy4u_data'); window.location.reload(); } }); }
 const qrModal = document.getElementById('qr-modal');
 const qrImage = document.getElementById('qr-image');
 const openQrBtn = document.getElementById('open-qr-btn'); 
 const closeQrBtn = document.getElementById('close-qr-btn');
-
-if (openQrBtn) {
-    openQrBtn.addEventListener('click', () => {
-        const currentUrl = window.location.href;
-        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
-        infoModal.style.display = 'none';
-        qrModal.style.display = 'flex';
-    });
-}
-
-if (closeQrBtn) {
-    closeQrBtn.addEventListener('click', () => {
-        qrModal.style.display = 'none';
-        infoModal.style.display = 'flex';
-    });
-}
+if (openQrBtn) { openQrBtn.addEventListener('click', () => { const currentUrl = window.location.href; qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`; infoModal.style.display = 'none'; qrModal.style.display = 'flex'; }); }
+if (closeQrBtn) { closeQrBtn.addEventListener('click', () => { qrModal.style.display = 'none'; infoModal.style.display = 'flex'; }); }
