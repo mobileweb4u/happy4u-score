@@ -121,6 +121,7 @@ function initProfile(name) {
             totalGoldenBreaks: 0, 
             totalRevDishes: 0, 
             framesWon: 0, 
+            framesLost: 0, // UPDATED: Track frames against
             draws: 0,
             history: [] 
         };
@@ -200,8 +201,12 @@ function updateCareerStats(winnerName, loserName, isDraw = false) {
             recordResult(loserName, "LOSS", lossScore, winnerName);
         }
     }
+    // UPDATED: Logic to track both Frames Won and Frames Lost
     playerProfiles[gameState.p1Name].framesWon += gameState.p1Score;
+    playerProfiles[gameState.p1Name].framesLost = (playerProfiles[gameState.p1Name].framesLost || 0) + gameState.p2Score;
+    
     playerProfiles[gameState.p2Name].framesWon += gameState.p2Score;
+    playerProfiles[gameState.p2Name].framesLost = (playerProfiles[gameState.p2Name].framesLost || 0) + gameState.p1Score;
     
     playerProfiles[gameState.p1Name].totalDishes += gameState.p1Dishes;
     playerProfiles[gameState.p1Name].totalGoldenBreaks += gameState.p1GoldenBreaks;
@@ -738,7 +743,6 @@ async function updateStorageDisplay() {
 
 /**
  * UPDATED viewPlayerHistory: Recent Performance Log
- * 8 Stats Grid, Pipe separators, and "SUMMARY" link.
  */
 window.viewPlayerHistory = function(name) {
     const p = playerProfiles[name];
@@ -795,8 +799,8 @@ window.viewPlayerHistory = function(name) {
                 <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Reverse Dishes</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.totalRevDishes || 0}</span></div>
                 <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Draws</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.draws || 0}</span></div>
                 <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">FRAME-F</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesWon}</span></div>
-                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">FRAME-A</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">0</span></div>
-                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Total Frames</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesWon}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">FRAME-A</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesLost || 0}</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center;"><span style="color: #777777; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Total Frames</span><span style="color: #ffe100; font-size: 1.4rem; font-weight: 900;">${p.framesWon + (p.framesLost || 0)}</span></div>
             </div>
 
             <div style="margin-bottom: 15px; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px;">
@@ -812,7 +816,6 @@ window.viewPlayerHistory = function(name) {
                     style="display: block !important; flex: 1; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; padding: 20px; font-weight: 900; font-size: 1.1rem; border: none; background-color: #00f2ff; color: black;">
                     SUMMARY
                 </button>
-                <!-- LOAD BUTTON UPDATED TO CALL loadMatchFromHistory -->
                 <button onclick="loadMatchFromHistory('${name}', '${latestOpponent}')" 
                     style="flex: 1; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 15px; padding: 20px; font-weight: 900; font-size: 1.1rem; border: none; background-color: #00f2ff; color: black;">
                     Load
@@ -828,11 +831,9 @@ window.viewPlayerHistory = function(name) {
 }
 
 /**
- * NEW: loadMatchFromHistory
- * Populates Match Setup with names from the history record.
+ * loadMatchFromHistory
  */
 window.loadMatchFromHistory = function(p1, p2) {
-    // Close everything currently open
     const profModal = document.getElementById('prof-history-modal');
     if(profModal) profModal.style.display = 'none';
     const hofModal = document.getElementById('hall-fame-modal');
@@ -840,7 +841,6 @@ window.loadMatchFromHistory = function(p1, p2) {
     const infoM = document.getElementById('info-modal');
     if(infoM) infoM.style.display = 'none';
 
-    // Populate Setup screen inputs
     const p1In = document.getElementById('p1-input');
     const p2In = document.getElementById('p2-input');
     if(p1In && p2In) {
@@ -848,12 +848,11 @@ window.loadMatchFromHistory = function(p1, p2) {
         p2In.value = p2;
     }
 
-    // Open Match Setup
     if(setupModal) setupModal.style.display = 'flex';
 };
 
 /**
- * RE-ALIGNEDviewRivalries Carousel view preserved below...
+ * RE-ALIGNED viewRivalries
  */
 window.viewRivalries = function(name) {
     let rivalKeys = Object.keys(rivalryHistory).filter(key => key.includes(name));
@@ -884,7 +883,7 @@ window.viewRivalries = function(name) {
             });
         }
         rivModal.innerHTML = `
-            <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 600px; padding: 35px; border-radius: 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #ffe100, transparent); box-shadow: 0 0 15px #ffe100;"></div><div style="text-align: center; margin-bottom: 30px;"><div style="background: #1e51ff; display: inline-block; padding: 5px 30px; margin-bottom: 10px;"><h2 style="color: #fff; margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 5px; font-weight: 900;">HEAD-TO-HEAD</h2></div><div style="color: #00ff00; font-size: 0.85rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">OFFICIAL PERFORMANCE METRICS: ${name}</div></div><div style="background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px; border-left: 5px solid #ffe100; margin-bottom: 30px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><span style="color: #00ff00; font-weight: 900; font-size: 1.8rem; text-transform: uppercase;">VS ${opponent}</span><span style="background: #ffe100; color: #000; padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 0 15px rgba(241,196,15,0.3);">${winPct}% WIN RATE</span></div><div style="display: flex; align-items: center; margin-bottom: 30px;"><span style="color: #777; font-size: 0.8rem; font-weight: 800;">RECENT FORM:</span>${trendHtml}</div><div style="background: #050505; padding: 20px 10px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 10px; text-align: center;"><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">RIVALRY WINS</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${stats[name]}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">GOLDEN BREAK</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${(stats.goldenBreaks && stats.goldenBreaks[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">BREAK DISHES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${(stats.dishes && stats.dishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">REVERSE DISHES</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${(stats.revDishes && stats.revDishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">DRAWS</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${stats.draws || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-F</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${playerProfiles[name].framesWon || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-A</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">0</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">TOTAL FRAMES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${playerProfiles[name].framesWon || 0}</div></div></div></div><div style="display: flex; gap: 15px;"><button id="riv-pre" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">PRE</button><button id="riv-next" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">NEXT</button><button onclick="document.getElementById('rivalry-modal').style.display='none'" style="flex: 2; padding: 20px; background: #ffe100; border: none; color: #000; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem;">EXIT RECORDS</button></div></div>`;
+            <div style="background: #050505; border: 2px solid #222; width: 95%; max-width: 600px; padding: 35px; border-radius: 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; overflow: hidden;"><div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, #ffe100, transparent); box-shadow: 0 0 15px #ffe100;"></div><div style="text-align: center; margin-bottom: 30px;"><div style="background: #1e51ff; display: inline-block; padding: 5px 30px; margin-bottom: 10px;"><h2 style="color: #fff; margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 5px; font-weight: 900;">HEAD-TO-HEAD</h2></div><div style="color: #00ff00; font-size: 0.85rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">OFFICIAL PERFORMANCE METRICS: ${name}</div></div><div style="background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 20px; padding: 30px; border-left: 5px solid #ffe100; margin-bottom: 30px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><span style="color: #00ff00; font-weight: 900; font-size: 1.8rem; text-transform: uppercase;">VS ${opponent}</span><span style="background: #ffe100; color: #000; padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 0 15px rgba(241,196,15,0.3);">${winPct}% WIN RATE</span></div><div style="display: flex; align-items: center; margin-bottom: 30px;"><span style="color: #777; font-size: 0.8rem; font-weight: 800;">RECENT FORM:</span>${trendHtml}</div><div style="background: #050505; padding: 20px 10px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 10px; text-align: center;"><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">RIVALRY WINS</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${stats[name]}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">GOLDEN BREAK</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${(stats.goldenBreaks && stats.goldenBreaks[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">BREAK DISHES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${(stats.dishes && stats.dishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">REVERSE DISHES</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${(stats.revDishes && stats.revDishes[name]) || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">DRAWS</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${stats.draws || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-F</div><div style="font-size: 1.5rem; color: #00ff00; font-weight: 900;">${playerProfiles[name].framesWon || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">FRAME-A</div><div style="font-size: 1.5rem; color: #ff00ff; font-weight: 900;">${playerProfiles[name].framesLost || 0}</div></div><div><div style="font-size: 0.6rem; color: #777; font-weight: 900;">TOTAL FRAMES</div><div style="font-size: 1.5rem; color: #fff; font-weight: 900;">${playerProfiles[name].framesWon + (playerProfiles[name].framesLost || 0)}</div></div></div></div><div style="display: flex; gap: 15px;"><button id="riv-pre" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">PRE</button><button id="riv-next" style="flex: 0.5; padding: 15px; background: transparent; border: 2px solid #ffe100; color: #ffe100; border-radius: 12px; cursor: pointer; font-weight: 900;">NEXT</button><button onclick="document.getElementById('rivalry-modal').style.display='none'" style="flex: 2; padding: 20px; background: #ffe100; border: none; color: #000; border-radius: 12px; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem;">EXIT RECORDS</button></div></div>`;
         document.getElementById('riv-pre').onclick = () => { rivalIndex = (rivalIndex - 1 + rivalKeys.length) % rivalKeys.length; renderRivalCard(); };
         document.getElementById('riv-next').onclick = () => { rivalIndex = (rivalIndex + 1) % rivalKeys.length; renderRivalCard(); };
     };
