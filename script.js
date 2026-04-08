@@ -1,3 +1,7 @@
+// ==========================================
+// --- HAPPY4U SCOREBOARD LOGIC V4.0.0 ---
+// 
+
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
