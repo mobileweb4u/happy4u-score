@@ -33,7 +33,9 @@ const ASSETS = [
   'Drill/drill6.png',
   'Drill/drill7.png',
   'Drill/drill8.png',
-  'Drill/drill9.png'
+  'Drill/drill9.png',
+// video  
+  'videos/local-video.mp4',
 ];
 
 // 1. INSTALL: Resilient Pre-caching
