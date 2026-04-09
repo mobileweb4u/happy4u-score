@@ -34,7 +34,7 @@ const ASSETS = [
   'Drill/drill7.png',
   'Drill/drill8.png',
   'Drill/drill9.png',
-// video  
+  // video  
   'videos/local-video.mp4',
 ];
 
