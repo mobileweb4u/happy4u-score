@@ -1,12 +1,12 @@
 // ==========================================
-// --- HAPPY4U SCOREBOARD LOGIC V4.0.0 ---
+// --- HAPPY4U SCOREBOARD LOGIC V4.1.0 ---
 // 
 
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "4.0.0"; 
+const APP_VERSION = "4.1.0"; 
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
