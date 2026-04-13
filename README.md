@@ -4,10 +4,10 @@ app has evolved from a simple counter into a full **Match Management System**.
 Here is the updated code for your `README.md`. You can copy and paste this entire block to replace your current file:
 
 ```markdown
-# 🎱 HAPPY4U Pool Scoreboard - V4.1.0
+# 🎱 HAPPY4U Pool Scoreboard - V4.2.0
 **A High-Performance, Neon-Styled Match Management System**
 
-[![Version](https://img.shields.io/badge/Version-4.0.0-cyan.svg)](https://github.com/mobileweb4u/happy4u-score)
+[![Version](https://img.shields.io/badge/Version-4.2.0-cyan.svg)](https://github.com/mobileweb4u/happy4u-score)
 [![Platform](https://img.shields.io/badge/Platform-PWA%20/%20Mobile%20/%20Tablet-blueviolet.svg)](#)
 
 HAPPY4U is a professional-grade Progressive Web App (PWA) specifically engineered for competitive pool matches. Unlike basic counters,
@@ -15,7 +15,7 @@ it tracks win types, match duration, and provides full analytical reports.
 
 ---
 
-## 🆕 What's New in V4.1.0
+## 🆕 What's New in V4.2.0
 - **Upgraded Service Worker:** Faster loading and more resilient offline caching (v4.0.0 architecture).
 - **Enhanced Cache Management:** Automatic cleanup of old version data to save device storage.
 - **Improved UI Responsiveness:** Optimized for the latest Samsung and iPad tablets used in pool halls.
@@ -84,6 +84,6 @@ This app isn't just a simple counter; it's a **Match Management System**. By tra
 
 ```bash
 git add .
-git commit -m "Upgrade to V4.0.0 - Updated Service Worker and Documentation"
+git commit -m "Upgrade to V4.2.0 - Updated Service Worker and Documentation"
 git push origin main
 ```
