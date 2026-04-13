@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.1.0 ---
+// --- SERVICE WORKER MASTER VERSION v4.2.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.1.0';
+const CACHE_NAME = 'happy4u-v4.2.0';
 
 // All assets required for the scoreboard to work offline
 const ASSETS = [
@@ -44,7 +44,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("🛠️ PWA: Pre-caching v4.1.0 Assets");
+      console.log("🛠️ PWA: Pre-caching v4.2.0 Assets");
       return Promise.all(
         ASSETS.map(url => {
           return cache.add(url).catch(err => console.error(`❌ Failed to cache: ${url}`, err));
@@ -54,7 +54,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVATE: Cleanup old versions (This deletes v4.0.0 and frees space)
+// 2. ACTIVATE: Cleanup old versions (This deletes v4.1.0 and frees space)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
