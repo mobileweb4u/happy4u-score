@@ -525,8 +525,12 @@ header {
 <script src="script.js"></script>
 
 <script>
-    document.querySelector('header .info-icon').addEventListener('click', () => {
+  document.querySelector('header .info-icon').addEventListener('click', () => {
         document.getElementById('info-modal').style.display = 'flex';
+    });
+
+    document.getElementById('share-app-btn').addEventListener('click', () => {
+        window.location.href = 'player-list.html';
     });
 
     const currentVersion = "v4.0.0";
