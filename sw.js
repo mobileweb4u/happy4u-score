@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.0.0 ---
+// --- SERVICE WORKER MASTER VERSION v4.1.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.0.0';
+const CACHE_NAME = 'happy4u-v4.1.0';
 
 // All assets required for the scoreboard to work offline
 const ASSETS = [
@@ -9,6 +9,7 @@ const ASSETS = [
   'style.css',
   'script.js',
   'manifest.json',
+  'player-list.html',
   'favicon.png',
   'icon-192.png',
   'icon-512.png',
@@ -43,7 +44,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("🛠️ PWA: Pre-caching v4.0.0 Assets");
+      console.log("🛠️ PWA: Pre-caching v4.1.0 Assets");
       return Promise.all(
         ASSETS.map(url => {
           return cache.add(url).catch(err => console.error(`❌ Failed to cache: ${url}`, err));
@@ -53,7 +54,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVATE: Cleanup old versions (This deletes v3.8.2 and frees space)
+// 2. ACTIVATE: Cleanup old versions (This deletes v4.0.0 and frees space)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -61,7 +62,7 @@ self.addEventListener('activate', (event) => {
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log("✅ PWA: v4.0.0 Activated");
+      console.log("✅ PWA: v4.1.0 Activated");
       return self.clients.claim();
     })
   );
