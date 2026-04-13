@@ -4,7 +4,7 @@ app has evolved from a simple counter into a full **Match Management System**.
 Here is the updated code for your `README.md`. You can copy and paste this entire block to replace your current file:
 
 ```markdown
-# 🎱 HAPPY4U Pool Scoreboard - V4.0.0
+# 🎱 HAPPY4U Pool Scoreboard - V4.1.0
 **A High-Performance, Neon-Styled Match Management System**
 
 [![Version](https://img.shields.io/badge/Version-4.0.0-cyan.svg)](https://github.com/mobileweb4u/happy4u-score)
@@ -15,7 +15,7 @@ it tracks win types, match duration, and provides full analytical reports.
 
 ---
 
-## 🆕 What's New in V4.0.0
+## 🆕 What's New in V4.1.0
 - **Upgraded Service Worker:** Faster loading and more resilient offline caching (v4.0.0 architecture).
 - **Enhanced Cache Management:** Automatic cleanup of old version data to save device storage.
 - **Improved UI Responsiveness:** Optimized for the latest Samsung and iPad tablets used in pool halls.
