@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.2.0 ---
+// --- SERVICE WORKER MASTER VERSION v4.3.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.2.0';
+const CACHE_NAME = 'happy4u-v4.3.0';
 
 // All assets required for the scoreboard to work offline
 const ASSETS = [
@@ -10,6 +10,8 @@ const ASSETS = [
   'script.js',
   'manifest.json',
   'player-list.html',
+  'ChampionsLeague.html',
+  'Division(Red).html',
   'favicon.png',
   'icon-192.png',
   'icon-512.png',
