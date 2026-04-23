@@ -1,52 +1,53 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.4.0 ---
+// --- SERVICE WORKER MASTER VERSION v4.5.0 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.4.0';
+const CACHE_NAME = 'happy4u-v4.5.0';
 
-// All assets required for the scoreboard to work offline
+// Use relative paths (./) to ensure compatibility with GitHub Pages subfolders
 const ASSETS = [
-  'index.html',
-  'style.css',
-  'script.js',
-  'manifest.json',
-  'player-list.html',
-  'ChampionsLeague.html',
-  'Division(Red).html',
-  'favicon.png',
-  'icon-192.png',
-  'icon-512.png',
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json',
+  './player-list.html',
+  './ChampionsLeague.html',
+  './Division(Red).html',
+  './favicon.png',
+  './icon-192.png',
+  './icon-512.png',
   // Sponsors
-  'ads/sponsor1.png',
-  'ads/sponsor2.png',
-  'ads/sponsor3.png',
-  'ads/sponsor4.png',
-  'ads/sponsor5.png',
-  'ads/sponsor6.png',
-  'ads/sponsor7.png',
-  'ads/sponsor8.png',
-  'ads/sponsor9.png',
-  'ads/sponsor10.png',
-  'ads/sponsor11.png',
+  './ads/sponsor1.png',
+  './ads/sponsor2.png',
+  './ads/sponsor3.png',
+  './ads/sponsor4.png',
+  './ads/sponsor5.png',
+  './ads/sponsor6.png',
+  './ads/sponsor7.png',
+  './ads/sponsor8.png',
+  './ads/sponsor9.png',
+  './ads/sponsor10.png',
+  './ads/sponsor11.png',
   // Practice Drills
-  'Drill/drill1.png',
-  'Drill/drill2.png',
-  'Drill/drill3.png',
-  'Drill/drill4.png',
-  'Drill/drill5.png',
-  'Drill/drill6.png',
-  'Drill/drill7.png',
-  'Drill/drill8.png',
-  'Drill/drill9.png',
-  // video  
-  'videos/local-video.mp4',
+  './Drill/drill1.png',
+  './Drill/drill2.png',
+  './Drill/drill3.png',
+  './Drill/drill4.png',
+  './Drill/drill5.png',
+  './Drill/drill6.png',
+  './Drill/drill7.png',
+  './Drill/drill8.png',
+  './Drill/drill9.png',
+  // Note: Large videos over 50MB may fail to cache on some mobile browsers
+  './videos/local-video.mp4',
 ];
 
-// 1. INSTALL: Resilient Pre-caching
+// 1. INSTALL: Pre-cache assets
 self.addEventListener('install', (event) => {
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("🛠️ PWA: Pre-caching v4.3.0 Assets");
+      console.log(`🛠️ PWA: Pre-caching ${CACHE_NAME} Assets`);
       return Promise.all(
         ASSETS.map(url => {
           return cache.add(url).catch(err => console.error(`❌ Failed to cache: ${url}`, err));
@@ -56,7 +57,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVATE: Cleanup old versions (This deletes v4.3.0 and frees space)
+// 2. ACTIVATE: Cleanup old cache versions
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -64,17 +65,24 @@ self.addEventListener('activate', (event) => {
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
     }).then(() => {
-      console.log("✅ PWA: v4.3.0 Activated");
+      console.log(`✅ PWA: ${CACHE_NAME} Activated`);
       return self.clients.claim();
     })
   );
 });
 
-// 3. FETCH: Network-First strategy
+// 3. FETCH: Cache-First Strategy (Best for Offline PWA)
+// This checks the cache first for an instant load, then goes to network if not found.
 self.addEventListener('fetch', (event) => {
+  // Skip cross-origin requests (like Google Analytics) to prevent errors
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request);
     })
   );
 });
