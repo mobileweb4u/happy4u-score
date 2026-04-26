@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.5.0 ---
+// --- SERVICE WORKER MASTER VERSION v4.5.1 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.5.0';
+const CACHE_NAME = 'happy4u-v4.5.1';
 
 // Use relative paths (./) to ensure compatibility with GitHub Pages subfolders
 const ASSETS = [
@@ -16,7 +16,7 @@ const ASSETS = [
   './favicon.png',
   './icon-192.png',
   './icon-512.png',
-  // Sponsors
+   // Sponsors
   './ads/sponsor1.png',
   './ads/sponsor2.png',
   './ads/sponsor3.png',
@@ -28,6 +28,14 @@ const ASSETS = [
   './ads/sponsor9.png',
   './ads/sponsor10.png',
   './ads/sponsor11.png',
+  './ads/sponsor12.png',
+  './ads/sponsor13.png',
+  './ads/sponsor14.png',
+  './ads/sponsor15.png',
+  './ads/sponsor16.png',
+  './ads/sponsor17.png',
+  './ads/sponsor18.png',
+  './ads/sponsor19.png',
   // Practice Drills
   './Drill/drill1.png',
   './Drill/drill2.png',
@@ -71,10 +79,8 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. FETCH: Cache-First Strategy (Best for Offline PWA)
-// This checks the cache first for an instant load, then goes to network if not found.
+// 3. FETCH: Cache-First Strategy
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin requests (like Google Analytics) to prevent errors
   if (!event.request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(

@@ -1,10 +1,10 @@
-To update your **README.md** for **V4.4.0**, you should highlight that this is a major release. This helps users and contributors understand that the 
+To update your **README.md** for **V4.5.1**, you should highlight that this is a major release. This helps users and contributors understand that the 
 app has evolved from a simple counter into a full **Match Management System**.
 
 Here is the updated code for your `README.md`. You can copy and paste this entire block to replace your current file:
 
 ```markdown
-# 🎱 HAPPY4U Pool Scoreboard - V4.4.0
+# 🎱 HAPPY4U Pool Scoreboard - V4.5.1
 **A High-Performance, Neon-Styled Match Management System**
 
 [![Version](https://img.shields.io/badge/Version-4.2.0-cyan.svg)](https://github.com/mobileweb4u/happy4u-score)
@@ -84,6 +84,6 @@ This app isn't just a simple counter; it's a **Match Management System**. By tra
 
 ```bash
 git add .
-git commit -m "Upgrade to V4.4.0 - Updated Service Worker and Documentation"
+git commit -m "Upgrade to V4.5.1 - Updated Service Worker and Documentation"
 git push origin main
 ```

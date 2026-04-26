@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HAPPY4U Scoreboard v4.5.0</title>
+<title>HAPPY4U Scoreboard v4.5.1</title>
 
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.json">
@@ -336,7 +336,7 @@ header {
 
 <header>
     <div class="header-left">
-        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v4.5.0</span></h1>
+        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v4.5.1</span></h1>
         <button id="pwa-install-trigger">
             <i class="fas fa-download"></i> INSTALL
         </button>
@@ -372,7 +372,7 @@ header {
 
  <section class="ad-zone">
     <img id="sponsor-img" src="ads/sponsor1.png" alt="Sponsor Advertisement">
-    
+
     <!-- VIDEO PLAYER ADDED BELOW SPONSOR IMG -->
     <video id="local-video-player" class="ad-video" controls autoplay muted loop>
         <source src="videos/local-video.mp4" type="video/mp4">
@@ -457,7 +457,7 @@ header {
 <div id="about-modal" class="modal-overlay" style="display:none;">
 <div class="modal-content">
 <h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
-<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.0</span></p>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.1</span></p>
 <div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
 <span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
 <button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
@@ -534,7 +534,7 @@ header {
         window.location.href = 'player-list.html';
     });
 
-    const currentVersion = "v4.3.0";
+    const currentVersion = "v4.5.1";
     function checkVersion() {
         fetch('index.html', { cache: "no-store" })
             .then(response => response.text())
@@ -549,17 +549,28 @@ header {
     setInterval(checkVersion, 30000); 
 
     const sponsorImg = document.getElementById('sponsor-img');
-    const sponsors = ['ads/sponsor1.png', 'ads/sponsor2.png', 'ads/sponsor3.png', 'ads/sponsor4.png', 'ads/sponsor5.png', 'ads/sponsor6.png', 'ads/sponsor7.png', 'ads/sponsor8.png', 'ads/sponsor9.png', 'ads/sponsor10.png', 'ads/sponsor11.png'];
+    const sponsors = ['ads/sponsor1.png', 'ads/sponsor2.png', 'ads/sponsor3.png', 'ads/sponsor4.png', 'ads/sponsor5.png', 'ads/sponsor6.png', 'ads/sponsor7.png', 'ads/sponsor8.png', 'ads/sponsor9.png', 'ads/sponsor10.png', 'ads/sponsor11.png', 'ads/sponsor12.png', 'ads/sponsor13.png', 'ads/sponsor14.png', 'ads/sponsor15.png', 'ads/sponsor16.png', 'ads/sponsor17.png', 'ads/sponsor18.png', 'ads/sponsor19.png'];
     let currentSponsorIndex = 0;
 
-    setInterval(() => {
-        sponsorImg.style.opacity = '0';
-        setTimeout(() => {
-            currentSponsorIndex = (currentSponsorIndex + 1) % sponsors.length;
-            sponsorImg.src = sponsors[currentSponsorIndex];
+ setInterval(() => {
+    // 1. Start Fade Out
+    sponsorImg.style.opacity = '0';
+
+    setTimeout(() => {
+        // 2. Change Index
+        currentSponsorIndex = (currentSponsorIndex + 1) % sponsors.length;
+
+        // 3. Create a temporary image to "pre-load" the next file
+        const tempImg = new Image();
+        tempImg.src = sponsors[currentSponsorIndex];
+
+        tempImg.onload = () => {
+            // 4. Only update the real image and fade in once it's fully loaded
+            sponsorImg.src = tempImg.src;
             sponsorImg.style.opacity = '1';
-        }, 800);
-    }, 15000);
+        };
+    }, 800); // Matches the CSS transition time
+}, 15000); // Rotate every 15 seconds
 </script>
 </body>
 </html>

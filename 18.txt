@@ -1,0 +1,14 @@
+sponsor12.png
+sponsor13.png
+sponsor14.png
+sponsor15.png
+sponsor16.png
+sponsor17.png
+sponsor18.png
+
+
+I have a Samsung tablet With a memory card of 128.
+I want to step by step instruction of how to install the following from this site.
+https://github.com/mobileweb4u/happy4u-score
+Explain how you'd implement this. And you're understanding?
+
