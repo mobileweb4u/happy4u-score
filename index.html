@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HAPPY4U Scoreboard v4.5.1</title>
+<title>HAPPY4U Scoreboard v4.5.2</title>
 
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.json">
@@ -336,7 +336,7 @@ header {
 
 <header>
     <div class="header-left">
-        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v4.5.1</span></h1>
+        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v4.5.2</span></h1>
         <button id="pwa-install-trigger">
             <i class="fas fa-download"></i> INSTALL
         </button>
@@ -373,7 +373,6 @@ header {
  <section class="ad-zone">
     <img id="sponsor-img" src="ads/sponsor1.png" alt="Sponsor Advertisement">
 
-    <!-- VIDEO PLAYER ADDED BELOW SPONSOR IMG -->
     <video id="local-video-player" class="ad-video" controls autoplay muted loop>
         <source src="videos/local-video.mp4" type="video/mp4">
         Your browser does not support the video tag.
@@ -428,6 +427,21 @@ header {
 <div class="setup-rules-container">
     <label><input type="checkbox" id="leagueMode"> League Match (Race to 12)</label>
     <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
+    <label>
+    <input type="checkbox" id="bar8HandicapActive"> Bar 8 Champions League Active
+</label>
+<div id="bar8-match-selector" style="display: none; margin-top: 10px;">
+    <label style="font-size: 0.8rem; color: gold;">SELECT LEAGUE MATCH:</label>
+    <select id="match-list-dropdown" style="width: 100%; padding: 8px; background: #222; color: #00ff44; border: 1px solid #444;">
+        <option value="">-- Choose Match --</option>
+        <option value="0">Alastair Key [5] vs Frederick Russell [3]</option>
+        <option value="1">Anthony Illingworth [-2] vs Frederick Russell [3]</option>
+        <option value="2">Frederick Russell [3] vs Rumeen Farsad [3]</option>
+        <option value="3">Frederick Russell [3] vs GUY SMITH [4]</option>
+        <option value="4">Frederick Russell [3] vs DARREN PALMER [4]</option>
+        <option value="5">Frederick Russell [3] vs STEVE WEBB [9]</option>
+    </select>
+</div>
 </div>
 <div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
 <button id="save-setup-btn" class="menu-btn" style="flex: 1;">SAVE & START</button>
@@ -457,7 +471,7 @@ header {
 <div id="about-modal" class="modal-overlay" style="display:none;">
 <div class="modal-content">
 <h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
-<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.1</span></p>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.2</span></p>
 <div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
 <span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
 <button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
@@ -523,6 +537,7 @@ header {
 <span class="nav-icon">👤</span>
 </footer>
 
+<script src="champions.js"></script>
 <script src="script.js"></script>
 
 <script>
@@ -534,7 +549,7 @@ header {
         window.location.href = 'player-list.html';
     });
 
-    const currentVersion = "v4.5.1";
+    const currentVersion = "v4.5.2";
     function checkVersion() {
         fetch('index.html', { cache: "no-store" })
             .then(response => response.text())

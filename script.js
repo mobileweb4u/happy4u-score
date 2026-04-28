@@ -1,12 +1,12 @@
 // ==========================================
-// --- HAPPY4U SCOREBOARD LOGIC V4.5.1 ---
+// --- HAPPY4U SCOREBOARD LOGIC V4.5.2 ---
 // 
 
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "4.5.1"; 
+const APP_VERSION = "4.5.2"; 
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
@@ -78,30 +78,73 @@ window.addEventListener('resize', () => {
     updateUI(); 
 });
 
-// --- 1. Match Setup Logic ---
+// --- 1. Match Setup Logic (Integrated with Bar 8 Champions League) ---
+
+// Initialize League Dropdown on load
+window.addEventListener('load', () => {
+    if (window.ChampionsLeague) {
+        ChampionsLeague.populateDropdown('match-list-dropdown');
+    }
+});
+
+// Toggle Bar 8 Selector Visibility
+const bar8Check = document.getElementById('bar8HandicapActive');
+const bar8Div = document.getElementById('bar8-match-selector');
+const raceIn = document.getElementById('race-input');
+
+if (bar8Check) {
+    bar8Check.addEventListener('change', function() {
+        bar8Div.style.display = this.checked ? 'block' : 'none';
+        if (this.checked) {
+            raceIn.value = 11;
+            raceIn.disabled = true;
+        } else {
+            raceIn.disabled = false;
+        }
+    });
+}
+
 const setupBtn = document.getElementById('save-setup-btn');
 if(setupBtn) {
     setupBtn.addEventListener('click', () => {
         const p1In = document.getElementById('p1-input');
         const p2In = document.getElementById('p2-input');
-        const raceIn = document.getElementById('race-input');
         const goldenCheck = document.getElementById('goldenBreakActive');
+        const matchDropdown = document.getElementById('match-list-dropdown');
+        
+        const isBar8 = bar8Check ? bar8Check.checked : false;
 
-        gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
-        gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
+        // Reset game state for a clean start
+        gameState.p1Score = 0;
+        gameState.p2Score = 0;
+
+        if (isBar8 && matchDropdown.value !== "") {
+            // LOAD FROM CHAMPIONS.JS
+            const match = ChampionsLeague.matches[matchDropdown.value];
+            gameState.p1Name = match.p1.toUpperCase();
+            gameState.p2Name = match.p2.toUpperCase();
+            gameState.p1Score = match.p1Start; // Applying handicap
+            gameState.p2Score = match.p2Start; // Applying handicap
+            gameState.raceTo = 11;
+        } else {
+            // STANDARD MANUAL INPUT
+            gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
+            gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
+            gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
+        }
         
         initProfile(gameState.p1Name);
         initProfile(gameState.p2Name);
 
-        gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
         gameState.startTime = new Date();
         gameState.matchID = "MATCH-" + Date.now(); 
 
         const isGoldenActive = goldenCheck ? goldenCheck.checked : true;
         localStorage.setItem('goldenBreakEnabled', isGoldenActive);
 
+        // Update displays
         const goalDisp = document.getElementById('race-goal-display');
-        if(goalDisp) goalDisp.innerText = (gameState.raceTo === 12) ? "9 (LEAGUE)" : gameState.raceTo;
+        if(goalDisp) goalDisp.innerText = gameState.raceTo;
         
         document.getElementById('p1-name-display').innerText = gameState.p1Name;
         document.getElementById('p2-name-display').innerText = gameState.p2Name;
@@ -113,6 +156,7 @@ if(setupBtn) {
         
         updateUI();
         updateTicker(`SETTING UP: ${gameState.p1Name} VS ${gameState.p2Name}`);
+        saveData();
     });
 }
 
