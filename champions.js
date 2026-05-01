@@ -1,12 +1,12 @@
 // champions.js - Data and Reporting for Bar 8 Champions League
 const ChampionsLeague = {
     matches: [
-        { p1: "Alastair 'kiwi' Key", p1Start: 5, p2: "Frederick Russell", p2Start: 3 },
+        { p1: "Alastair 'kiwi' Key", p1Start: 2, p2: "Frederick Russell", p2Start: 0 },
         { p1: "Anthony Illingworth", p1Start: -2, p2: "Frederick Russell", p2Start: 3 },
-        { p1: "Frederick Russell", p1Start: 3, p2: "Rumeen Farsad", p2Start: 3 },
-        { p1: "Frederick Russell", p1Start: 3, p2: "GUY SMITH", p2Start: 4 },
-        { p1: "Frederick Russell", p1Start: 3, p2: "DARREN PALMER", p2Start: 4 },
-        { p1: "Frederick Russell", p1Start: 3, p2: "STEVE WEBB", p2Start: 9 }
+        { p1: "Frederick Russell", p1Start: 0, p2: "Rumeen Farsad", p2Start: 0 },
+        { p1: "Frederick Russell", p1Start: 0, p2: "GUY SMITH", p2Start: 1 },
+        { p1: "Frederick Russell", p1Start: 0, p2: "DARREN PALMER", p2Start: 1 },
+        { p1: "Frederick Russell", p1Start: 0, p2: "STEVE WEBB", p2Start: 6 }
     ],
 
     populateDropdown: function(dropdownId) {
