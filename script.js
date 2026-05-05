@@ -104,6 +104,22 @@ if (bar8Check) {
     });
 }
 
+// Toggle Singles League Selector Visibility
+const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
+const singlesDiv = document.getElementById('singles-league-selector');
+
+if (singlesCheck) {
+    singlesCheck.addEventListener('change', function() {
+        singlesDiv.style.display = this.checked ? 'block' : 'none';
+        if (this.checked) {
+            raceIn.value = 12;
+            raceIn.disabled = true;
+        } else {
+            raceIn.disabled = false;
+        }
+    });
+}
+
 const setupBtn = document.getElementById('save-setup-btn');
 if(setupBtn) {
     setupBtn.addEventListener('click', () => {
@@ -111,8 +127,11 @@ if(setupBtn) {
         const p2In = document.getElementById('p2-input');
         const goldenCheck = document.getElementById('goldenBreakActive');
         const matchDropdown = document.getElementById('match-list-dropdown');
+        const singlesMatchDropdown = document.getElementById('singles-match-dropdown');
+        const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
         
         const isBar8 = bar8Check ? bar8Check.checked : false;
+        const isSingles = singlesCheck ? singlesCheck.checked : false;
 
         // Reset game state for a clean start
         gameState.p1Score = 0;
@@ -126,6 +145,14 @@ if(setupBtn) {
             gameState.p1Score = match.p1Start; // Applying handicap
             gameState.p2Score = match.p2Start; // Applying handicap
             gameState.raceTo = 11;
+        } else if (isSingles && singlesMatchDropdown.value !== "") {
+            // LOAD FROM SINGLES LEAGUE
+            const match = SinglesLeague.matches[singlesMatchDropdown.value];
+            gameState.p1Name = match.p1.toUpperCase();
+            gameState.p2Name = match.p2.toUpperCase();
+            gameState.p1Score = match.p1Start; // No handicap for singles
+            gameState.p2Score = match.p2Start; // No handicap for singles
+            gameState.raceTo = 12; // League matches are race to 12
         } else {
             // STANDARD MANUAL INPUT
             gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
