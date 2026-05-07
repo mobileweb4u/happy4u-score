@@ -114,18 +114,18 @@ color: white;
     background-color: #000 !important;
     border-top: 1px solid #333;
     border-bottom: 1px solid #333;
-    height: 74px !important;
+    height: 64px !important;
     display: flex;
     align-items: center;
     position: relative;
 }
 
 .ticker {
-    font-size: 2rem !important;
+    font-size: 3.5rem !important;
     font-weight: 800 !important;
     color: #00ff44 !important;
     white-space: nowrap;
-    line-height: 74px;
+    line-height: 64px;
     display: inline-block;
     padding-left: 100%; 
     animation: marquee 50s linear infinite; 
@@ -241,7 +241,7 @@ color: white;
 /* Header Info Icon Professional Update - UNIFORM SIZE */
 header .info-icon {
     cursor: pointer;
-    font-size: 2rem; 
+    font-size: 3.3rem; 
     color: #fff;
     margin-left: auto;
     margin-right: 15px; 
@@ -277,7 +277,7 @@ header {
 }
 
 .brand {
-    font-size: 2.2rem !important; 
+    font-size: 4.2rem !important; 
     margin: 0 !important;
     display: flex;
     align-items: center;
@@ -290,7 +290,7 @@ header {
     margin: 0 !important;
     white-space: nowrap;
     z-index: 1;
-    font-size: 2rem !important; 
+    font-size: 3.2rem !important; 
 }
 
 #pwa-install-trigger {
@@ -336,7 +336,7 @@ header {
 
 <header>
     <div class="header-left">
-        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">v4.5.2</span></h1>
+        <h1 class="brand">HAPPY4U <span id="header-v-badge" class="version-badge">4.5.2</span></h1>
         <button id="pwa-install-trigger">
             <i class="fas fa-download"></i> INSTALL
         </button>
@@ -372,12 +372,13 @@ header {
 
  <section class="ad-zone">
     <img id="sponsor-img" src="ads/sponsor1.png" alt="Sponsor Advertisement">
-
+    
+    <!-- VIDEO PLAYER ADDED BELOW SPONSOR IMG -->
     <video id="local-video-player" class="ad-video" controls autoplay muted loop>
         <source src="videos/local-video.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <a id="player-list" href="player-list.html">← player-list</a>
+      <a id="player-list" href="player-list.html">← player-list</a>
 </section>
 
 <section class="player-column" id="p2-section">
@@ -428,13 +429,8 @@ header {
     <label><input type="checkbox" id="leagueMode"> League Match (Race to 12)</label>
     <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
     <label><input type="checkbox" id="bar8HandicapActive"> Bar 8 Champions League Active</label>
-    
-    <!-- ADDED: Singles League Checkbox -->
-    <label>
-        <input type="checkbox" id="SinglesLeague(Red)Active"> Division 1 Singles League (Red) Active
-    </label>
+    <label><input type="checkbox" id="SinglesLeague(Red)Active"> Division 1 Singles League (Red) Active</label>
 
-    <!-- Bar 8 Selector -->
     <div id="bar8-match-selector" style="display: none; margin-top: 10px;">
         <label style="font-size: 0.8rem; color: gold;">SELECT BAR 8 MATCH:</label>
         <select id="match-list-dropdown" style="width: 100%; padding: 8px; background: #222; color: #00ff44; border: 1px solid #444;">
@@ -448,7 +444,6 @@ header {
         </select>
     </div>
 
-    <!-- ADDED: New Singles League Selector -->
    <div id="singles-league-selector" style="display: none; margin-top: 10px;">
     <label style="font-size: 0.8rem; color: #ff4444;">SELECT LEAGUE MATCH:</label>
     <select id="singles-match-dropdown" style="width: 100%; padding: 8px; background: #222; color: #ff4444; border: 1px solid #444;">
@@ -465,7 +460,6 @@ header {
         <option value="9">Freddie Russell vs William Sturdy</option> 
     </select>
 </div>
-</div>
 <div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
 <button id="save-setup-btn" class="menu-btn" style="flex: 1;">SAVE & START</button>
 <button id="exit-setup-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;">EXIT</button>
@@ -473,16 +467,85 @@ header {
 </div>
 </div>
 
-<!-- Remaining Modals Unchanged -->
-<div id="info-modal" class="modal-overlay" style="display:none;"><div class="modal-content info-menu"><h2 style="color: var(--neon-magenta); margin-bottom: 20px;">MAIN MENU</h2><div class="menu-grid"><button class="menu-btn">GAME MODE</button><button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button><button class="menu-btn" id="open-history-btn">SUMMARY</button><button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button><button class="menu-btn" id="share-app-btn">SHARE APP LINK</button><button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button><button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button><button class="menu-btn">SHOT CLOCK</button><button class="menu-btn" id="open-about-btn">ABOUT</button><button id="close-info-btn">CLOSE</button></div></div></div>
-<div id="about-modal" class="modal-overlay" style="display:none;"><div class="modal-content"><h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2><p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.2</span></p><div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;"><span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span><button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button></div><p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Created by Freddie Russell</p><div style="display: flex; gap: 10px; width: 100%;"><button id="update-app-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);"><i class="fas fa-sync-alt"></i> UPDATES</button><button id="pwa-install-trigger-alt" class="menu-btn" style="flex: 1; display: none; border-color: #00f2ff; color: #00f2ff;"><i class="fas fa-download"></i> INSTALL PWA</button></div><button id="close-about-btn" class="menu-btn" style="margin-top: 10px; width: 100%; border-color: #ff4444; color: #ff4444;">CLOSE</button></div></div>
+<div id="info-modal" class="modal-overlay" style="display:none;">
+<div class="modal-content info-menu">
+<h2 style="color: var(--neon-magenta); margin-bottom: 20px;">MAIN MENU</h2>
+<div class="menu-grid">
+<button class="menu-btn">GAME MODE</button>
+<button class="menu-btn" id="open-setup-from-menu">MATCH SETUP</button>
+<button class="menu-btn" id="open-history-btn">SUMMARY</button>
+<button class="menu-btn" id="open-drills-btn" style="border-color: var(--neon-green); color: var(--neon-green);">PRACTICE DRILLS</button>
+<button class="menu-btn" id="share-app-btn">SHARE APP LINK</button>
+<button class="menu-btn" id="open-qr-btn" style="border-color: gold; color: gold;">OPEN QR SYNC</button>
+<button class="menu-btn" id="install-pwa-btn" style="display:none; border-color: #00ff44; color: #00ff44;">INSTALL APP</button>
+<button class="menu-btn">SHOT CLOCK</button>
+<button class="menu-btn" id="open-about-btn">ABOUT</button>
+<button id="close-info-btn">CLOSE</button>
+</div>
+</div>
+</div>
+
+<div id="about-modal" class="modal-overlay" style="display:none;">
+<div class="modal-content">
+<h2 style="color: var(--neon-magenta);">ABOUT SCOREBOARD</h2>
+<p style="color: white; margin: 10px 0;">Version: <span id="about-v-badge" class="version-badge">v4.5.2</span></p>
+<div style="margin-bottom: 20px; background: #111; padding: 10px; border-radius: 8px;">
+<span id="storage-info" style="color: #888; font-size: 0.75rem;">Storage: Calculating...</span>
+<button id="factory-reset-btn" class="reset-storage-btn">CLEAR DATA</button>
+</div>
+<p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Created by Freddie Russell</p>
+<div style="display: flex; gap: 10px; width: 100%;">
+    <button id="update-app-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">
+        <i class="fas fa-sync-alt"></i> UPDATES
+    </button>
+    <button id="pwa-install-trigger-alt" class="menu-btn" style="flex: 1; display: none; border-color: #00f2ff; color: #00f2ff;">
+        <i class="fas fa-download"></i> INSTALL PWA
+    </button>
+</div>
+<button id="close-about-btn" class="menu-btn" style="margin-top: 10px; width: 100%; border-color: #ff4444; color: #ff4444;">CLOSE</button>
+</div>
+</div>
+
 <div id="qr-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="text-align: center;"><h2 style="color: gold; margin-bottom: 15px;">SCAN TO SYNC</h2><div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"><img id="qr-image" src="" alt="Scan this QR code" style="width: 250px; height: 250px; display: block;"></div><button id="close-qr-btn" class="menu-btn" style="margin-top: 20px; width: 100%;">CLOSE</button></div></div>
 <div id="lag-modal" class="modal-overlay" style="display:none;"><div class="modal-content"><h2>WHO WON THE LAG?</h2><div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;"><button id="lag-p1-btn" class="menu-btn">P1</button><button id="lag-p2-btn" class="menu-btn">P2</button></div></div></div>
-<div id="dish-modal" class="modal-overlay" style="display:none;"><div class="modal-content"><h2 style="color: var(--neon-magenta); text-align: center;">DID YOU DISH?</h2><div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;"><button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button><button class="dish-option menu-btn" data-type="break-dish" style="border-color: var(--neon-green); color: var(--neon-green);">★ BREAK & DISH</button><button class="dish-option menu-btn" data-type="reverse-dish" style="border: 2px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button><button class="dish-option menu-btn" data-type="normal" style="background: #333; color: white;">NORMAL WIN</button><button id="cancel-dish-btn" style="background:none; border:none; color: gray; cursor:pointer; margin-top: 10px;">CANCEL</button></div></div></div>
+
+<div id="dish-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2 style="color: var(--neon-magenta); text-align: center;">DID YOU DISH?</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <button class="dish-option menu-btn golden-break-row" data-type="golden-break" style="border: 2px solid gold; color: gold;">✨ GOLDEN BREAK</button>
+            <button class="dish-option menu-btn" data-type="break-dish" style="border-color: var(--neon-green); color: var(--neon-green);">★ BREAK & DISH</button>
+            <button class="dish-option menu-btn" data-type="reverse-dish" style="border: 2px solid var(--neon-magenta); color: var(--neon-magenta);">REVERSE DISH</button>
+            <button class="dish-option menu-btn" data-type="normal" style="background: #333; color: white;">NORMAL WIN</button>
+            <button id="cancel-dish-btn" style="background:none; border:none; color: gray; cursor:pointer; margin-top: 10px;">CANCEL</button>
+        </div>
+    </div>
+</div>
+
 <div id="winner-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 600px;"><h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2><div style="display: flex; flex-direction: column; gap: 15px;"><div style="display: flex; gap: 10px; width: 100%;"><button id="again-race-btn" class="menu-btn" style="flex: 1;">AGAIN RACE</button><button class="end-game menu-btn" style="flex: 1; background: #ff4444;">END MATCH</button><button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">NEW RACE</button></div><div style="display: flex; gap: 10px; width: 100%;"><button id="save-match-btn" class="menu-btn" style="flex: 1; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button><button id="view-report-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button></div></div></div></div>
-<div id="report-view-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 90%; max-width: 900px;"><h2 style="color: gold; margin-bottom: 15px;">MATCH REPORT PREVIEW</h2><pre id="report-text-area" style="background: #000; color: #fff; padding: 10px; border: 1px solid #333; height: 250px; overflow-y: auto; text-align: left;"></pre><div class="menu-grid" style="margin-top: 20px;"><button id="copy-report-btn" class="menu-btn">📋 COPY</button><button id="reset-history-btn" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">⚠️ RESET</button><button id="close-report-view" class="menu-btn">CLOSE</button></div></div></div>
+
+<div id="report-view-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="width: 90%; max-width: 900px;">
+        <h2 style="color: gold; margin-bottom: 15px;">MATCH REPORT PREVIEW</h2>
+        <pre id="report-text-area" style="background: #000; color: #fff; padding: 10px; border: 1px solid #333; height: 250px; overflow-y: auto; text-align: left;"></pre>
+        <div class="menu-grid" style="margin-top: 20px;">
+            <button id="copy-report-btn" class="menu-btn">📋 COPY</button>
+            <button id="reset-history-btn" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">⚠️ RESET</button>
+            <button id="close-report-view" class="menu-btn">CLOSE</button>
+        </div>
+    </div>
+</div>
+
 <div id="drill-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 800px;"><h2 style="color: var(--neon-green); margin-bottom: 10px;">PRACTICE DRILLS</h2><div id="drill-container" style="background: #111; padding: 10px; border-radius: 10px;"><img id="drill-display" src="" alt="Drill Image" style="width: 100%; max-height: 55vh; object-fit: contain; border: 1px solid var(--neon-green);"><p id="drill-name" style="margin-top: 10px; color: #00f2ff;"></p></div><div class="menu-grid" style="margin-top: 15px;"><button id="prev-drill" class="menu-btn">⬅ PREV</button><button id="next-drill" class="menu-btn">NEXT ➡</button><button id="close-drills" class="menu-btn" style="border-color: #ff4444; color: #ff4444;">CLOSE</button></div></div></div>
-<div id="history-modal" class="modal-overlay" style="display:none;"><div class="modal-content info-menu"><h2 style="color: var(--neon-green); margin-bottom: 20px;">MATCH SUMMARY</h2><div id="history-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 20px;"></div><button id="undo-btn" class="menu-btn" style="width: 100%;">↩ UNDO LAST FRAME</button><button id="close-history-btn" class="menu-btn" style="width: 100%; margin-top: 5px;">BACK</button></div></div>
+
+<div id="history-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content info-menu">
+        <h2 style="color: var(--neon-green); margin-bottom: 20px;">MATCH SUMMARY</h2>
+        <div id="history-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 20px;"></div>
+        <button id="undo-btn" class="menu-btn" style="width: 100%;">↩ UNDO LAST FRAME</button>
+        <button id="close-history-btn" class="menu-btn" style="width: 100%; margin-top: 5px;">BACK</button>
+    </div>
+</div>
 
 <footer class="bottom-nav">
 <span class="nav-icon">🏠</span>
@@ -495,75 +558,6 @@ header {
 <script src="script.js"></script>
 
 <script>
-    // --- UPDATED DYNAMIC HEADER & SELECTOR LOGIC ---
-    const bar8Checkbox = document.getElementById('bar8HandicapActive');
-    const singlesCheckbox = document.getElementById('SinglesLeague(Red)Active');
-    const mainTitle = document.getElementById('main-title');
-    const bar8Div = document.getElementById('bar8-match-selector');
-    const singlesDiv = document.getElementById('singles-league-selector');
-
-    function updateInterface() {
-    // 1. Get the latest race number from the input or the display
-    // Using the setup input value is more reliable if the span isn't updated yet
-    const raceInputVal = document.getElementById('race-input').value;
-    
-    // 2. Handle Selector Visibility
-    bar8Div.style.display = bar8Checkbox.checked ? 'block' : 'none';
-    singlesDiv.style.display = singlesCheckbox.checked ? 'block' : 'none';
-
-    // 3. Update the Header Title Text with the Neon Green span included
-    let newTitle = '';
-    
-    if (singlesCheckbox.checked) {
-        newTitle = `Division 1 Singles League (Red) Active <span id="race-goal-display" style="color: var(--neon-green);">${raceInputVal}</span>`;
-    } else if (bar8Checkbox.checked) {
-        newTitle = `Bar 8 Champions League Active <span id="race-goal-display" style="color: var(--neon-green);">${raceInputVal}</span>`;
-    } else {
-        newTitle = `Race To <span id="race-goal-display" style="color: var(--neon-green);">${raceInputVal}</span>`;
-    }
-
-    // 4. Apply the change to the DOM
-    mainTitle.innerHTML = newTitle;
-}
-        // Get the current race number from the span
-        const raceVal = document.getElementById('race-goal-display').innerText;
-        
-        // Handle Selector Visibility
-        bar8Div.style.display = bar8Checkbox.checked ? 'block' : 'none';
-        singlesDiv.style.display = singlesCheckbox.checked ? 'block' : 'none';
-
-        // Populate dropdowns if visible
-        if (bar8Checkbox.checked && window.ChampionsLeague) {
-            ChampionsLeague.populateDropdown('match-list-dropdown');
-        }
-        if (singlesCheckbox.checked && window.SinglesLeague) {
-            SinglesLeague.populateDropdown('singles-match-dropdown');
-        }
-
-        // Handle Header Text Logic
-        if (singlesCheckbox.checked) {
-            mainTitle.innerHTML = `Division 1 Singles League (Red) Active <span id="race-goal-display" style="color: var(--neon-green);">${raceVal}</span>`;
-        } else if (bar8Checkbox.checked) {
-            mainTitle.innerHTML = `Bar 8 Champions League Active <span id="race-goal-display" style="color: var(--neon-green);">${raceVal}</span>`;
-        } else {
-            mainTitle.innerHTML = `Race To <span id="race-goal-display" style="color: var(--neon-green);">${raceVal}</span>`;
-        }
-    }
-
-    // Call updateInterface on load
-    updateInterface();
-
-    // Event Listeners for live toggling
-    bar8Checkbox.addEventListener('change', () => {
-        if(bar8Checkbox.checked) singlesCheckbox.checked = false; // Prevents title overlap
-        updateInterface();
-    });
-    singlesCheckbox.addEventListener('change', () => {
-        if(singlesCheckbox.checked) bar8Checkbox.checked = false; // Prevents title overlap
-        updateInterface();
-    });
-
-    // --- EXISTING APP LOGIC ---
     document.querySelector('header .info-icon').addEventListener('click', () => {
         document.getElementById('info-modal').style.display = 'flex';
     });
@@ -587,19 +581,23 @@ header {
     setInterval(checkVersion, 30000); 
 
     const sponsorImg = document.getElementById('sponsor-img');
-    const sponsors = ['ads/sponsor1.png', 'ads/sponsor2.png', 'ads/sponsor3.png', 'ads/sponsor4.png', 'ads/sponsor5.png', 'ads/sponsor6.png', 'ads/sponsor7.png', 'ads/sponsor8.png', 'ads/sponsor9.png', 'ads/sponsor10.png', 'ads/sponsor11.png', 'ads/sponsor12.png', 'ads/sponsor13.png', 'ads/sponsor14.png', 'ads/sponsor15.png', 'ads/sponsor16.png', 'ads/sponsor17.png', 'ads/sponsor18.png', 'ads/sponsor19.png'];
+    const sponsors = [
+    'ads/sponsor1.png', 'ads/sponsor2.png', 'ads/sponsor3.png', 
+    'ads/sponsor4.png', 'ads/sponsor5.png', 'ads/sponsor6.png', 
+    'ads/sponsor7.png', 'ads/sponsor8.png', 'ads/sponsor9.png', 
+    'ads/sponsor10.png', 'ads/sponsor11.png', 'ads/sponsor12.png', 
+    'ads/sponsor13.png', 'ads/sponsor14.png', 'ads/sponsor15.png', 
+    'ads/sponsor16.png', 'ads/sponsor17.png', 'ads/sponsor18.png', 
+    'ads/sponsor19.png'
+];
     let currentSponsorIndex = 0;
 
     setInterval(() => {
         sponsorImg.style.opacity = '0';
         setTimeout(() => {
             currentSponsorIndex = (currentSponsorIndex + 1) % sponsors.length;
-            const tempImg = new Image();
-            tempImg.src = sponsors[currentSponsorIndex];
-            tempImg.onload = () => {
-                sponsorImg.src = tempImg.src;
-                sponsorImg.style.opacity = '1';
-            };
+            sponsorImg.src = sponsors[currentSponsorIndex];
+            sponsorImg.style.opacity = '1';
         }, 800);
     }, 15000);
 </script>
