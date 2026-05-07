@@ -6,6 +6,8 @@ const ChampionsLeague = {
         { p1: "Freddie Russell", p1Start: 0, p2: "Rumeen Farsad", p2Start: 0 },
         { p1: "Freddie Russell", p1Start: 0, p2: "GUY SMITH", p2Start: 1 },
         { p1: "Freddie Russell", p1Start: 0, p2: "DARREN PALMER", p2Start: 1 },
+        { p1: "JAMIE WHITE", p1Start: -2, p2: "Frederick Russell", p2Start: 3 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "Jaymesh Patel", p2Start: 2 },
         { p1: "Freddie Russell", p1Start: 0, p2: "STEVE WEBB", p2Start: 6 }
     ],
 
