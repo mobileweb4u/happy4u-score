@@ -1,7 +1,7 @@
 // ==========================================
-// --- SERVICE WORKER MASTER VERSION v4.5.2 ---
+// --- SERVICE WORKER MASTER VERSION v4.5.3 ---
 // ==========================================
-const CACHE_NAME = 'happy4u-v4.5.2';
+const CACHE_NAME = 'happy4u-v4.5.3';
 
 // Use relative paths (./) to ensure compatibility with GitHub Pages subfolders
 const ASSETS = [

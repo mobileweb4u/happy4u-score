@@ -107,7 +107,8 @@ const SinglesLeague = {
         { p1: "DAVID ODWELL", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
         { p1: "Freddie Russell", p1Start: 0, p2: "STUART SMITH", p2Start: 0 },
         { p1: "AARON WATERER", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "William Sturdy", p2Start: 0 }     
+        { p1: "Freddie Russell", p1Start: 0, p2: "William Sturdy", p2Start: 0 }, 
+        { p1: "IAN CABLE ", p1Start: 0, p2: "Freddie Russell", p2Start: 0 }     
     ],
 
     populateDropdown: function(dropdownId) {

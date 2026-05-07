@@ -1,3 +1,88 @@
+
+
+--------------
+
+<div class="setup-rules-container">
+    <label><input type="checkbox" id="leagueMode"> League Match (Race to 12)</label>
+    <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
+    <label><input type="checkbox" id="bar8HandicapActive"> Bar 8 Champions League Active</label>
+    <label><input type="checkbox" id="SinglesLeague(Red)Active"> Division 1 Singles League (Red) Active</label>
+
+    <div id="bar8-match-selector" style="display: none; margin-top: 10px;">
+        <label style="font-size: 0.8rem; color: gold;">SELECT BAR 8 MATCH:</label>
+        <select id="match-list-dropdown" style="width: 100%; padding: 8px; background: #222; color: #00ff44; border: 1px solid #444;">
+            <option value="">-- Choose Match --</option>
+            <option value="0">Alastair Key [5] vs Freddie Russell [3]</option>
+            <option value="1">Anthony Illingworth [-2] vs Freddie Russell [3]</option>
+            <option value="2">Freddie Russell [3] vs Rumeen Farsad [3]</option>
+            <option value="3">Freddie Russell [3] vs GUY SMITH [4]</option>
+            <option value="4">Freddie Russell [3] vs DARREN PALMER [4]</option>
+            <option value="5">Freddie Russell [3] vs STEVE WEBB [9]</option>
+            <option value="6">JAMIE WHITE [-2] vs Freddie Russell [3]</option> 
+            <option value="7">Freddie Russell [3] vs Jaymesh Patel [5]</option>
+        </select>
+    </div>
+
+  <div id="singles-league-selector" style="display: none; margin-top: 10px;">
+    <label style="font-size: 0.8rem; color: #ff4444;">SELECT LEAGUE MATCH:</label>
+    <select id="singles-match-dropdown" style="width: 100%; padding: 8px; background: #222; color: #ff4444; border: 1px solid #444;">
+        <option value="">-- Choose Match --</option>
+        <option value="0">Freddie Russell vs JOHN CROFT</option>
+        <option value="1">MICK COBURN vs Freddie Russell</option>
+        <option value="2">Freddie Russell vs PAUL RODD</option>
+        <option value="3">CHRIS ISAACS vs Freddie Russell</option>
+        <option value="4">GUY SMITH vs Freddie Russell</option>
+        <option value="5">Freddie Russell vs ALEX BURNETT</option>
+        <option value="6">DAVID ODWELL vs Freddie Russell</option>
+        <option value="7">Freddie Russell vs STUART SMITH</option>
+        <option value="8">AARON WATERER vs Freddie Russell</option>
+        <option value="9">Freddie Russell vs William Sturdy</option> 
+    </select>
+</div>
+
+
+
+--------------------------------------------
+
+// champions.js - Data and Reporting for Bar 8 Champions League
+const ChampionsLeague = {
+    matches: [
+        { p1: "Alastair 'kiwi' Key", p1Start: 2, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "Anthony Illingworth", p1Start: -2, p2: "Freddie Russell", p2Start: 3 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "Rumeen Farsad", p2Start: 0 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "GUY SMITH", p2Start: 1 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "DARREN PALMER", p2Start: 1 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "STEVE WEBB", p2Start: 6 },
+        { p1: "JAMIE WHITE", p1Start: -2, p2: "Freddie Russell", p2Start: 3 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "Jaymesh Patel", p2Start: 2 }
+    ],
+
+
+------------------------------------
+
+    / Division 1 Singles League (Red)
+const SinglesLeague = {
+    matches: [
+        { p1: "Freddie Russell", p1Start: 0, p2: "JOHN CROFT", p2Start: 0 },
+        { p1: "MICK COBURN", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "PAUL RODD", p2Start: 0 },
+        { p1: "CHRIS ISAACS", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "GUY SMITH", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "ALEX BURNETT", p2Start: 0 },
+        { p1: "DAVID ODWELL", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "STUART SMITH", p2Start: 0 },
+        { p1: "AARON WATERER", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
+        { p1: "Freddie Russell", p1Start: 0, p2: "William Sturdy", p2Start: 0 }, 
+        { p1: "IAN CABLE ", p1Start: 0, p2: "Freddie Russell", p2Start: 0 }     
+    ],
+
+
+
+
+
+
+-------------------------------
+
 sponsor12.png
 sponsor13.png
 sponsor14.png

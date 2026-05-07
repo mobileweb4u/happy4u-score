@@ -1,6 +1,6 @@
 {
   "name": "happy4u-score",
-  "version": "4.5.2",
+  "version": "4.5.3",
   "description": "Happy4U Scoreboard application for tracking matches and frame wins.",
   "main": "index.js",
   "scripts": {
