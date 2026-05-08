@@ -1,14 +1,14 @@
 // champions.js - Data and Reporting for Bar 8 Champions League
 const ChampionsLeague = {
     matches: [
-        { p1: "Alastair 'kiwi' Key", p1Start: 2, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Anthony Illingworth", p1Start: -2, p2: "Freddie Russell", p2Start: 3 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "Rumeen Farsad", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "GUY SMITH", p2Start: 1 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "DARREN PALMER", p2Start: 1 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "STEVE WEBB", p2Start: 6 },
-        { p1: "JAMIE WHITE", p1Start: -2, p2: "Freddie Russell", p2Start: 3 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "Jaymesh Patel", p2Start: 2 }
+        { p1: "Alastair ", p1Start: 2, p2: "Freddie", p2Start: 0 },
+        { p1: "Anthony ", p1Start: -2, p2: "Freddie", p2Start: 3 },
+        { p1: "Freddie ", p1Start: 0, p2: "Rumeen", p2Start: 0 },
+        { p1: "Freddie ", p1Start: 0, p2: "GUY", p2Start: 1 },
+        { p1: "Freddie ", p1Start: 0, p2: "DARREN", p2Start: 1 },
+        { p1: "Freddie ", p1Start: 0, p2: "STEVE", p2Start: 6 },
+        { p1: "JAMIE ", p1Start: -2, p2: "Freddie", p2Start: 3 },
+        { p1: "Freddie", p1Start: 0, p2: "Jaymesh", p2Start: 2 }
     ],
 
     populateDropdown: function(dropdownId) {
@@ -98,17 +98,17 @@ const ChampionsLeague = {
 // Division 1 Singles League (Red)
 const SinglesLeague = {
     matches: [
-        { p1: "Freddie Russell", p1Start: 0, p2: "JOHN CROFT", p2Start: 0 },
-        { p1: "MICK COBURN", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "PAUL RODD", p2Start: 0 },
-        { p1: "CHRIS ISAACS", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "GUY SMITH", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "ALEX BURNETT", p2Start: 0 },
-        { p1: "DAVID ODWELL", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "STUART SMITH", p2Start: 0 },
-        { p1: "AARON WATERER", p1Start: 0, p2: "Freddie Russell", p2Start: 0 },
-        { p1: "Freddie Russell", p1Start: 0, p2: "William Sturdy", p2Start: 0 }, 
-        { p1: "IAN CABLE ", p1Start: 0, p2: "Freddie Russell", p2Start: 0 }     
+        { p1: "Freddie", p1Start: 0, p2: "JOHN", p2Start: 0 },
+        { p1: "MICK", p1Start: 0, p2: "Freddie", p2Start: 0 },
+        { p1: "Freddie", p1Start: 0, p2: "PAUL", p2Start: 0 },
+        { p1: "CHRIS", p1Start: 0, p2: "Freddie", p2Start: 0 },
+        { p1: "GUY", p1Start: 0, p2: "Freddie", p2Start: 0 },
+        { p1: "Freddie", p1Start: 0, p2: "ALEX", p2Start: 0 },
+        { p1: "DAVID ", p1Start: 0, p2: "Freddie", p2Start: 0 },
+        { p1: "Freddie", p1Start: 0, p2: "STUART", p2Start: 0 },
+        { p1: "AARON", p1Start: 0, p2: "Freddie", p2Start: 0 },
+        { p1: "Freddie", p1Start: 0, p2: "William", p2Start: 0 }, 
+        { p1: "IAN ", p1Start: 0, p2: "Freddie", p2Start: 0 }     
     ],
 
     populateDropdown: function(dropdownId) {

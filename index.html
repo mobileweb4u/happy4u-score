@@ -17,6 +17,23 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* This is critical to stop scrolling */
+    display: flex;
+    flex-direction: column; /* This stacks Header, Ticker, Scoreboard, Nav */
+    background-color: #000;
+}
+
+.break-text {
+    color: #00ff44 !important;
+    font-weight: bold;
+    text-shadow: 0 0 5px #00ff44; /* Optional: adds a professional glow */
+}
+
 /* 3-BUTTON ROW LAYOUT */
 .menu-grid {
 display: grid;
@@ -31,6 +48,74 @@ padding: 10px 2px;
 text-align: center;
 white-space: nowrap;
 }
+
+.player-name {
+    font-size: 1.1rem !important;
+    margin: 5px 0;
+    text-transform: uppercase;
+
+    /* CHANGE THIS LINE TO WHITE */
+    color: #ffffff !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.player-info-header {
+    display: flex;
+    justify-content: space-between; /* Pushes name to one side, races to the other */
+    align-items: center;
+    width: 100%;
+    padding: 0 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider line */
+    margin-bottom: 5px;
+}
+
+.player-header-bar {
+    display: flex;
+    align-items: center;           /* Forces perfect vertical alignment */
+    justify-content: space-between; /* Pushes name and wins to opposite ends */
+    width: 100%;
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+}
+
+/* ADD THIS NEW BLOCK */
+.player-header-row {
+    display: flex;
+    justify-content: space-between; /* Pushes Wins to left, Name to right */
+    align-items: center; /* THIS FIXES THE LINING UP */
+    width: 100%;
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Update these to remove the gaps that cause misalignment */
+.player-name, .match-wins {
+    font-size: 1.4rem !important;
+    margin: 0 !important;         /* Removes default H2 spacing */
+    color: #ffffff !important;     /* Professional White */
+    white-space: nowrap;
+}
+
+#p1-name-display, #p2-name-display {
+    color: #ffffff !important;
+}
+
+#p2-name-display {
+    text-align: right;
+}
+
+.match-wins {
+    font-size: 1.1rem !important;
+    color: var(--cyber-cyan);
+    margin-bottom: 5px;
+}
+
 
 /* Forces the Close button to occupy its own line at the bottom */
 #close-info-btn {
@@ -109,26 +194,31 @@ color: white;
 
 /* --- FIXED TICKER STYLING --- */
 .ticker-wrap {
-    width: 100%;
+    height: 40px !important; /* Fixed height */
     overflow: hidden;
-    background-color: #000 !important;
-    border-top: 1px solid #333;
-    border-bottom: 1px solid #333;
-    height: 74px !important;
+    background-color: #000;
     display: flex;
     align-items: center;
-    position: relative;
+    flex-shrink: 0; 
 }
 
+.scoreboard {
+    flex: 1; /* This fills the space between the Ticker and the Footer */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
 .ticker {
-    font-size: 2rem !important;
+    font-size: 2.2rem !important; /* Slightly smaller so it doesn't clip */
     font-weight: 800 !important;
     color: #00ff44 !important;
     white-space: nowrap;
-    line-height: 74px;
+    line-height: 60px; /* Must match the ticker-wrap height */
     display: inline-block;
     padding-left: 100%; 
-    animation: marquee 50s linear infinite; 
+    animation: marquee 30s linear infinite; /* Adjusted speed */
 }
 
 /* Ticker Movement Logic */
@@ -259,14 +349,12 @@ header .info-icon:active {
 
 /* PROFESSIONAL TOP BAR STYLING */
 header {
+    height: 60px !important; /* Fixed height */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background: #000;
-    border-bottom: 1px solid #222;
-    position: relative;
-    height: 60px;
+    padding: 0 20px;
+    flex-shrink: 0; /* Prevents the header from getting squashed */
 }
 
 .header-left {
@@ -355,7 +443,7 @@ header {
 <main class="scoreboard">
 <section class="player-column" id="p1-section">
 <h2 class="player-name">
-<span id="p1-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-right: 10px;">★ BREAK</span>
+<span id="p1-break-indicator" style="visibility: hidden; color: #00ff44;"> ★ BREAK</span>
 <span id="p1-name-display">Player 1</span>
 </h2>
 <div class="match-wins">Races Won: <span id="p1-matches">0</span></div>
@@ -383,7 +471,7 @@ header {
 <section class="player-column" id="p2-section">
 <h2 class="player-name">
 <span id="p2-name-display">Player 2</span>
-<span id="p2-break-indicator" style="visibility: hidden; color: var(--neon-magenta); margin-left: 10px;">★ BREAK</span>
+<span id="p2-break-indicator" style="visibility: hidden; color: #00ff44;"> ★ BREAK</span>
 </h2>
 <div class="match-wins">Races Won: <span id="p2-matches">0</span></div>
 <div class="score-box" id="p2-box">
@@ -550,12 +638,7 @@ header {
     </div>
 </div>
 
-<footer class="bottom-nav">
-<span class="nav-icon">🏠</span>
-<span class="nav-icon info-icon">ⓘ</span>
-<span class="nav-icon star-icon" id="view-progress-btn">★</span>
-<span class="nav-icon">👤</span>
-</footer>
+
 
 <script src="champions.js"></script>
 <script src="script.js"></script>

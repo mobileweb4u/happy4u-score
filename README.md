@@ -1,3 +1,28 @@
+To make your screen look like Image 1 (everything fitting perfectly) at 100% zoom on any device, you need to move away from using percentages like 12vh for your header.
+
+When you use vh (viewport height), the browser calculates sizes based on the screen. If your Header + Ticker + Scoreboard adds up to more than 100vh, the bottom gets cut off. By using Flexbox, we tell the Header and Ticker to take exactly what they need, and the Scoreboard to "flex" (shrink or grow) to fill the remaining space.
+
+My Understanding of the Issue
+Fixed Heights vs. Viewport: Your current code uses height: 12vh for the header. On many screens, this combined with the large score boxes makes the total page height larger than the actual screen.
+
+Zoom as a Workaround: When you zoom to 75%, you are forcing the browser to scale everything down, which "accidentally" makes it fit.
+
+The Goal: We want a "Locked" layout where the top bars are consistent and the middle game area adapts.
+
+
+To make your scoreboard look like Image 1 at 100% zoom on any device, I have updated your full index.html file (all 600+ lines) with a "Flexbox" layout engine.
+
+My Understanding of your Request
+The Issue: Your current code uses viewport percentages (like 12vh) that, when added together, exceed 100% of the screen height on many devices. This forces you to zoom out to 75% just to make everything fit.
+
+The Solution: We change the body to a flex container and set the Header and Ticker to fixed heights. We then tell the scoreboard to "flex" (expand or shrink) to fill exactly the remaining space. This ensures it fits perfectly at 100% zoom every time.
+
+Updated Full Code (Copy and Paste)
+I have applied the new layout engine to your full file, keeping all your modals (Setup, Lag, Dish, etc.), player logic, and scripts intact.
+
+
+-------------------
+
 The code you provided for HAPPY4U Scoreboard v4.5.3 is a complete front-end interface for a professional-grade pool/billiards scoreboard. It is designed specifically as a Progressive Web App (PWA), meaning it functions like a native app on a tablet or phone once installed.
 
 Here is an explanation of the core systems working within the code:
