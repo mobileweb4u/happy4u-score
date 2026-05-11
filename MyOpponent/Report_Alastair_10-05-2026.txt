@@ -1,0 +1,13 @@
+
+BAR 8 CHAMPIONS LEAGUE REPORT
+------------------------------
+Date: 10/05/2026
+Player: Frederick Russell [3]
+Opponent: Alastair
+Your "Real" Race: 11 Frames
+Target: Race to 11
+
+STATUS: Match Recorded Successfully.
+------------------------------
+Folder: /MyOpponent
+            
