@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY4U Archive Manager</title>
+    <style>
+        :root { --neon-green: #00ff44; --neon-blue: #0088ff; }
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .card { width: 100%; max-width: 450px; border: 2px solid var(--neon-green); padding: 20px; border-radius: 20px; background: #111; box-shadow: 0 0 20px rgba(0,255,68,0.2); }
+        h2 { color: var(--neon-green); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        .btn { 
+            width: 100%; padding: 18px; border: none; font-weight: bold; border-radius: 12px; 
+            margin: 10px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem;
+        }
+        .export-btn { background: var(--neon-blue); color: white; }
+        .import-btn { background: #222; color: var(--neon-green); border: 2px solid var(--neon-green); }
+        .home-btn { background: #444; color: white; margin-top: 20px; }
+        
+        #display-area { 
+            margin-top: 20px; padding: 20px; background: #000; border-radius: 15px; 
+            display: none; border: 1px solid #333; animation: fadeIn 0.5s;
+        }
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; }
+        .val { color: var(--neon-green); font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📂 Archive Center</h2>
+    <p style="text-align: center; color: #888; font-size: 0.8rem;">SD Card Management (MyOpponent)</p>
+    
+    <button class="btn export-btn" onclick="saveActiveMatch()">
+        <b>💾 SAVE LATEST MATCH</b>
+    </button>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+
+    <input type="file" id="sdPicker" style="display:none" onchange="readSDFile(event)">
+    <button class="btn import-btn" onclick="document.getElementById('sdPicker').click()">
+        <b>🔍 VIEW ARCHIVED JSON</b>
+    </button>
+
+    <div id="display-area">
+        <h3 id="m-names" style="color: var(--neon-blue); margin-top: 0;"></h3>
+        <div id="m-stats"></div>
+    </div>
+
+    <button class="btn home-btn" onclick="window.location.href='index.html'">
+        ⬅ RETURN TO SCOREBOARD
+    </button>
+</div>
+
+<script>
+    // 1. SAVE: Grabs whatever is currently in your tablet's local memory
+    function saveActiveMatch() {
+        const data = localStorage.getItem('happy4u_data');
+        if (!data) return alert("No active match found! Play a game first.");
+
+        const state = JSON.parse(data);
+        const fileName = `Match_${state.p1Name}_vs_${state.p2Name}_${Date.now()}.json`;
+        
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        
+        alert("Match exported! Save this to your 'MyOpponent' folder on your SD card.");
+    }
+
+    // 2. LOAD: Reads a JSON file from your SD card
+    function readSDFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                renderStats(json);
+            } catch (err) {
+                alert("This file is not a valid match report.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // 3. RENDER: Beautifully displays the archived stats
+    function renderStats(match) {
+        const area = document.getElementById('display-area');
+        const stats = document.getElementById('m-stats');
+        
+        document.getElementById('m-names').innerText = `${match.p1Name} vs ${match.p2Name}`;
+        
+        stats.innerHTML = `
+            <div class="stat-row"><span>Final Score</span> <span class="val">${match.p1Score} - ${match.p2Score}</span></div>
+            <div class="stat-row"><span>Race To</span> <span class="val">${match.raceTo}</span></div>
+            <div class="stat-row"><span>P1 G.Breaks</span> <span class="val">${match.p1GoldenBreaks}</span></div>
+            <div class="stat-row"><span>P2 G.Breaks</span> <span class="val">${match.p2GoldenBreaks}</span></div>
+            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.6rem">${match.matchID || 'N/A'}</span></div>
+        `;
+        
+        area.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
