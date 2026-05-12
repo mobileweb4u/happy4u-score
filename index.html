@@ -442,9 +442,9 @@ header {
 
 <main class="scoreboard">
 <section class="player-column" id="p1-section">
-<h2 class="player-name">
-<span id="p1-break-indicator" style="visibility: hidden; color: #00ff44;"> ★ BREAK</span>
-<span id="p1-name-display">Player 1</span>
+<h2 class="player-name" style="text-align: center;">
+    <span id="p1-break-indicator" style="visibility: visible; color: rgb(0, 255, 68); display: block;"> ★ BREAK</span>
+    <span id="p1-name-display">Player 1</span>
 </h2>
 <div class="match-wins">Races Won: <span id="p1-matches">0</span></div>
 <div class="score-box" id="p1-box">
@@ -469,10 +469,11 @@ header {
 </section>
 
 <section class="player-column" id="p2-section">
-<h2 class="player-name">
-<span id="p2-name-display">Player 2</span>
-<span id="p2-break-indicator" style="visibility: hidden; color: #00ff44;"> ★ BREAK</span>
+<h2 class="player-name" style="text-align: center;">
+    <span id="p2-break-indicator" style="visibility: visible; color: rgb(0, 255, 68); display: block;"> ★ BREAK</span>
+    <span id="p2-name-display">Player 2</span>
 </h2>
+
 <div class="match-wins">Races Won: <span id="p2-matches">0</span></div>
 <div class="score-box" id="p2-box">
 <div class="score-display" id="p2-score">0</div>
@@ -517,6 +518,7 @@ header {
     <label><input type="checkbox" id="goldenBreakActive"> Golden Break Active</label>
     <label><input type="checkbox" id="bar8HandicapActive"> Bar 8 Champions League Active</label>
     <label><input type="checkbox" id="SinglesLeague(Red)Active"> Division 1 Singles League (Red) Active</label>
+    <label><input type="checkbox" id="PracticeNightActive"> Practice Night Active</label>
 
     <div id="bar8-match-selector" style="display: none; margin-top: 10px;">
         <label style="font-size: 0.8rem; color: gold;">SELECT BAR 8 MATCH:</label>
@@ -549,6 +551,11 @@ header {
         <option value="9">Freddie Russell vs William Sturdy</option> 
         <option value="10">IAN CABLE vs Freddie Russell</option>
     </select>
+
+
+
+
+
 </div>
 </div>
 <div style="display: flex; flex-direction: row; gap: 10px; width: 100%;">
@@ -639,7 +646,8 @@ header {
 </div>
 
 
-
+<script src="menu.js"></script>
+<script src="practice.js"></script>
 <script src="champions.js"></script>
 <script src="script.js"></script>
 
