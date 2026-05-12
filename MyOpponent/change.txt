@@ -1,3 +1,29 @@
+
+Practice Race5
+
+
+
+
+
+
+Match Setup and Leagues
+The Match Setup Modal allows for detailed configuration before starting a match:
+
+Standard Setup: Fields for player names and the "Race To" target number.
+
+League Options: Checkboxes to activate specific league rules and handicaps.
+
+Bar 8 Champions League: Includes a dropdown to select specific pre-defined matches (e.g., Alastair Key vs. Freddie Russell).
+
+Division 1 Singles League (Red): Offers its own dropdown for league-specific matches (e.g., Freddie Russell vs. John Croft).
+
+
+
+
+
+
+
+-------------------------------------
 Step-by-Step Instructions
 Go to the repository: https://github.com/mobileweb4u/happy4u-score.
 
