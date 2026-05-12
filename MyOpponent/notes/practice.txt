@@ -1,0 +1,29 @@
+The practice.js file you've created is a specialized controller that manages the transition between a standard scoreboard and a "Practice Night" match.
+
+It works by connecting your data (the list of players) to the user interface (the dropdown and text boxes) through a three-step process:
+
+1. The Data Structure (PracticeNightActive object)
+The file starts by defining a hard-coded list of matches. Each match contains the player names (p1, p2) and their starting scores. The populateDropdown function inside this object is a "builder"—it automatically creates the list of matches you see in the setup menu so you don't have to write them manually in HTML.
+
+2. The Mode Trigger (Checkbox Logic)
+The script listens for you to check the box labeled Practice Night Active. When you click it:
+
+Sets the Title: It changes a global variable so the scoreboard header will eventually say "Practice Night."
+
+Sets the Goal: It automatically sets the "Race To" input to 5, which is your preferred practice length.
+
+Mutual Exclusion: It unchecks "Bar 8" or "Singles League" checkboxes to ensure the scoreboard doesn't get confused by having two different league modes active at once.
+
+3. The Auto-Fill Logic (The "Carry Forward" Fix)
+This is the most important part of the script. It solves the problem where selected players weren't appearing on the scoreboard.
+
+When you select a match from the dropdown (e.g., "Freddie vs Tubbz"), this listener:
+
+Finds the match in your list using the index.
+
+Locates the hidden input fields in your setup menu (p1-input and p2-input).
+
+"Types" the names into those boxes for you.
+
+Why this approach works
+By "typing" the names into the standard name inputs (p1-input and p2-input), practice.js ensures that when you finally click SAVE & START, the main engine (script.js) sees those names and loads them onto the scoreboard exactly as if you had typed them in manually. It bridges the gap between your custom practice list and the core scoreboard functionality.
