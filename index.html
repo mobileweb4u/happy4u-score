@@ -411,9 +411,36 @@ header {
     font-size: 1.2rem;
 }
 
+<pre id="summary-display-area" style="
+    text-align: left; 
+    background: rgba(10, 10, 10, 0.95); 
+    padding: 30px; 
+    border: 2px solid #00ff44; 
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 255, 68, 0.15), inset 0 0 10px rgba(0, 255, 68, 0.1);
+    overflow-x: auto; 
+    color: #00ff44; 
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    letter-spacing: 0.5px;
+"></pre>
+
 </style>
 </head>
 <body>
+<div id="summary-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Match Report Preview</h3>
+        <pre id="summary-display-area" style="text-align: left; background: #111; padding: 10px; border: 1px solid #333; overflow-x: auto; color: #00ff44; font-family: monospace;"></pre>
+        
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button id="save-summary-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-green); color: var(--neon-green);" onclick="saveSummaryReport()">💾 SAVE</button>
+            <button id="close-summary-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;" onclick="document.getElementById('summary-modal').style.display='none'">CLOSE</button>
+        </div>
+    </div>
+</div>
 <div id="update-toast" onclick="location.reload()">🚀 NEW VERSION AVAILABLE! TAP TO UPDATE</div>
 
 <div id="rotation-warning">
@@ -466,6 +493,9 @@ header {
         Your browser does not support the video tag.
     </video>
     <a id="player-list" href="player-list.html">← player-list</a>
+    <button class="menu-btn" onclick="showSummary()">
+    📊 MATCH SUMMARY
+</button>
 </section>
 
 <section class="player-column" id="p2-section">

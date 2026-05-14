@@ -8,7 +8,8 @@ const ChampionsLeague = {
         { p1: "Freddie ", p1Start: 0, p2: "DARREN", p2Start: 1 },
         { p1: "Freddie ", p1Start: 0, p2: "STEVE", p2Start: 6 },
         { p1: "JAMIE ", p1Start: -2, p2: "Freddie", p2Start: 3 },
-        { p1: "Freddie", p1Start: 0, p2: "Jaymesh", p2Start: 2 }
+        { p1: "Freddie", p1Start: 0, p2: "Jaymesh", p2Start: 2 },
+        { p1: "KINGSLEY", p1Start: -5, p2: "RYAN", p2Start: 1 }
     ],
 
     populateDropdown: function(dropdownId) {
@@ -23,73 +24,80 @@ const ChampionsLeague = {
         });
     },
 
-    // YOUR NEW REPORT FUNCTION INTEGRATED HERE
+    handleSelection: function(index) {
+        const match = this.matches[index];
+        if (!match) return;
+
+        // 1. Set the live scores to the handicap values immediately
+        gameState.p1Name = match.p1.toUpperCase().trim();
+        gameState.p2Name = match.p2.toUpperCase().trim();
+        gameState.p1Score = match.p1Start; 
+        gameState.p2Score = match.p2Start; 
+
+        // 2. Archive these starting values for the log generator
+        gameState.p1ScoreStart = match.p1Start; 
+        gameState.p2ScoreStart = match.p2Start;
+        
+        const p1In = document.getElementById('p1-input');
+        const p2In = document.getElementById('p2-input');
+        if (p1In) p1In.value = match.p1.trim();
+        if (p2In) p2In.value = match.p2.trim();
+    },
+
     generateReport: function() {
         const now = new Date();
-        const datePart = now.toLocaleDateString('en-GB');
-        const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
-        const dateStr = `${datePart}, ${timePart}`;
-        const durationText = getDuration(); // Assumes getDuration exists in script.js
+        const dateStr = now.toLocaleDateString('en-GB') + ", " + now.toLocaleTimeString('en-GB', { hour12: false });
         
-        let report = `╔═════════════════════════════════════════════════════╗\n`;
-        report +=    `║                 Bar 8 Champions League              ║\n`;
-        report +=    `╚═════════════════════════════════════════════════════╝\n\n`;
-        
-        const raceCount = Math.max(1, gameState.p1Matches + gameState.p2Matches);
-        
-        report += `DATE:      ${dateStr}\n`;
-        report += `MATCH ID:  ${gameState.matchID || 'SESSION-ACTIVE'}\n`; 
-        report += `TYPE:      RACE TO ${gameState.raceTo} * ${raceCount}\n`;
-        report += `STATUS:    FINISHED ✅\n`;
-        report += `DURATION:  ${durationText}\n`;
-        report += `------------------------------------------------------\n`;
-        report += `SCORE:     ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})\n`;
-        report += `------------------------------------------------------\n`;
+        const startP1 = gameState.p1ScoreStart || 0;
+        const startP2 = gameState.p2ScoreStart || 0;
+        const isFinished = (gameState.p1Score >= gameState.raceTo || gameState.p2Score >= gameState.raceTo);
+        const statusText = isFinished ? "FINISHED ✅" : "IN PROGRESS 🏃";
 
-        let totalP1F = 0, totalP1A = 0, totalP2F = 0, totalP2A = 0;
-        matchHistory.forEach(f => {
-            if (f.winner === gameState.p1Name) { totalP1F++; totalP2A++; }
-            else { totalP2F++; totalP1A++; }
-        });
+        let report = `DATE:      ${dateStr}\n`;
+        report +=    `TYPE:      STANDARD RACE TO ${gameState.raceTo}\n`;
+        report +=    `STATUS:    ${statusText}\n`;
+        report +=    `SCORE:     ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})\n`;
+        report +=    `----------------------------------------------------------------------------------------------------------\n`;
 
         report += `PLAYER STATISTICS:\n`;
-        report += `${gameState.p1Name.padEnd(15)} | DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}\n`;
-        report += `${gameState.p1Name.padEnd(15)} | FRAME-F: ${totalP1F} | FRAME-A: ${totalP1A}\n`;
-        report += `${gameState.p2Name.padEnd(15)} | DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}\n`;
-        report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${totalP2F} | FRAME-A: ${totalP2A}\n`;
-        report += `------------------------------------------------------\n\n`;
+        // Statistics display "FRAME-F" (Frames For) which includes the handicap
+        report += `${gameState.p1Name.padEnd(20)} | DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}\n`;
+        report += `                     | FRAME-F: ${gameState.p1Score} | FRAME-A: ${gameState.p2Score}\n`;
+        report += `..........................................................................................................\n`;
+        report += `${gameState.p2Name.padEnd(20)} | DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}\n`;
+        report += `                     | FRAME-F: ${gameState.p2Score} | FRAME-A: ${gameState.p1Score}\n`;
+        report += `----------------------------------------------------------------------------------------------------------\n\n`;
 
-        report += `MATCH LOG:\n`;
+        report += `MATCH PROGRESS LOG:\n`;
         
-        let raceP1 = 0, raceP2 = 0;
-        let cumP1 = 0, cumP2 = 0;
+        let frameCount = 1;
+        
+        // 3. AUTOMATED HANDICAP LOGGING
+        // This adds "virtual" frames to the log if a player starts above 0
+        if (startP1 > 0) {
+            for (let i = 0; i < startP1; i++) {
+                report += `[✔] FRAME ${frameCount.toString().padEnd(7)} | WINNER: ${gameState.p1Name.padEnd(20)} | TYPE: handicap\n`;
+                frameCount++;
+            }
+        }
+        if (startP2 > 0) {
+            for (let i = 0; i < startP2; i++) {
+                report += `[✔] FRAME ${frameCount.toString().padEnd(7)} | WINNER: ${gameState.p2Name.padEnd(20)} | TYPE: handicap\n`;
+                frameCount++;
+            }
+        }
 
-        matchHistory.forEach((item, index) => {
-            const frameStr = `FRAME ${item.frame}`.padEnd(10);
-            const winnerStr = `WINNER: ${item.winner}`.padEnd(20);
-            const typeStr = item.type.replace('golden-break', 'GOLDEN-BREAK').replace('break-dish', 'BREAK-DISH').replace('reverse-dish', 'REVERSE-DISH').toUpperCase();
-            
+        // 4. ADD ACTUAL PLAYED FRAMES
+        matchHistory.forEach((item) => {
+            const frameStr = `FRAME ${frameCount}`.padEnd(10);
+            const winnerStr = `WINNER: ${item.winner.toUpperCase()}`.padEnd(25);
+            const typeStr = `TYPE: ${item.type.toUpperCase()}`;
             report += `[✔] ${frameStr} | ${winnerStr} | ${typeStr}\n`;
-            
-            if (item.winner === gameState.p1Name) { raceP1++; cumP1++; }
-            else { raceP2++; cumP2++; }
-
-            let isEndOfRace = false;
-            if (gameState.raceTo === 12) {
-                 if (raceP1 === 9 || raceP2 === 9 || (raceP1 + raceP2 === 12)) isEndOfRace = true;
-            } else {
-                 if (raceP1 >= gameState.raceTo || raceP2 >= gameState.raceTo) isEndOfRace = true;
-            }
-
-            if (isEndOfRace) {
-                report += `\n${gameState.p1Name.padEnd(15)} | FRAME-F: ${cumP1} | FRAME-A: ${cumP2}\n`;
-                report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${cumP2} | FRAME-A: ${cumP1}\n\n`;
-                raceP1 = 0; raceP2 = 0; 
-            }
+            frameCount++;
         });
 
-        report += `\n______________________________________________________\n`;
-        report += `            GENERATED BY Freddie Russell          `;
+        report += `\n__________________________________________________________________________________________________________\n`;
+        report += `                             GENERATED BY Freddie Russell`;
         
         return report;
     }
@@ -99,18 +107,8 @@ const ChampionsLeague = {
 const SinglesLeague = {
     matches: [
         { p1: "Freddie", p1Start: 0, p2: "JOHN", p2Start: 0 },
-        { p1: "MICK", p1Start: 0, p2: "Freddie", p2Start: 0 },
-        { p1: "Freddie", p1Start: 0, p2: "PAUL", p2Start: 0 },
-        { p1: "CHRIS", p1Start: 0, p2: "Freddie", p2Start: 0 },
-        { p1: "GUY", p1Start: 0, p2: "Freddie", p2Start: 0 },
-        { p1: "Freddie", p1Start: 0, p2: "ALEX", p2Start: 0 },
-        { p1: "DAVID ", p1Start: 0, p2: "Freddie", p2Start: 0 },
-        { p1: "Freddie", p1Start: 0, p2: "STUART", p2Start: 0 },
-        { p1: "AARON", p1Start: 0, p2: "Freddie", p2Start: 0 },
-        { p1: "Freddie", p1Start: 0, p2: "William", p2Start: 0 }, 
-        { p1: "IAN ", p1Start: 0, p2: "Freddie", p2Start: 0 }     
+        { p1: "MICK", p1Start: 0, p2: "Freddie", p2Start: 0 }
     ],
-
     populateDropdown: function(dropdownId) {
         const dropdown = document.getElementById(dropdownId);
         if (!dropdown) return;

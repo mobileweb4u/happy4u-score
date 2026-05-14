@@ -26,6 +26,8 @@ let gameState = {
     p2GoldenBreaks: 0, 
     p2Dishes: 0,
     p2RevDishes: 0,
+    p1ScoreStart: 0,
+    p2ScoreStart: 0,
     raceTo: 3,
     lagWinner: null,
     startTime: null,
@@ -144,6 +146,8 @@ if(setupBtn) {
             gameState.p2Name = match.p2.toUpperCase();
             gameState.p1Score = match.p1Start; // Applying handicap
             gameState.p2Score = match.p2Start; // Applying handicap
+            gameState.p1ScoreStart = match.p1Start; // Preserve handicap start for reporting
+            gameState.p2ScoreStart = match.p2Start; // Preserve handicap start for reporting
             gameState.raceTo = 11;
         } else if (isSingles && singlesMatchDropdown.value !== "") {
             // LOAD FROM SINGLES LEAGUE
@@ -152,12 +156,16 @@ if(setupBtn) {
             gameState.p2Name = match.p2.toUpperCase();
             gameState.p1Score = match.p1Start; // No handicap for singles
             gameState.p2Score = match.p2Start; // No handicap for singles
+            gameState.p1ScoreStart = match.p1Start;
+            gameState.p2ScoreStart = match.p2Start;
             gameState.raceTo = 12; // League matches are race to 12
         } else {
             // STANDARD MANUAL INPUT
             gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
             gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
             gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
+            gameState.p1ScoreStart = 0;
+            gameState.p2ScoreStart = 0;
         }
         
         initProfile(gameState.p1Name);
@@ -401,6 +409,9 @@ function showWinner(name) {
     }
     winnerModal.style.display = 'flex';
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
+    
+    // Automatically save the report when target is met
+    autoSaveReport();
 }
 
 function showDraw() {
@@ -419,6 +430,64 @@ function showDraw() {
     }
     winnerModal.style.display = 'flex';
     updateTicker(`LEAGUE ALERT: MATCH ENDED IN A DRAW!`);
+    
+    // Automatically save the report when target is met (draw)
+    autoSaveReport();
+}
+
+// --- BRIDGE FUNCTION FOR CHAMPIONS LEAGUE SUMMARY ---
+function showSummary() {
+    // 1. Pull the formatted text from your champions.js logic
+    // This ensures handicaps are included in the log
+    const reportText = ChampionsLeague.generateReport();
+    
+    // 2. Find the black text area in your Match Summary popup
+    const displayArea = document.getElementById('summary-display-area');
+    const summaryModal = document.getElementById('summary-modal');
+    
+    if (displayArea && summaryModal) {
+        // 3. Inject the text into the preview
+        displayArea.textContent = reportText;
+        
+        // 4. Open the popup
+        summaryModal.style.display = 'flex';
+    } else {
+        console.error("Error: Could not find summary elements. Check your IDs.");
+    }
+}
+
+function saveSummaryReport() {
+    const displayArea = document.getElementById('summary-display-area');
+    const reportText = displayArea ? displayArea.textContent : ChampionsLeague.generateReport();
+    const blob = new Blob([reportText], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Match_Summary_${gameState.matchID || Date.now()}.txt`;
+    link.click();
+}
+
+function autoSaveReport() {
+    // Save text report
+    const reportText = ChampionsLeague.generateReport();
+    const textBlob = new Blob([reportText], { type: 'text/plain' });
+    const textLink = document.createElement('a');
+    textLink.href = URL.createObjectURL(textBlob);
+    textLink.download = `Auto_Save_Report_${gameState.matchID || Date.now()}.txt`;
+    textLink.click();
+
+    // Save JSON data
+    const matchData = {
+        gameState: gameState,
+        matchHistory: matchHistory,
+        totalFramesPlayed: totalFramesPlayed,
+        timestamp: new Date().toISOString(),
+        reportText: reportText
+    };
+    const jsonBlob = new Blob([JSON.stringify(matchData, null, 2)], { type: 'application/json' });
+    const jsonLink = document.createElement('a');
+    jsonLink.href = URL.createObjectURL(jsonBlob);
+    jsonLink.download = `Auto_Save_Data_${gameState.matchID || Date.now()}.json`;
+    jsonLink.click();
 }
 
 // --- 6. UNDO LOGIC ---

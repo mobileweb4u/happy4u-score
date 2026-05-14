@@ -29,7 +29,7 @@
 <body>
 
 <div class="card">
-    <h2>📂 Archive Center</h2>
+    <h2>📁 Archive Center</h2>
     <p style="text-align: center; color: #888; font-size: 0.8rem;">SD Card Management (MyOpponent)</p>
     
     <button class="btn export-btn" onclick="saveActiveMatch()">
@@ -54,10 +54,12 @@
 </div>
 
 <script>
-    // 1. SAVE: Grabs whatever is currently in your tablet's local memory
+    // 1. SAVE: Grabs the live game data from browser memory
     function saveActiveMatch() {
-        const data = localStorage.getItem('happy4u_data');
-        if (!data) return alert("No active match found! Play a game first.");
+        // Checking for 'latestMatch' or 'happy4u_data'
+        const data = localStorage.getItem('happy4u_data') || localStorage.getItem('latestMatch');
+        
+        if (!data) return alert("No active match found! Play a game on the scoreboard first.");
 
         const state = JSON.parse(data);
         const fileName = `Match_${state.p1Name}_vs_${state.p2Name}_${Date.now()}.json`;
@@ -69,10 +71,10 @@
         a.download = fileName;
         a.click();
         
-        alert("Match exported! Save this to your 'MyOpponent' folder on your SD card.");
+        alert("Match exported! Save this to your 'MyOpponent' folder.");
     }
 
-    // 2. LOAD: Reads a JSON file from your SD card
+    // 2. LOAD: Reads the JSON file you select
     function readSDFile(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -83,25 +85,33 @@
                 const json = JSON.parse(e.target.result);
                 renderStats(json);
             } catch (err) {
-                alert("This file is not a valid match report.");
+                alert("Error: This file is not a valid match report.");
             }
         };
         reader.readAsText(file);
     }
 
-    // 3. RENDER: Beautifully displays the archived stats
+    // 3. RENDER: Displays the data using the keys from your champions.js
     function renderStats(match) {
         const area = document.getElementById('display-area');
         const stats = document.getElementById('m-stats');
         
-        document.getElementById('m-names').innerText = `${match.p1Name} vs ${match.p2Name}`;
+        // Handle nested gameState structure from auto-saved JSON
+        const gameState = match.gameState || match;
         
+        // Ensure we handle missing names gracefully
+        const name1 = gameState.p1Name || "Unknown Player";
+        const name2 = gameState.p2Name || "Unknown Player";
+        
+        document.getElementById('m-names').innerText = `${name1} vs ${name2}`;
+        
+        // Updated keys to match your scoreboard logic (p1Dishes, p1Score, etc.)
         stats.innerHTML = `
-            <div class="stat-row"><span>Final Score</span> <span class="val">${match.p1Score} - ${match.p2Score}</span></div>
-            <div class="stat-row"><span>Race To</span> <span class="val">${match.raceTo}</span></div>
-            <div class="stat-row"><span>P1 G.Breaks</span> <span class="val">${match.p1GoldenBreaks}</span></div>
-            <div class="stat-row"><span>P2 G.Breaks</span> <span class="val">${match.p2GoldenBreaks}</span></div>
-            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.6rem">${match.matchID || 'N/A'}</span></div>
+            <div class="stat-row"><span>Final Score</span> <span class="val">${gameState.p1Score ?? 0} - ${gameState.p2Score ?? 0}</span></div>
+            <div class="stat-row"><span>Race To</span> <span class="val">${gameState.raceTo || 'N/A'}</span></div>
+            <div class="stat-row"><span>P1 Dishes</span> <span class="val">${gameState.p1Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>P2 Dishes</span> <span class="val">${gameState.p2Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.6rem">${gameState.matchID || Date.now()}</span></div>
         `;
         
         area.style.display = 'block';

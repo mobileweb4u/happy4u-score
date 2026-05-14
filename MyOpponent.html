@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frederick Russell [3] - Match Schedule</title>
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; border: 2px solid #00ff44; padding: 25px; border-radius: 15px; }
+        h1 { color: #00ff44; text-align: center; text-transform: uppercase; border-bottom: 2px solid #00ff44; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #1a1a1a; }
+        th, td { padding: 15px; border: 1px solid #333; text-align: center; }
+        th { background-color: #00ff44; color: black; font-size: 0.9em; }
+        .save-btn { background: #00ff44; color: black; border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
+        .save-btn:hover { background: #00f2ff; box-shadow: 0 0 10px #00f2ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frederick Russell [3] - Match Schedule</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Opponent</th>
+                    <th>Handicap</th>
+                    <th>Your Start</th>
+                    <th>Their Start</th>
+                    <th>Your "Real"</th>
+                    <th>Their "Real"</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="opponent-table-body"></tbody>
+        </table>
+    </div>
+
+    <script src="MyOpponent.js"></script>
+    <script>
+        const tbody = document.getElementById('opponent-table-body');
+
+        // 1. DYNAMIC PATH DETECTION (Hidden from UI)
+        function getProjectRoot() {
+            const currentPath = window.location.pathname;
+            const directory = currentPath.substring(0, currentPath.lastIndexOf('/'));
+            return decodeURIComponent(directory);
+        }
+
+        const projectRoot = getProjectRoot();
+
+        // 2. BUILD TABLE
+        MyOpponentData.opponents.forEach(opp => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${opp.name}</td>
+                <td>${opp.handicap}</td>
+                <td style="color:#00ff44">${opp.youStart}</td>
+                <td>${opp.themStart}</td>
+                <td>${opp.youReal} Frames</td>
+                <td>${opp.themReal} Frames</td>
+                <td><button class="save-btn" onclick="saveMatchData('${opp.name}', ${opp.youReal}, ${opp.themReal}, '${opp.handicap}')">Save Match</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // 3. JSON DOWNLOAD LOGIC
+        function saveMatchData(name, youReal, themReal, handicap) {
+            const date = new Date().toLocaleDateString('en-GB');
+            
+            const matchRecord = {
+                league: "BAR 8 CHAMPIONS LEAGUE",
+                generatedDate: date,
+                playerMain: "Frederick Russell [3]",
+                opponent: name,
+                handicapValue: handicap,
+                realRaceRequirement: {
+                    freddieNeeds: youReal,
+                    opponentNeeds: themReal
+                },
+                targetRace: 11,
+                localProjectRoot: projectRoot
+            };
+
+            const jsonContent = JSON.stringify(matchRecord, null, 4);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `MatchRecord_${name}_${date.replace(/\//g, '-')}.json`;
+            
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            // Alert still provides instructions for the detected folder
+            alert(`JSON File Generated!\n\nPlease move this file to:\n${projectRoot}`);
+        }
+    </script>
+</body>
+</html>
