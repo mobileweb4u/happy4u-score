@@ -1,0 +1,35 @@
+## How to test it
+
+1. Open index.html in your browser from happy4u-score-main10.
+
+2. Open the main menu:
+   - Click the info icon `ⓘ`.
+
+3. Open `MATCH SETUP`.
+
+4. Enable Bar 8 Champions League:
+   - Check `Bar 8 Champions League Active`.
+   - Select `JAMIE WHITE [-2] vs Freddie Russell [3]` from the match dropdown.
+
+5. Click `SAVE & START`.
+
+6. Confirm the initial scores:
+   - `JAMIE` should start at `-2`
+   - `FREDDIE` should start at `3`
+
+7. Play frames normally until the match finishes.
+
+8. Open the report:
+   - Click `📊 MATCH SUMMARY`
+   - Confirm the modal shows `TYPE: STANDARD RACE TO 11`
+
+9. Also verify the saved report:
+   - Click `💾 SAVE` in the summary modal
+   - Open the downloaded `.txt`
+   - Confirm it also contains `TYPE: STANDARD RACE TO 11`
+
+10. Optional: if you have an archive/export path using generateReport.js, run the same match and verify that tool’s report output also shows `STANDARD RACE TO 11`.
+
+> If you want, I can also give you a quick browser console command to confirm `gameState.raceTo === 11` and the generated report string directly.
+
+Updated todo list
