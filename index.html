@@ -411,6 +411,7 @@ header {
     font-size: 1.2rem;
 }
 
+
 <pre id="summary-display-area" style="
     text-align: left; 
     background: rgba(10, 10, 10, 0.95); 
@@ -430,17 +431,7 @@ header {
 </style>
 </head>
 <body>
-<div id="summary-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <h3>Match Report Preview</h3>
-        <pre id="summary-display-area" style="text-align: left; background: #111; padding: 10px; border: 1px solid #333; overflow-x: auto; color: #00ff44; font-family: monospace;"></pre>
-        
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-            <button id="save-summary-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-green); color: var(--neon-green);" onclick="saveSummaryReport()">💾 SAVE</button>
-            <button id="close-summary-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;" onclick="document.getElementById('summary-modal').style.display='none'">CLOSE</button>
-        </div>
-    </div>
-</div>
+
 <div id="update-toast" onclick="location.reload()">🚀 NEW VERSION AVAILABLE! TAP TO UPDATE</div>
 
 <div id="rotation-warning">
@@ -492,10 +483,10 @@ header {
         <source src="videos/local-video.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <a id="player-list" href="player-list.html">← player-list</a>
     <button class="menu-btn" onclick="showSummary()">
     📊 MATCH SUMMARY
 </button>
+ <a id="player-list" href="player-list.html">← player-list</a>
 </section>
 
 <section class="player-column" id="p2-section">
@@ -650,7 +641,7 @@ header {
     </div>
 </div>
 
-<div id="winner-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 600px;"><h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2><div style="display: flex; flex-direction: column; gap: 15px;"><div style="display: flex; gap: 10px; width: 100%;"><button id="again-race-btn" class="menu-btn" style="flex: 1;">AGAIN RACE</button><button class="end-game menu-btn" style="flex: 1; background: #ff4444;">END MATCH</button><button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">NEW RACE</button></div><div style="display: flex; gap: 10px; width: 100%;"><button id="save-match-btn" class="menu-btn" style="flex: 1; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button><button id="view-report-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button></div></div></div></div>
+<div id="winner-modal" class="modal-overlay" style="display:none;"><div class="modal-content" style="width: 95%; max-width: 600px;"><h2 id="winner-text" style="color: var(--neon-green); margin-bottom: 25px;">CONGRATULATIONS!</h2><div style="display: flex; flex-direction: column; gap: 15px;"><div style="display: flex; gap: 10px; width: 100%;"><button id="again-race-btn" class="menu-btn" style="flex: 1;">AGAIN RACE</button><button class="end-game menu-btn" style="flex: 1; background: #ff4444;">END MATCH</button><button id="new-race-btn" class="menu-btn" style="flex: 1; border-color: var(--neon-green); color: var(--neon-green);">NEW RACE</button></div><div style="display: flex; gap: 10px; width: 100%;"><button id="save-match-btn" class="menu-btn" style="flex: 1; border: 1px solid gold; color: gold;">💾 SAVE REPORT</button><button id="view-report-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-magenta); color: white;">VIEW REPORT</button><button id="share-report-btn" class="menu-btn" style="flex: 1; border: 1px solid #25D366; color: #25D366;">📱 WHATSAPP</button></div></div></div></div>
 
 <div id="report-view-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content" style="width: 90%; max-width: 900px;">
@@ -675,6 +666,16 @@ header {
     </div>
 </div>
 
+<div id="summary-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="width: 95%; max-width: 700px;">
+        <h2 style="color: var(--neon-green); margin-bottom: 15px;">Match Report Preview</h2>
+        <pre id="summary-display-area" style="text-align: left; background: #111; padding: 15px; border: 1px solid #333; overflow-x: auto; color: #00ff44; font-family: monospace; white-space: pre-wrap; min-height: 260px;"></pre>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button id="save-summary-btn" class="menu-btn" style="flex: 1; border: 1px solid var(--neon-green); color: var(--neon-green);" onclick="saveSummaryReport()">💾 SAVE</button>
+            <button id="close-summary-btn" class="menu-btn" style="flex: 1; border-color: #ff4444; color: #ff4444;" onclick="document.getElementById('summary-modal').style.display='none'">CLOSE</button>
+        </div>
+    </div>
+</div>
 
 <script src="menu.js"></script>
 <script src="practice.js"></script>

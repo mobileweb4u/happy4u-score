@@ -397,7 +397,7 @@ function showWinner(name) {
     gameState.isFinished = true; 
     saveData();
     const winText = document.getElementById('winner-text');
-    winText.innerHTML = `CONGRATULATIONS FINISH <span style="color:var(--neon-magenta);">${name}</span><br>` +
+    winText.innerHTML = `CONGRATULATIONS WINNER <span style="color:var(--neon-magenta);">${name}</span><br>` +
                         `<small style="font-size: 0.7em; color: white;">FINAL SCORE: ${gameState.p1Score}-${gameState.p2Score}</small>`;
     
     const reportBtn = document.getElementById('view-report-btn');
@@ -409,9 +409,6 @@ function showWinner(name) {
     }
     winnerModal.style.display = 'flex';
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
-    
-    // Automatically save the report when target is met
-    autoSaveReport();
 }
 
 function showDraw() {
@@ -430,9 +427,6 @@ function showDraw() {
     }
     winnerModal.style.display = 'flex';
     updateTicker(`LEAGUE ALERT: MATCH ENDED IN A DRAW!`);
-    
-    // Automatically save the report when target is met (draw)
-    autoSaveReport();
 }
 
 // --- BRIDGE FUNCTION FOR CHAMPIONS LEAGUE SUMMARY ---
@@ -464,30 +458,6 @@ function saveSummaryReport() {
     link.href = URL.createObjectURL(blob);
     link.download = `Match_Summary_${gameState.matchID || Date.now()}.txt`;
     link.click();
-}
-
-function autoSaveReport() {
-    // Save text report
-    const reportText = ChampionsLeague.generateReport();
-    const textBlob = new Blob([reportText], { type: 'text/plain' });
-    const textLink = document.createElement('a');
-    textLink.href = URL.createObjectURL(textBlob);
-    textLink.download = `Auto_Save_Report_${gameState.matchID || Date.now()}.txt`;
-    textLink.click();
-
-    // Save JSON data
-    const matchData = {
-        gameState: gameState,
-        matchHistory: matchHistory,
-        totalFramesPlayed: totalFramesPlayed,
-        timestamp: new Date().toISOString(),
-        reportText: reportText
-    };
-    const jsonBlob = new Blob([JSON.stringify(matchData, null, 2)], { type: 'application/json' });
-    const jsonLink = document.createElement('a');
-    jsonLink.href = URL.createObjectURL(jsonBlob);
-    jsonLink.download = `Auto_Save_Data_${gameState.matchID || Date.now()}.json`;
-    jsonLink.click();
 }
 
 // --- 6. UNDO LOGIC ---
@@ -741,63 +711,68 @@ function generateReportText() {
     const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
     const dateStr = `${datePart}, ${timePart}`;
     const durationText = getDuration();
-    
+    const startP1 = gameState.p1ScoreStart || 0;
+    const startP2 = gameState.p2ScoreStart || 0;
+    const isBar8Active = (startP1 !== 0 || startP2 !== 0);
+    const reportTitle = isBar8Active ? 'Bar 8 Champions League Active' : 'HAPPY4U MATCH REPORT';
+    const centeredTitle = reportTitle.length >= 45
+        ? reportTitle
+        : reportTitle.padStart(Math.floor((45 + reportTitle.length) / 2)).padEnd(45);
+    const typeLabel = `STANDARD RACE TO ${gameState.raceTo}`;
+    const statusText = gameState.isFinished ? 'FINISHED ✅' : 'IN PROGRESS 🏃';
+
     let report = `╔═════════════════════════════════════════════════════╗\n`;
-    report +=    `║                HAPPY4U MATCH REPORT                 ║\n`;
-    report +=    `╚═════════════════════════════════════════════════════╝\n\n`;
-    
-    const raceCount = Math.max(1, gameState.p1Matches + gameState.p2Matches);
+    report += `║ ${centeredTitle} ║\n`;
+    report += `╚═════════════════════════════════════════════════════╝\n\n`;
     
     report += `DATE:      ${dateStr}\n`;
     report += `MATCH ID:  ${gameState.matchID || 'SESSION-ACTIVE'}\n`; 
-    report += `TYPE:      RACE TO ${gameState.raceTo} * ${raceCount}\n`;
-    report += `STATUS:    FINISHED ✅\n`;
+    report += `TYPE:      ${typeLabel}\n`;
+    report += `STATUS:    ${statusText}\n`;
     report += `DURATION:  ${durationText}\n`;
     report += `------------------------------------------------------\n`;
-    report += `SCORE:     ${gameState.p1Name} (${gameState.p1Matches}) - ${gameState.p2Name} (${gameState.p2Matches})\n`;
+    report += `SCORE:     ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})\n`;
     report += `------------------------------------------------------\n`;
-
-    let totalP1F = 0, totalP1A = 0, totalP2F = 0, totalP2A = 0;
-    matchHistory.forEach(f => {
-        if (f.winner === gameState.p1Name) { totalP1F++; totalP2A++; }
-        else { totalP2F++; totalP1A++; }
-    });
 
     report += `PLAYER STATISTICS:\n`;
     report += `${gameState.p1Name.padEnd(15)} | DISHES: ${gameState.p1Dishes} | REV: ${gameState.p1RevDishes}\n`;
-    report += `${gameState.p1Name.padEnd(15)} | FRAME-F: ${totalP1F} | FRAME-A: ${totalP1A}\n`;
+    report += `${gameState.p1Name.padEnd(15)} | FRAME-F: ${gameState.p1Score} | FRAME-A: ${gameState.p2Score}\n`;
     report += `${gameState.p2Name.padEnd(15)} | DISHES: ${gameState.p2Dishes} | REV: ${gameState.p2RevDishes}\n`;
-    report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${totalP2F} | FRAME-A: ${totalP2A}\n`;
+    report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${gameState.p2Score} | FRAME-A: ${gameState.p1Score}\n`;
     report += `------------------------------------------------------\n\n`;
 
     report += `MATCH LOG:\n`;
-    
-    let raceP1 = 0, raceP2 = 0;
-    let cumP1 = 0, cumP2 = 0;
 
-    matchHistory.forEach((item, index) => {
-        const frameStr = `FRAME ${item.frame}`.padEnd(10);
-        const winnerStr = `WINNER: ${item.winner}`.padEnd(20);
-        const typeStr = item.type.replace('golden-break', 'GOLDEN-BREAK').replace('break-dish', 'BREAK-DISH').replace('reverse-dish', 'REVERSE-DISH').toUpperCase();
-        
+    let frameCount = 1;
+    if (startP1 > 0) {
+        for (let i = 0; i < startP1; i++) {
+            report += `[✔] ${`FRAME ${frameCount}`.padEnd(12)} | ${`WINNER: ${gameState.p1Name}`.padEnd(25)} | TYPE: HANDICAP\n`;
+            frameCount++;
+        }
+    }
+    if (startP2 > 0) {
+        for (let i = 0; i < startP2; i++) {
+            report += `[✔] ${`FRAME ${frameCount}`.padEnd(12)} | ${`WINNER: ${gameState.p2Name}`.padEnd(25)} | TYPE: HANDICAP\n`;
+            frameCount++;
+        }
+    }
+
+    matchHistory.forEach((item) => {
+        const frameStr = `FRAME ${frameCount}`.padEnd(12);
+        const winnerStr = `WINNER: ${item.winner}`.padEnd(25);
+        const typeText = item.type === 'normal'
+            ? 'NORMAL'
+            : item.type.replace('golden-break', 'GOLDEN-BREAK').replace('break-dish', 'BREAK-DISH').replace('reverse-dish', 'REVERSE-DISH').toUpperCase();
+        const typeStr = `TYPE: ${typeText}`;
         report += `[✔] ${frameStr} | ${winnerStr} | ${typeStr}\n`;
-        
-        if (item.winner === gameState.p1Name) { raceP1++; cumP1++; }
-        else { raceP2++; cumP2++; }
-
-        let isEndOfRace = false;
-        if (gameState.raceTo === 12) {
-             if (raceP1 === 9 || raceP2 === 9 || (raceP1 + raceP2 === 12)) isEndOfRace = true;
-        } else {
-             if (raceP1 >= gameState.raceTo || raceP2 >= gameState.raceTo) isEndOfRace = true;
-        }
-
-        if (isEndOfRace) {
-            report += `\n${gameState.p1Name.padEnd(15)} | FRAME-F: ${cumP1} | FRAME-A: ${cumP2}\n`;
-            report += `${gameState.p2Name.padEnd(15)} | FRAME-F: ${cumP2} | FRAME-A: ${cumP1}\n\n`;
-            raceP1 = 0; raceP2 = 0; 
-        }
+        frameCount++;
     });
+
+    if (gameState.isFinished) {
+        const winner = gameState.p1Score > gameState.p2Score ? gameState.p1Name : gameState.p2Name;
+        report += `\nCONGRATULATIONS WINNER ${winner}\n`;
+        report += `FINAL SCORE: ${gameState.p1Score}-${gameState.p2Score}\n`;
+    }
 
     report += `\n______________________________________________________\n`;
     report += `            GENERATED BY Freddie Russell          `;

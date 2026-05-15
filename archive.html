@@ -96,9 +96,6 @@
         const area = document.getElementById('display-area');
         const stats = document.getElementById('m-stats');
         
-        // Handle nested gameState structure from auto-saved JSON
-        const gameState = match.gameState || match;
-        
         // Ensure we handle missing names gracefully
         const name1 = gameState.p1Name || "Unknown Player";
         const name2 = gameState.p2Name || "Unknown Player";

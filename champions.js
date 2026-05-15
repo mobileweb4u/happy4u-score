@@ -76,20 +76,20 @@ const ChampionsLeague = {
         // This adds "virtual" frames to the log if a player starts above 0
         if (startP1 > 0) {
             for (let i = 0; i < startP1; i++) {
-                report += `[✔] FRAME ${frameCount.toString().padEnd(7)} | WINNER: ${gameState.p1Name.padEnd(20)} | TYPE: handicap\n`;
+                report += `[✔] ${`FRAME ${frameCount}`.padEnd(12)} | ${`WINNER: ${gameState.p1Name}`.padEnd(25)} | TYPE: HANDICAP\n`;
                 frameCount++;
             }
         }
         if (startP2 > 0) {
             for (let i = 0; i < startP2; i++) {
-                report += `[✔] FRAME ${frameCount.toString().padEnd(7)} | WINNER: ${gameState.p2Name.padEnd(20)} | TYPE: handicap\n`;
+                report += `[✔] ${`FRAME ${frameCount}`.padEnd(12)} | ${`WINNER: ${gameState.p2Name}`.padEnd(25)} | TYPE: HANDICAP\n`;
                 frameCount++;
             }
         }
-
+        
         // 4. ADD ACTUAL PLAYED FRAMES
         matchHistory.forEach((item) => {
-            const frameStr = `FRAME ${frameCount}`.padEnd(10);
+            const frameStr = `FRAME ${frameCount}`.padEnd(12);
             const winnerStr = `WINNER: ${item.winner.toUpperCase()}`.padEnd(25);
             const typeStr = `TYPE: ${item.type.toUpperCase()}`;
             report += `[✔] ${frameStr} | ${winnerStr} | ${typeStr}\n`;
