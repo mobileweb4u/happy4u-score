@@ -23,7 +23,7 @@ I have applied the new layout engine to your full file, keeping all your modals 
 
 -------------------
 
-The code you provided for HAPPY4U Scoreboard v4.5.3 is a complete front-end interface for a professional-grade pool/billiards scoreboard. It is designed specifically as a Progressive Web App (PWA), meaning it functions like a native app on a tablet or phone once installed.
+The code you provided for HAPPY4U Scoreboard v4.5.4 is a complete front-end interface for a professional-grade pool/billiards scoreboard. It is designed specifically as a Progressive Web App (PWA), meaning it functions like a native app on a tablet or phone once installed.
 
 Here is an explanation of the core systems working within the code:
 
@@ -104,7 +104,7 @@ Reusability: You can easily update this file every season with new players witho
 
 Accuracy: Because the handicaps are hardcoded here, there is no risk of a user typing the wrong starting score during a high-stakes league match.
 
-Summary of your Current Version (v4.5.3):
+Summary of your Current Version (v4.5.4):
 The file is currently set up to favor Freddie Russell as a primary player across both leagues, with specific handicaps ranging from -2 to +9 depending on the opponent's skill level.
 
 ---------------
@@ -218,14 +218,14 @@ The file starts with a constant called ASSETS. This is a list of every single fi
 2. The INSTALL Event (Pre-Caching)
 The install listener is the first thing that runs when someone visits your site.
 
-Storage: it creates a cache storage named happy4u-v4.5.3.
+Storage: it creates a cache storage named happy4u-v4.5.4.
 
 Reliability: It loops through your ASSETS list and saves them locally.
 
 Error Handling: You’ve included a .catch block that logs a message to the console if a specific file (like a missing sponsor image) fails to cache, ensuring one missing file doesn't break the whole app.
 
 3. The ACTIVATE Event (Housecleaning)
-Since you are on version v4.5.3, you likely had older versions (like v4.5.2) previously installed on your device.
+Since you are on version v4.5.4, you likely had older versions (like v4.5.3) previously installed on your device.
 
 Cache Cleanup: This section looks through the browser's storage for any old caches that don't match the current CACHE_NAME.
 

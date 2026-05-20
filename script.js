@@ -1,17 +1,19 @@
 // ==========================================
-// --- HAPPY4U SCOREBOARD LOGIC V4.5.3 ---
+// --- HAPPY4U SCOREBOARD LOGIC V4.5.4 ---
 // 
 
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "4.5.3"; 
+const APP_VERSION = "4.5.4";
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
 // NEW: Tracks Head-to-Head rivalry stats
 let rivalryHistory = JSON.parse(localStorage.getItem('happy4u_rivalries')) || {};
+// Practice Night ledger storage
+let practiceNightHistory = JSON.parse(localStorage.getItem('practice_night_history') || '[]');
 
 let gameState = {
     p1Name: "PLAYER 1",
@@ -32,7 +34,9 @@ let gameState = {
     lagWinner: null,
     startTime: null,
     isFinished: false,
-    matchID: null 
+    matchID: null,
+    leagueMatchId: null,
+    matchMode: 'standard'
 };
 
 // Helper for Duration Calculation
@@ -49,6 +53,7 @@ function saveData() {
     localStorage.setItem('happy4u_data', JSON.stringify(data));
     localStorage.setItem('happy4u_profiles', JSON.stringify(playerProfiles));
     localStorage.setItem('happy4u_rivalries', JSON.stringify(rivalryHistory));
+    localStorage.setItem('practice_night_history', JSON.stringify(practiceNightHistory));
 }
 
 function loadData() {
@@ -61,6 +66,58 @@ function loadData() {
         return true;
     }
     return false;
+}
+
+function loadPracticeHistory() {
+    const saved = localStorage.getItem('practice_night_history');
+    if (saved) {
+        practiceNightHistory = JSON.parse(saved);
+    }
+}
+
+function isPracticeMode() {
+    return gameState.matchMode === 'practice';
+}
+
+function recordPracticeLeg() {
+    const winner = gameState.p1Score > gameState.p2Score ? gameState.p1Name :
+        gameState.p2Score > gameState.p1Score ? gameState.p2Name : 'DRAW';
+    const entry = {
+        legNumber: practiceNightHistory.length + 1,
+        legId: `PRACTICE-${gameState.matchID || Date.now()}`,
+        createdAt: new Date().toLocaleString('en-GB'),
+        p1Name: gameState.p1Name,
+        p2Name: gameState.p2Name,
+        p1Score: gameState.p1Score,
+        p2Score: gameState.p2Score,
+        raceTo: gameState.raceTo,
+        winner,
+        duration: getDuration(),
+        frameLog: matchHistory.slice(),
+        reportText: generateReportText()
+    };
+    practiceNightHistory.push(entry);
+    localStorage.setItem('practice_night_history', JSON.stringify(practiceNightHistory));
+}
+
+function resetPracticeLeg() {
+    gameState.p1Score = 0;
+    gameState.p2Score = 0;
+    gameState.p1Dishes = 0;
+    gameState.p2Dishes = 0;
+    gameState.p1RevDishes = 0;
+    gameState.p2RevDishes = 0;
+    gameState.p1GoldenBreaks = 0;
+    gameState.p2GoldenBreaks = 0;
+    matchHistory = [];
+    totalFramesPlayed = 0;
+    gameState.isFinished = false;
+    gameState.practiceLegSaved = false;
+    gameState.matchID = `MATCH-${Date.now()}`;
+    gameState.startTime = new Date();
+    updateUI();
+    updateTicker(`PRACTICE LEG ${practiceNightHistory.length + 1} READY`);
+    saveData();
 }
 
 // --- DOM Elements ---
@@ -80,11 +137,14 @@ window.addEventListener('resize', () => {
     updateUI(); 
 });
 
-// --- 1. Match Setup Logic (Integrated with Bar 8 Champions League) ---
+// --- 1. Match Setup Logic (Integrated with Bar 8 Champions League via LeagueManager) ---
 
 // Initialize League Dropdown on load
 window.addEventListener('load', () => {
-    if (window.ChampionsLeague) {
+    if (window.LeagueManager) {
+        LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
+        LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+    } else if (window.ChampionsLeague) {
         ChampionsLeague.populateDropdown('match-list-dropdown');
     }
 });
@@ -130,35 +190,66 @@ if(setupBtn) {
         const goldenCheck = document.getElementById('goldenBreakActive');
         const matchDropdown = document.getElementById('match-list-dropdown');
         const singlesMatchDropdown = document.getElementById('singles-match-dropdown');
+        const practiceActive = document.getElementById('PracticeNightActive');
+        const practiceDropdown = document.getElementById('practice-match-dropdown');
         const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
         
         const isBar8 = bar8Check ? bar8Check.checked : false;
         const isSingles = singlesCheck ? singlesCheck.checked : false;
+        const isPractice = practiceActive ? practiceActive.checked : false;
 
         // Reset game state for a clean start
         gameState.p1Score = 0;
         gameState.p2Score = 0;
+        gameState.matchMode = isPractice ? 'practice' : 'standard';
+        gameState.practiceLegSaved = false;
 
         if (isBar8 && matchDropdown.value !== "") {
-            // LOAD FROM CHAMPIONS.JS
-            const match = ChampionsLeague.matches[matchDropdown.value];
-            gameState.p1Name = match.p1.toUpperCase();
-            gameState.p2Name = match.p2.toUpperCase();
-            gameState.p1Score = match.p1Start; // Applying handicap
-            gameState.p2Score = match.p2Start; // Applying handicap
-            gameState.p1ScoreStart = match.p1Start; // Preserve handicap start for reporting
-            gameState.p2ScoreStart = match.p2Start; // Preserve handicap start for reporting
-            gameState.raceTo = 11;
+            // LOAD FROM LEAGUEMANAGER (Centralized Source of Truth)
+            const match = window.LeagueManager ? window.LeagueManager.getMatchByIndex(matchDropdown.value) : ChampionsLeague.matches[matchDropdown.value];
+            if (match) {
+                if (window.LeagueManager && window.LeagueManager.isMatchCompleted(match.id)) {
+                    return alert('This Bar 8 Champions League match has already been played and cannot be restarted.');
+                }
+                gameState.p1Name = match.p1.toUpperCase();
+                gameState.p2Name = match.p2.toUpperCase();
+                gameState.p1Score = match.p1Start; // Applying handicap
+                gameState.p2Score = match.p2Start; // Applying handicap
+                gameState.p1ScoreStart = match.p1Start; // Preserve handicap start for reporting
+                gameState.p2ScoreStart = match.p2Start; // Preserve handicap start for reporting
+                gameState.raceTo = 11;
+                gameState.leagueMatchId = match.id; // Store league match ID for review modal integration
+            }
         } else if (isSingles && singlesMatchDropdown.value !== "") {
-            // LOAD FROM SINGLES LEAGUE
-            const match = SinglesLeague.matches[singlesMatchDropdown.value];
-            gameState.p1Name = match.p1.toUpperCase();
-            gameState.p2Name = match.p2.toUpperCase();
-            gameState.p1Score = match.p1Start; // No handicap for singles
-            gameState.p2Score = match.p2Start; // No handicap for singles
-            gameState.p1ScoreStart = match.p1Start;
-            gameState.p2ScoreStart = match.p2Start;
-            gameState.raceTo = 12; // League matches are race to 12
+            const match = window.LeagueManager ? window.LeagueManager.getSinglesMatchByIndex(singlesMatchDropdown.value) : null;
+            if (match) {
+                if (window.LeagueManager && window.LeagueManager.isMatchCompleted(match.id)) {
+                    return alert('This Division 1 Singles League match has already been played and cannot be restarted.');
+                }
+                gameState.p1Name = match.p1.toUpperCase();
+                gameState.p2Name = match.p2.toUpperCase();
+                gameState.p1Score = match.p1Start;
+                gameState.p2Score = match.p2Start;
+                gameState.p1ScoreStart = match.p1Start;
+                gameState.p2ScoreStart = match.p2Start;
+                gameState.raceTo = 12; // League matches are race to 12
+                gameState.leagueMatchId = match.id;
+            }
+        } else if (isPractice) {
+            gameState.raceTo = 5;
+            gameState.p1ScoreStart = 0;
+            gameState.p2ScoreStart = 0;
+            gameState.leagueMatchId = null;
+            if (practiceDropdown && practiceDropdown.value !== "") {
+                const practiceMatch = PracticeNightActive.matches[practiceDropdown.value];
+                if (practiceMatch) {
+                    gameState.p1Name = practiceMatch.p1.toUpperCase();
+                    gameState.p2Name = practiceMatch.p2.toUpperCase();
+                }
+            } else {
+                gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
+                gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
+            }
         } else {
             // STANDARD MANUAL INPUT
             gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
@@ -395,6 +486,24 @@ function showWinner(name) {
         updateCareerStats(name, loser, false);
     }
     gameState.isFinished = true; 
+    
+    // Mark league match as completed if this was a Bar 8 Champions match
+    if (gameState.leagueMatchId && window.LeagueManager) {
+        const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
+        window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
+            score: finalScore,
+            reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
+            gameState: { ...gameState }
+        });
+        LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
+        LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+    }
+
+    if (isPracticeMode() && !gameState.practiceLegSaved) {
+        recordPracticeLeg();
+        gameState.practiceLegSaved = true;
+    }
+    
     saveData();
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `CONGRATULATIONS WINNER <span style="color:var(--neon-magenta);">${name}</span><br>` +
@@ -408,12 +517,34 @@ function showWinner(name) {
         reportBtn.style.flex = "1";
     }
     winnerModal.style.display = 'flex';
+    if (reportTextArea && reportViewModal) {
+        reportTextArea.innerText = generateReportText();
+        reportViewModal.style.display = 'flex';
+    }
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
 }
 
 function showDraw() {
     if (!gameState.isFinished) updateCareerStats(null, null, true);
     gameState.isFinished = true;
+    
+    // Mark league match as completed if this was a Bar 8 Champions match
+    if (gameState.leagueMatchId && window.LeagueManager) {
+        const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
+        window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
+            score: finalScore,
+            reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
+            gameState: { ...gameState }
+        });
+        LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
+        LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+    }
+
+    if (isPracticeMode() && !gameState.practiceLegSaved) {
+        recordPracticeLeg();
+        gameState.practiceLegSaved = true;
+    }
+    
     saveData();
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `<span style="color:var(--neon-cyan);">MATCH DRAWN (6-6)</span><br>` +
@@ -426,6 +557,10 @@ function showDraw() {
         reportBtn.style.display = "block";
     }
     winnerModal.style.display = 'flex';
+    if (reportTextArea && reportViewModal) {
+        reportTextArea.innerText = generateReportText();
+        reportViewModal.style.display = 'flex';
+    }
     updateTicker(`LEAGUE ALERT: MATCH ENDED IN A DRAW!`);
 }
 
@@ -486,13 +621,20 @@ if (undoBtn) undoBtn.addEventListener('click', undoLastFrame);
 
 // --- 7. Navigation / Reset ---
 document.getElementById('again-race-btn').addEventListener('click', () => {
-    gameState.p1Score = 0;
-    gameState.p2Score = 0;
-    gameState.isFinished = false; 
+    if (isPracticeMode()) {
+        resetPracticeLeg();
+    } else {
+        gameState.p1Score = 0;
+        gameState.p2Score = 0;
+        gameState.isFinished = false; 
+        matchHistory = [];
+        totalFramesPlayed = 0;
+        gameState.practiceLegSaved = false;
+        updateUI();
+        updateBreakIndicator();
+        updateTicker("NEW RACE STARTED!");
+    }
     winnerModal.style.display = 'none';
-    updateUI();
-    updateBreakIndicator();
-    updateTicker("NEW RACE STARTED!");
 });
 
 document.getElementById('new-race-btn').addEventListener('click', () => {
@@ -619,6 +761,10 @@ function addBackupButtons() {
         openHallOfFame(); 
     }, `TOP RANK: ${topPlayer}`);
 
+    const practiceLedgerBtn = createMenuBtn("PRACTICE LEDGER", "📘", "#00ff88", () => {
+        window.location.href = 'PracticeLedger.html';
+    }, `${practiceNightHistory.length} LEGS`);
+
     const backupBtn = createMenuBtn("CLOUD BACKUP", "☁️", "var(--neon-blue)", () => {
         exportData();
         localStorage.setItem('happy4u_last_backup', new Date().toLocaleDateString());
@@ -628,6 +774,7 @@ function addBackupButtons() {
     container.appendChild(leagueBtn);
     container.appendChild(drillsBtn);
     container.appendChild(fameBtn);
+    container.appendChild(practiceLedgerBtn);
     container.appendChild(backupBtn);
     
     infoContent.appendChild(container);
@@ -1044,7 +1191,7 @@ document.getElementById('open-about-btn').addEventListener('click', () => { info
 document.getElementById('close-about-btn').addEventListener('click', () => { aboutModal.style.display = 'none'; infoModal.style.display = 'flex'; });
 const factoryBtn = document.getElementById('factory-reset-btn');
 if (factoryBtn) { factoryBtn.addEventListener('click', async () => { if (confirm("Wipe all data?")) { localStorage.clear(); window.location.reload(); } }); }
-window.addEventListener('load', () => { loadData(); updateUI(); updateBreakIndicator(); updateStorageDisplay(); });
+window.addEventListener('load', () => { loadData(); loadPracticeHistory(); updateUI(); updateBreakIndicator(); updateStorageDisplay(); });
 const exitSetupBtn = document.getElementById('exit-setup-btn');
 if (exitSetupBtn) { exitSetupBtn.addEventListener('click', () => { if(confirm("Exit match setup?")) { localStorage.removeItem('happy4u_data'); window.location.reload(); } }); }
 const qrModal = document.getElementById('qr-modal');

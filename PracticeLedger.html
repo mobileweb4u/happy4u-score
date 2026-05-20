@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Night Statistics Ledger</title>
+    <style>
+        :root {
+            --bg-main: #0a0a0a;
+            --bg-card: #141414;
+            --border-color: #262626;
+            --accent-cyan: #00e5ff;
+            --accent-green: #00ff44;
+            --accent-magenta: #e040fb;
+            --text-bright: #e0e0e0;
+            --text-muted: #777777;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-bright);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ledger-container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .header-section {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .header-section h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 6px;
+        }
+
+        .table-wrapper {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #1c1c1c;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding: 14px 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .player-cell {
+            text-align: left;
+            font-weight: 700;
+            color: #ffffff;
+            padding-left: 20px;
+            min-width: 150px;
+        }
+
+        .count-badge {
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        
+        .badge-played { color: var(--accent-cyan); }
+        .badge-win { color: var(--accent-green); }
+        .badge-loss { color: var(--accent-magenta); }
+        
+        .score-col {
+            color: #aaaaaa;
+            font-family: monospace;
+        }
+        
+        .score-zero {
+            color: #333333 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ledger-container">
+        <div class="header-section">
+            <h2>🎯 Practice Night Performance Ledger</h2>
+            <div class="subtitle">Historical Matrix & Score Frequency Breakdown</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding-left: 20px;">Player</th>
+                        <th>Played</th>
+                        <th>Wins</th>
+                        <th>Losses</th>
+                        <th>5 - 0</th>
+                        <th>5 - 1</th>
+                        <th>5 - 2</th>
+                        <th>5 - 3</th>
+                        <th>5 - 4</th>
+                        <th>5 - 5</th> </tr>
+                </thead>
+                <tbody id="ledger-rows">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            calculatePracticeStats();
+        });
+
+        function calculatePracticeStats() {
+            const practiceHistory = JSON.parse(localStorage.getItem('practice_night_history')) || [];
+            const statsMap = {};
+
+            function initPlayerRow(name) {
+                if (!statsMap[name]) {
+                    statsMap[name] = {
+                        name: name, played: 0, wins: 0, losses: 0,
+                        s50: 0, s51: 0, s52: 0, s53: 0, s54: 0, s55: 0 // Fixed: Added s55 property map initialization entry
+                    };
+                }
+            }
+
+            practiceHistory.forEach(match => {
+                // Safeguard name references to read from either schema structure variations
+                const p1 = match.player1 || match.p1Name;
+                const p2 = match.player2 || match.p2Name;
+
+                if (!p1 || !p2) return; // Skip corrupted rows safely
+
+                initPlayerRow(p1);
+                initPlayerRow(p2);
+
+                statsMap[p1].played++;
+                statsMap[p2].played++;
+
+                if (match.winner === p1) {
+                    statsMap[p1].wins++;
+                    statsMap[p2].losses++;
+                } else if (match.winner === p2) {
+                    statsMap[p2].wins++;
+                    statsMap[p1].losses++;
+                }
+
+                const s1 = parseInt(match.p1Score, 10);
+                const s2 = parseInt(match.p2Score, 10);
+
+                // Track Scorelines for Player 1
+                if (s1 === 5) {
+                    if (s2 === 0) statsMap[p1].s50++;
+                    if (s2 === 1) statsMap[p1].s51++;
+                    if (s2 === 2) statsMap[p1].s52++;
+                    if (s2 === 3) statsMap[p1].s53++;
+                    if (s2 === 4) statsMap[p1].s54++;
+                    if (s2 === 5) statsMap[p1].s55++; // Fixed: Increments 5-5 scores cleanly
+                } else if (s2 === 5) {
+                    if (s1 === 0) statsMap[p1].s50++;
+                    if (s1 === 1) statsMap[p1].s51++;
+                    if (s1 === 2) statsMap[p1].s52++;
+                    if (s1 === 3) statsMap[p1].s53++;
+                    if (s1 === 4) statsMap[p1].s54++;
+                }
+
+                // Track Scorelines for Player 2
+                if (s2 === 5) {
+                    if (s1 === 0) statsMap[p2].s50++;
+                    if (s1 === 1) statsMap[p2].s51++;
+                    if (s1 === 2) statsMap[p2].s52++;
+                    if (s1 === 3) statsMap[p2].s53++;
+                    if (s1 === 4) statsMap[p2].s54++;
+                    if (s1 === 5) statsMap[p2].s55++; // Fixed: Increments 5-5 scores cleanly
+                } else if (s1 === 5) {
+                    if (s2 === 0) statsMap[p2].s50++;
+                    if (s2 === 1) statsMap[p2].s51++;
+                    if (s2 === 2) statsMap[p2].s52++;
+                    if (s2 === 3) statsMap[p2].s53++;
+                    if (s2 === 4) statsMap[p2].s54++;
+                }
+            });
+
+            const tbody = document.getElementById('ledger-rows');
+            tbody.innerHTML = '';
+
+            const players = Object.values(statsMap);
+            if (players.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-muted); padding: 30px;">No practice records found. Log matches in Practice Mode to generate stats.</td></tr>`;
+                return;
+            }
+
+            // Fallback evaluation condition: Safely handle undefined numbers dynamically
+            const formatValue = (val) => (val === 0 || val === undefined) ? `<span class="score-zero">0</span>` : val;
+
+            players.forEach(p => {
+                const rowHTML = `
+                    <tr>
+                        <td class="player-cell">${p.name}</td>
+                        <td class="count-badge badge-played">${p.played}</td>
+                        <td class="count-badge badge-win">${p.wins}</td>
+                        <td class="count-badge badge-loss">${p.losses}</td>
+                        <td class="score-col">${formatValue(p.s50)}</td>
+                        <td class="score-col">${formatValue(p.s51)}</td>
+                        <td class="score-col">${formatValue(p.s52)}</td>
+                        <td class="score-col">${formatValue(p.s53)}</td>
+                        <td class="score-col">${formatValue(p.s54)}</td>
+                        <td class="score-col">${formatValue(p.s55)}</td> </tr>
+                `;
+                tbody.innerHTML += rowHTML;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -76,6 +76,7 @@
     <a id="player-list" href="player-list.html">← player-list</a>
     <a id="ChampionsLeague" href="ChampionsLeague.html">← ChampionsLeague</a>
     <a id="Division(Red)" href="Division(Red).html">← Division(Red)</a>
+    <div id="winner-return-link" style="margin: 10px 0;"></div>
     <h2>POT 2 - Player Rankings</h2>
     <table>
         <thead>
@@ -168,6 +169,19 @@
         </tbody>
     </table>
 </div>
-
+<script>
+    function addWinnerReturnLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') !== 'winner') return;
+        const placeholder = document.getElementById('winner-return-link');
+        if (!placeholder) return;
+        const link = document.createElement('a');
+        link.href = 'index.html?returnToWinner=1';
+        link.textContent = '← RETURN TO WINNER';
+        link.style.cssText = 'display: inline-block; margin: 0 12px 0 0; color: #ff4444; font-weight: 700;';
+        placeholder.appendChild(link);
+    }
+    window.addEventListener('load', addWinnerReturnLink);
+</script>
 </body>
 </html>

@@ -64,6 +64,91 @@
             color: #888;
             font-size: 12px;
         }
+        .completed-row {
+            background-color: #e8f7e8;
+            color: #154d27;
+        }
+        .pending-row {
+            opacity: 0.82;
+        }
+        .status-cell,
+        .action-cell {
+            text-align: center;
+            white-space: nowrap;
+        }
+        .review-btn {
+            border: none;
+            background: #1abc9c;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .review-btn:hover {
+            background: #16a085;
+        }
+        .locked-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ccc;
+            color: #333;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+        }
+        .clickable-row {
+            cursor: pointer;
+        }
+        .clickable-row:hover {
+            background-color: #dbf0db;
+        }
+        .score-cell {
+            text-align: center;
+            font-weight: 700;
+            color: #222;
+        }
+        .review-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+        .review-modal-content {
+            background: #fff;
+            color: #222;
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 18px 60px rgba(0,0,0,0.22);
+        }
+        .review-modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        .review-modal-content pre {
+            background: #f6f6f6;
+            border-radius: 10px;
+            padding: 12px;
+            overflow-x: auto;
+        }
+        .modal-close-btn {
+            border: none;
+            background: #ff4444;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            float: right;
+            font-weight: 700;
+        }
         tr:hover {
             background-color: #fff9f5;
         }
@@ -84,60 +169,39 @@
                 <th>Competition</th>
                 <th style="text-align: center;">Matchup</th>
                 <th>Venue</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">ALASTAIR 'KIWI' KEY <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">ANTHONY ILLINGWORTH <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> RUMEEN FARSAD</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> GUY SMITH</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> DARREN PALMER</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> STEVE WEBB</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> JAMESH PATEL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">09/08/26 | 00:00</td>
-                <td class="comp">Bar 8 Champions League</td>
-                <td class="matchup">JAMIE WHITE <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-        </tbody>
+        <tbody id="schedule-body"></tbody>
     </table>
 </div>
 
+<div id="review-modal" class="review-modal-overlay">
+    <div class="review-modal-content">
+        <button id="close-review-btn" class="modal-close-btn">CLOSE</button>
+        <h2 id="review-title">Match Review</h2>
+        <p id="review-status" style="font-weight:700; margin-bottom:18px;"></p>
+        <div id="review-details"></div>
+    </div>
+</div>
+
+<script src="league-manager.js"></script>
+<script>
+    function addWinnerReturnLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') !== 'winner') return;
+        const nav = document.querySelector('.table-container');
+        if (!nav) return;
+
+        const link = document.createElement('a');
+        link.href = 'index.html?returnToWinner=1';
+        link.textContent = '← RETURN TO WINNER';
+        link.style.cssText = 'display: inline-block; margin-right: 12px; color: #16a085; font-weight: 700;';
+        nav.insertBefore(link, nav.firstChild);
+    }
+    window.addEventListener('load', addWinnerReturnLink);
+</script>
 </body>
 </html>

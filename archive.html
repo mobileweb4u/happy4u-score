@@ -30,48 +30,70 @@
 
 <div class="card">
     <h2>📁 Archive Center</h2>
-    <p style="text-align: center; color: #888; font-size: 0.8rem;">SD Card Management (MyOpponent)</p>
-    
-    <button class="btn export-btn" onclick="saveActiveMatch()">
-        <b>💾 SAVE LATEST MATCH</b>
-    </button>
+        <p style="text-align: center; color: #888; font-size: 0.8rem;">Completed League Matches</p>
+        
+        <div id="completed-list" style="margin-top: 15px;">
+            <p style="color: #888; text-align:center;">Loading completed matches...</p>
+        </div>
 
-    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
 
-    <input type="file" id="sdPicker" style="display:none" onchange="readSDFile(event)">
-    <button class="btn import-btn" onclick="document.getElementById('sdPicker').click()">
-        <b>🔍 VIEW ARCHIVED JSON</b>
-    </button>
+        <button class="btn export-btn" onclick="saveActiveMatch()">
+            <b>💾 SAVE LATEST MATCH</b>
+        </button>
 
-    <div id="display-area">
+        <button class="btn export-btn" onclick="exportRenderedMatch()">
+            <b>📤 EXPORT MATCH</b>
+        </button>
+
+        <button class="btn import-btn" onclick="document.getElementById('sdPicker').click()">
+            <b>🔍 IMPORT MATCH JSON</b>
+        </button>
+
+        <input type="file" id="sdPicker" style="display:none" onchange="readSDFile(event)">
         <h3 id="m-names" style="color: var(--neon-blue); margin-top: 0;"></h3>
         <div id="m-stats"></div>
     </div>
+    <div id="return-to-winner-container" style="margin-top: 10px;"></div>
 
     <button class="btn home-btn" onclick="window.location.href='index.html'">
         ⬅ RETURN TO SCOREBOARD
     </button>
 </div>
 
+<script src="league-manager.js"></script>
 <script>
+    let lastRenderedMatch = null;
+
     // 1. SAVE: Grabs the live game data from browser memory
     function saveActiveMatch() {
-        // Checking for 'latestMatch' or 'happy4u_data'
         const data = localStorage.getItem('happy4u_data') || localStorage.getItem('latestMatch');
-        
         if (!data) return alert("No active match found! Play a game on the scoreboard first.");
 
         const state = JSON.parse(data);
-        const fileName = `Match_${state.p1Name}_vs_${state.p2Name}_${Date.now()}.json`;
-        
-        const blob = new Blob([data], { type: "application/json" });
+        const fileName = `Match_${(state.gameState?.p1Name || state.p1Name || 'P1')}_vs_${(state.gameState?.p2Name || state.p2Name || 'P2')}_${Date.now()}.json`;
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = fileName;
         a.click();
-        
         alert("Match exported! Save this to your 'MyOpponent' folder.");
+    }
+
+    function exportRenderedMatch() {
+        const match = lastRenderedMatch || JSON.parse(localStorage.getItem('happy4u_data') || localStorage.getItem('latestMatch') || '{}');
+        if (!match || Object.keys(match).length === 0) return alert("No match available to export.");
+
+        const text = match.reportText || JSON.stringify(match, null, 2);
+        const fileName = `MatchExport_${(match.gameState?.p1Name || match.p1Name || 'P1')}_vs_${(match.gameState?.p2Name || match.p2Name || 'P2')}_${Date.now()}.txt`;
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        alert("Match export downloaded.");
     }
 
     // 2. LOAD: Reads the JSON file you select
@@ -91,28 +113,91 @@
         reader.readAsText(file);
     }
 
-    // 3. RENDER: Displays the data using the keys from your champions.js
+    // 3. RENDER: Displays the data from the stored match payload
     function renderStats(match) {
+        lastRenderedMatch = match;
         const area = document.getElementById('display-area');
         const stats = document.getElementById('m-stats');
-        
-        // Ensure we handle missing names gracefully
-        const name1 = gameState.p1Name || "Unknown Player";
-        const name2 = gameState.p2Name || "Unknown Player";
-        
+        const name1 = match.gameState?.p1Name || match.p1Name || 'Unknown';
+        const name2 = match.gameState?.p2Name || match.p2Name || 'Unknown';
+        const score1 = match.gameState?.p1Score ?? match.p1Score ?? 0;
+        const score2 = match.gameState?.p2Score ?? match.p2Score ?? 0;
+        const raceTo = match.gameState?.raceTo || match.raceTo || 'N/A';
+        const matchId = match.gameState?.matchID || match.matchID || match.id || 'N/A';
+
         document.getElementById('m-names').innerText = `${name1} vs ${name2}`;
-        
-        // Updated keys to match your scoreboard logic (p1Dishes, p1Score, etc.)
         stats.innerHTML = `
-            <div class="stat-row"><span>Final Score</span> <span class="val">${gameState.p1Score ?? 0} - ${gameState.p2Score ?? 0}</span></div>
-            <div class="stat-row"><span>Race To</span> <span class="val">${gameState.raceTo || 'N/A'}</span></div>
-            <div class="stat-row"><span>P1 Dishes</span> <span class="val">${gameState.p1Dishes ?? 0}</span></div>
-            <div class="stat-row"><span>P2 Dishes</span> <span class="val">${gameState.p2Dishes ?? 0}</span></div>
-            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.6rem">${gameState.matchID || Date.now()}</span></div>
+            <div class="stat-row"><span>Final Score</span> <span class="val">${score1} - ${score2}</span></div>
+            <div class="stat-row"><span>Race To</span> <span class="val">${raceTo}</span></div>
+            <div class="stat-row"><span>P1 Dishes</span> <span class="val">${match.gameState?.p1Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>P2 Dishes</span> <span class="val">${match.gameState?.p2Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.75rem">${matchId}</span></div>
+            <div class="stat-row"><span>Timestamp</span> <span class="val">${match.timestamp || 'N/A'}</span></div>
         `;
-        
         area.style.display = 'block';
     }
+
+    function renderCompletedMatches() {
+        const list = document.getElementById('completed-list');
+        const history = window.LeagueManager ? window.LeagueManager.loadHistory() : {};
+        const completedEntries = Object.entries(history).filter(([_, item]) => item.state === 'COMPLETED');
+
+        if (!completedEntries.length) {
+            list.innerHTML = '<p style="color: #888; text-align: center;">No completed league matches yet.</p>';
+            return;
+        }
+
+        list.innerHTML = completedEntries.map(([matchId, item]) => {
+            const match = window.LeagueManager.schedule.find(m => m.id === matchId) || {};
+            const label = `${match.p1 || 'P1'} vs ${match.p2 || 'P2'}`;
+            return `
+                <div class="stat-row" style="flex-wrap: wrap; gap: 10px;">
+                    <div>${label}</div>
+                    <div class="val">${item.score || 'N/A'}</div>
+                    <button class="btn" style="flex: 1; background: #222; color: var(--neon-green); border: 1px solid var(--neon-green);" onclick="viewMatch('${matchId}')">VIEW</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function viewMatch(matchId) {
+        const history = window.LeagueManager ? window.LeagueManager.loadHistory() : {};
+        const entry = history[matchId];
+        if (!entry) return alert('Match record not found.');
+
+        const match = window.LeagueManager.schedule.find(m => m.id === matchId) || {};
+        const payload = {
+            gameState: entry.gameState || {},
+            p1Name: match.p1,
+            p2Name: match.p2,
+            timestamp: entry.timestamp,
+            score: entry.score,
+            reportText: entry.reportText
+        };
+        renderStats(payload);
+    }
+
+    function addReturnToWinnerLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') !== 'winner') return;
+        const container = document.getElementById('return-to-winner-container');
+        if (!container) return;
+        const btn = document.createElement('button');
+        btn.className = 'btn home-btn';
+        btn.style.background = '#111';
+        btn.style.color = '#00ff44';
+        btn.style.border = '1px solid #00ff44';
+        btn.textContent = '← RETURN TO WINNER';
+        btn.onclick = () => {
+            window.location.href = 'index.html?returnToWinner=1';
+        };
+        container.appendChild(btn);
+    }
+
+    window.addEventListener('load', () => {
+        renderCompletedMatches();
+        addReturnToWinnerLink();
+    });
 </script>
 
 </body>

@@ -26,8 +26,8 @@ const PracticeNightActive = {
 document.addEventListener('DOMContentLoaded', () => {
     // Identify UI Elements from index.html
     const practiceCheckbox = document.getElementById('PracticeNightActive');
-    const practiceSelector = document.getElementById('singles-league-selector'); 
-    const practiceDropdown = document.getElementById('singles-match-dropdown');
+    const practiceSelector = document.getElementById('practice-match-selector'); 
+    const practiceDropdown = document.getElementById('practice-match-dropdown');
     const raceInput = document.getElementById('race-input');
     
     // The actual input boxes the scoreboard engine reads (Fixed IDs)
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const p2Input = document.getElementById('p2-input');
 
     // Initialize the Dropdown with data
-    PracticeNightActive.populateDropdown('singles-match-dropdown');
+    PracticeNightActive.populateDropdown('practice-match-dropdown');
 
     // 2. Logic: What happens when you check the "Practice Night" box
     if (practiceCheckbox) {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Set default Practice Race to 5
                 if (raceInput) raceInput.value = 5; 
                 
-                // Reveal the match dropdown
+                // Reveal the practice match dropdown
                 if (practiceSelector) practiceSelector.style.display = 'block';
 
                 // Mutual Exclusion: Uncheck official leagues
