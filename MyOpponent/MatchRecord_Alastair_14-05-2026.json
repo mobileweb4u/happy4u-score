@@ -1,0 +1,13 @@
+{
+    "league": "BAR 8 CHAMPIONS LEAGUE",
+    "generatedDate": "14/05/2026",
+    "playerMain": "Frederick Russell [3]",
+    "opponent": "Alastair",
+    "handicapValue": "+2",
+    "realRaceRequirement": {
+        "freddieNeeds": 11,
+        "opponentNeeds": 9
+    },
+    "targetRace": 11,
+    "localProjectRoot": "/home/config/Desktop/happy4u-score-main10"
+}
