@@ -250,7 +250,6 @@
     </div>
 </div>
 
-<script src="league-manager.js"></script>
 <script>
     const leagueMatches = [
         { id: 0, date: "20 May | 19:30", comp: "Bar 8 Champions League", p1: "Alastair Key [5]", p2: "Freddie Russell [3]", venue: "Table 1" },
@@ -273,83 +272,83 @@
         alert("Performance logs processed! Table records are now synchronized.");
     }
 
+    /**
+     * --- FIX ---
+     * This is the new, more robust name normalization function.
+     * It takes any name string (e.g., "Alastair 'kiwi' Key" or "Alastair Key [5]")
+     * and reliably returns the primary identifier (e.g., "alastair").
+     */
+    const getBaseName = (name) => {
+        if (!name) return '';
+        return name.toString().toLowerCase().split(' ')[0].replace(/'/g, '');
+    };
+
     function renderFixturesTable() {
-        const storedHistory = JSON.parse(localStorage.getItem('completed_matches_history')) || 
-                              JSON.parse(localStorage.getItem('match_history')) || [];
+        // --- FIX 1: Read the correct data from localStorage ('happy4u_profiles') ---
+        const playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
+        const allMatches = [];
+        const processedMatchIDs = new Set(); // Use a Set to easily prevent duplicate matches
+
+        // --- FIX 2: Create a clean, flat list of every match played from all profiles ---
+        for (const playerName in playerProfiles) {
+            if (playerProfiles[playerName] && playerProfiles[playerName].history) {
+                playerProfiles[playerName].history.forEach(matchRecord => {
+                    // Only add a match if it has an ID and we haven't already processed it
+                    if (matchRecord.matchID && !processedMatchIDs.has(matchRecord.matchID)) {
+                        allMatches.push({
+                            p1Name: playerName,
+                            p2Name: matchRecord.opponent,
+                            score: matchRecord.score, // The score is a string like "11-3"
+                            matchID: matchRecord.matchID
+                        });
+                        processedMatchIDs.add(matchRecord.matchID);
+                    }
+                });
+            }
+        }
+
         const tbody = document.getElementById('schedule-body');
         tbody.innerHTML = '';
 
-        // Isolate the base name keyword (e.g. "freddie", "steve")
-        const baseName = (name) => {
-            if (!name) return '';
-            let cleaned = name.toString().toLowerCase();
-            cleaned = cleaned.replace(/\s*\[-?\d+\]\s*/g, ''); 
-            cleaned = cleaned.replace(/\s*\(-?\d+\)\s*/g, '');
-            const parts = cleaned.trim().split(/\s+/).filter(w => w !== 'vs');
-            return parts[0] || '';
-        };
-
-        leagueMatches.forEach(match => {
+        // --- FIX 3: Loop through the official schedule and try to find a result for each fixture ---
+        leagueMatches.forEach(scheduledMatch => {
             let liveRecord = null;
-            let reverseScore = false;
+            
+            const scheduledP1Base = getBaseName(scheduledMatch.p1);
+            const scheduledP2Base = getBaseName(scheduledMatch.p2);
 
-            const s1Name = baseName(match.p1);
-            const s2Name = baseName(match.p2);
+            // Find a matching result from our clean `allMatches` list
+            for (const recordedMatch of allMatches) {
+                const recordedP1Base = getBaseName(recordedMatch.p1Name);
+                const recordedP2Base = getBaseName(recordedMatch.p2Name);
 
-            for (let i = 0; i < storedHistory.length; i++) {
-                const log = storedHistory[i];
-                
-                // Combine all properties to search safely against appended strings
-                const compositeLog = (
-                    (log.player1 || '') + " " + 
-                    (log.player2 || '') + " " + 
-                    (log.player1Name || '') + " " + 
-                    (log.player2Name || '') + " " +
-                    (log.p1Name || '') + " " +
-                    (log.p2Name || '')
-                ).toLowerCase();
-
-                if (compositeLog.includes(s1Name) && compositeLog.includes(s2Name)) {
-                    liveRecord = log;
-                    
-                    // Correct layout alignment if player positions are flipped
-                    const p1String = (log.player1 || log.player1Name || log.p1Name || '').toLowerCase();
-                    if (p1String.includes(s2Name) && !p1String.includes(s1Name)) {
-                        reverseScore = true;
-                    }
-                    break;
+                // Check if the players match in either order (P1 vs P2 or P2 vs P1)
+                if ((scheduledP1Base === recordedP1Base && scheduledP2Base === recordedP2Base) ||
+                    (scheduledP1Base === recordedP2Base && scheduledP2Base === recordedP1Base)) {
+                    liveRecord = recordedMatch;
+                    break; // Found the match, no need to keep searching
                 }
             }
-
+            
             let scoreText = "- -";
             let statusText = "Pending";
             let isCompleted = false;
 
             if (liveRecord) {
-                let s1 = liveRecord.score1;
-                let s2 = liveRecord.score2;
-
-                // Fallback score scraper if numbers are trapped inside names (Type B)
-                if (s1 === undefined || s2 === undefined || s1 === "" || s2 === "") {
-                    const fullText = JSON.stringify(liveRecord);
-                    const foundNumbers = fullText.match(/\d+/g);
-                    if (foundNumbers && foundNumbers.length >= 2) {
-                        s1 = foundNumbers[0];
-                        s2 = foundNumbers[1];
-                    } else {
-                        s1 = 0;
-                        s2 = 0;
-                    }
-                }
-
-                if (!reverseScore) {
-                    scoreText = `${s1} - ${s2}`;
-                } else {
-                    scoreText = `${s2} - ${s1}`;
-                }
-                
-                statusText = "Completed";
                 isCompleted = true;
+                statusText = "Completed";
+
+                // --- FIX 4: Correctly parse the score and display it in the right order ---
+                const scores = liveRecord.score.split('-').map(s => parseInt(s.trim()));
+                let p1Score = scores[0];
+                let p2Score = scores[1];
+                
+                // If the stored P1 name doesn't match the scheduled P1 name, flip the score
+                if (getBaseName(liveRecord.p1Name) !== scheduledP1Base) {
+                    scoreText = `${p2Score} - ${p1Score}`;
+                } else {
+                    scoreText = `${p1Score} - ${p2Score}`;
+                }
             }
 
             const rowClass = isCompleted ? "completed-row clickable-row" : "pending-row";
@@ -357,19 +356,17 @@
             tr.className = rowClass;
             
             tr.innerHTML = `
-                <td class="date">${match.date}</td>
-                <td class="comp">${match.comp}</td>
-                <td class="matchup">${match.p1} <span class="v-badge">VS</span> ${match.p2}</td>
-                <td class="venue">${match.venue}</td>
+                <td class="date">${scheduledMatch.date}</td>
+                <td class="comp">${scheduledMatch.comp}</td>
+                <td class="matchup">${scheduledMatch.p1} <span class="v-badge">VS</span> ${scheduledMatch.p2}</td>
+                <td class="venue">${scheduledMatch.venue}</td>
                 <td class="score-cell">${scoreText}</td>
                 <td class="status-cell">
-                    <span style="font-weight: bold; color: ${isCompleted ? '#27ae60' : '#f39c12'}">
-                        ${statusText}
-                    </span>
+                    <span style="font-weight: bold; color: ${isCompleted ? '#27ae60' : '#f39c12'}">${statusText}</span>
                 </td>
                 <td class="action-cell">
                     ${isCompleted ? 
-                        `<button class="review-btn" onclick="openReviewModal(${match.id}, '${scoreText}', '${statusText}')">REVIEW</button>` : 
+                        `<button class="review-btn" onclick="openReviewModal(${scheduledMatch.id}, '${scoreText}', '${statusText}')">REVIEW</button>` : 
                         `<span class="locked-badge">Locked</span>`
                     }
                 </td>
@@ -378,7 +375,7 @@
             if (isCompleted) {
                 tr.addEventListener('click', (e) => {
                     if (!e.target.classList.contains('review-btn')) {
-                        openReviewModal(match.id, scoreText, statusText);
+                        openReviewModal(scheduledMatch.id, scoreText, statusText);
                     }
                 });
             }
@@ -411,9 +408,8 @@
     };
 
     window.resetLeagueData = function() {
-        if (confirm("Clear all tournament match logs? This cannot be undone.")) {
-            localStorage.removeItem('completed_matches_history');
-            localStorage.removeItem('match_history');
+        if (confirm("Clear all player profiles and tournament history? This cannot be undone.")) {
+            localStorage.removeItem('happy4u_profiles');
             renderFixturesTable();
             alert("All tournament records successfully reset.");
         }
@@ -425,20 +421,6 @@
         closeBtn.addEventListener('click', () => modal.style.display = 'none');
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
     }
-
-    function addWinnerReturnLink() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('from') !== 'winner') return;
-        const nav = document.getElementById('nav-container');
-        if (!nav) return;
-
-        const link = document.createElement('a');
-        link.href = 'index.html?returnToWinner=1';
-        link.textContent = '← RETURN TO WINNER';
-        link.style.cssText = 'display: inline-block; margin-right: 12px; color: #16a085; font-weight: 700;';
-        nav.insertBefore(link, nav.firstChild);
-    }
-    window.addEventListener('load', addWinnerReturnLink);
 </script>
 </body>
 </html>
