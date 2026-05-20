@@ -11,13 +11,13 @@
             padding: 20px;
             color: #333;
         }
-        .container {
+        .table-container {
             max-width: 1100px;
             margin: auto;
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border-radius: 4px;
-            overflow: hidden;
+            padding: 20px;
         }
         table {
             width: 100%;
@@ -38,7 +38,7 @@
             border-bottom: 1px solid #eee;
         }
         .date {
-            color: #d35400; /* Orange color from image */
+            color: #d35400; 
             font-weight: bold;
             white-space: nowrap;
         }
@@ -152,15 +152,78 @@
         tr:hover {
             background-color: #fff9f5;
         }
+        .controls-nav {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #1abc9c;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .action-buttons-group {
+            display: flex;
+            gap: 10px;
+        }
+        .sync-data-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .sync-data-btn:hover {
+            background-color: #27ae60;
+        }
+        .reset-data-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .reset-data-btn:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
 
 <div class="table-container">
-    <a id="back-home" href="index.html">← Back Home</a>
-    <a id="player-list" href="player-list.html">← player-list</a>
-    <a id="ChampionsLeague" href="ChampionsLeague.html">← ChampionsLeague</a>
-    <a id="Division(Red)" href="Division(Red).html">← Division(Red)</a>
+    <div class="controls-nav">
+        <div class="nav-links" id="nav-container">
+            <a id="back-home" href="index.html">← Back Home</a>
+            <a id="player-list" href="player-list.html">← player-list</a>
+            <a id="ChampionsLeague" href="ChampionsLeague.html">← ChampionsLeague</a>
+            <a id="Division-Red" href="Division(Red).html">← Division(Red)</a>
+        </div>
+        <div class="action-buttons-group">
+            <button class="sync-data-btn" onclick="triggerManualSync()">🔄 Load From Performance Log</button>
+            <button class="reset-data-btn" onclick="resetLeagueData()">Reset All Data</button>
+        </div>
+    </div>
+    
     <h2>POT 2 - Player Rankings</h2>
     <table>
         <thead>
@@ -189,10 +252,184 @@
 
 <script src="league-manager.js"></script>
 <script>
+    const leagueMatches = [
+        { id: 0, date: "20 May | 19:30", comp: "Bar 8 Champions League", p1: "Alastair Key [5]", p2: "Freddie Russell [3]", venue: "Table 1" },
+        { id: 1, date: "20 May | 20:15", comp: "Bar 8 Champions League", p1: "Anthony Illingworth [-2]", p2: "Freddie Russell [3]", venue: "Table 2" },
+        { id: 2, date: "21 May | 19:00", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "Rumeen Farsad [3]", venue: "Table 1" },
+        { id: 3, date: "21 May | 19:45", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "GUY SMITH [4]", venue: "Table 3" },
+        { id: 4, date: "22 May | 19:30", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "DARREN PALMER [4]", venue: "Table 2" },
+        { id: 5, date: "22 May | 20:15", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "STEVE WEBB [9]", venue: "Table 1" },
+        { id: 6, date: "23 May | 15:00", comp: "Bar 8 Champions League", p1: "JAMIE WHITE [-2]", p2: "Freddie Russell [3]", venue: "Table 4" },
+        { id: 7, date: "23 May | 15:45", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "Jaymesh Patel [5]", venue: "Table 1" }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderFixturesTable();
+        setupModalEvents();
+    });
+
+    function triggerManualSync() {
+        renderFixturesTable();
+        alert("Performance logs processed! Table records are now synchronized.");
+    }
+
+    function renderFixturesTable() {
+        const storedHistory = JSON.parse(localStorage.getItem('completed_matches_history')) || 
+                              JSON.parse(localStorage.getItem('match_history')) || [];
+        const tbody = document.getElementById('schedule-body');
+        tbody.innerHTML = '';
+
+        // Isolate the base name keyword (e.g. "freddie", "steve")
+        const baseName = (name) => {
+            if (!name) return '';
+            let cleaned = name.toString().toLowerCase();
+            cleaned = cleaned.replace(/\s*\[-?\d+\]\s*/g, ''); 
+            cleaned = cleaned.replace(/\s*\(-?\d+\)\s*/g, '');
+            const parts = cleaned.trim().split(/\s+/).filter(w => w !== 'vs');
+            return parts[0] || '';
+        };
+
+        leagueMatches.forEach(match => {
+            let liveRecord = null;
+            let reverseScore = false;
+
+            const s1Name = baseName(match.p1);
+            const s2Name = baseName(match.p2);
+
+            for (let i = 0; i < storedHistory.length; i++) {
+                const log = storedHistory[i];
+                
+                // Combine all properties to search safely against appended strings
+                const compositeLog = (
+                    (log.player1 || '') + " " + 
+                    (log.player2 || '') + " " + 
+                    (log.player1Name || '') + " " + 
+                    (log.player2Name || '') + " " +
+                    (log.p1Name || '') + " " +
+                    (log.p2Name || '')
+                ).toLowerCase();
+
+                if (compositeLog.includes(s1Name) && compositeLog.includes(s2Name)) {
+                    liveRecord = log;
+                    
+                    // Correct layout alignment if player positions are flipped
+                    const p1String = (log.player1 || log.player1Name || log.p1Name || '').toLowerCase();
+                    if (p1String.includes(s2Name) && !p1String.includes(s1Name)) {
+                        reverseScore = true;
+                    }
+                    break;
+                }
+            }
+
+            let scoreText = "- -";
+            let statusText = "Pending";
+            let isCompleted = false;
+
+            if (liveRecord) {
+                let s1 = liveRecord.score1;
+                let s2 = liveRecord.score2;
+
+                // Fallback score scraper if numbers are trapped inside names (Type B)
+                if (s1 === undefined || s2 === undefined || s1 === "" || s2 === "") {
+                    const fullText = JSON.stringify(liveRecord);
+                    const foundNumbers = fullText.match(/\d+/g);
+                    if (foundNumbers && foundNumbers.length >= 2) {
+                        s1 = foundNumbers[0];
+                        s2 = foundNumbers[1];
+                    } else {
+                        s1 = 0;
+                        s2 = 0;
+                    }
+                }
+
+                if (!reverseScore) {
+                    scoreText = `${s1} - ${s2}`;
+                } else {
+                    scoreText = `${s2} - ${s1}`;
+                }
+                
+                statusText = "Completed";
+                isCompleted = true;
+            }
+
+            const rowClass = isCompleted ? "completed-row clickable-row" : "pending-row";
+            const tr = document.createElement('tr');
+            tr.className = rowClass;
+            
+            tr.innerHTML = `
+                <td class="date">${match.date}</td>
+                <td class="comp">${match.comp}</td>
+                <td class="matchup">${match.p1} <span class="v-badge">VS</span> ${match.p2}</td>
+                <td class="venue">${match.venue}</td>
+                <td class="score-cell">${scoreText}</td>
+                <td class="status-cell">
+                    <span style="font-weight: bold; color: ${isCompleted ? '#27ae60' : '#f39c12'}">
+                        ${statusText}
+                    </span>
+                </td>
+                <td class="action-cell">
+                    ${isCompleted ? 
+                        `<button class="review-btn" onclick="openReviewModal(${match.id}, '${scoreText}', '${statusText}')">REVIEW</button>` : 
+                        `<span class="locked-badge">Locked</span>`
+                    }
+                </td>
+            `;
+
+            if (isCompleted) {
+                tr.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('review-btn')) {
+                        openReviewModal(match.id, scoreText, statusText);
+                    }
+                });
+            }
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.openReviewModal = function(id, liveScore, liveStatus) {
+        const match = leagueMatches.find(m => m.id === id);
+        if (!match) return;
+
+        document.getElementById('review-title').innerText = `Match Details (ID: #${match.id})`;
+        document.getElementById('review-status').innerHTML = `
+            Scoreline Status: <span style="color:#27ae60;">${liveStatus}</span>
+        `;
+        document.getElementById('review-details').innerHTML = `
+            <pre>
+<strong>Competition:</strong> ${match.comp}
+<strong>Scheduled:</strong>   ${match.date}
+<strong>Arena Venue:</strong> ${match.venue}
+-----------------------------------------
+<strong>Player 1:</strong>    ${match.p1}
+<strong>Player 2:</strong>    ${match.p2}
+-----------------------------------------
+<strong>FINAL SCORE:</strong>  ${liveScore}
+            </pre>
+        `;
+        document.getElementById('review-modal').style.display = 'flex';
+    };
+
+    window.resetLeagueData = function() {
+        if (confirm("Clear all tournament match logs? This cannot be undone.")) {
+            localStorage.removeItem('completed_matches_history');
+            localStorage.removeItem('match_history');
+            renderFixturesTable();
+            alert("All tournament records successfully reset.");
+        }
+    };
+
+    function setupModalEvents() {
+        const modal = document.getElementById('review-modal');
+        const closeBtn = document.getElementById('close-review-btn');
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
     function addWinnerReturnLink() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('from') !== 'winner') return;
-        const nav = document.querySelector('.table-container');
+        const nav = document.getElementById('nav-container');
         if (!nav) return;
 
         const link = document.createElement('a');
