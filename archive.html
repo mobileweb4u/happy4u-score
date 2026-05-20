@@ -21,7 +21,7 @@
             margin-top: 20px; padding: 20px; background: #000; border-radius: 15px; 
             display: none; border: 1px solid #333; animation: fadeIn 0.5s;
         }
-        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; }
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; align-items: center; }
         .val { color: var(--neon-green); font-weight: bold; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -38,12 +38,13 @@
 
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
 
+        <div id="display-area">
+            <h3 id="m-names" style="color: var(--neon-blue); margin-top: 0; text-align: center;"></h3>
+            <div id="m-stats"></div>
+        </div>
+
         <button class="btn export-btn" onclick="saveActiveMatch()">
             <b>💾 SAVE LATEST MATCH</b>
-        </button>
-
-        <button class="btn export-btn" onclick="exportRenderedMatch()">
-            <b>📤 EXPORT MATCH</b>
         </button>
 
         <button class="btn import-btn" onclick="document.getElementById('sdPicker').click()">
@@ -51,9 +52,7 @@
         </button>
 
         <input type="file" id="sdPicker" style="display:none" onchange="readSDFile(event)">
-        <h3 id="m-names" style="color: var(--neon-blue); margin-top: 0;"></h3>
-        <div id="m-stats"></div>
-    </div>
+    
     <div id="return-to-winner-container" style="margin-top: 10px;"></div>
 
     <button class="btn home-btn" onclick="window.location.href='index.html'">
@@ -61,42 +60,27 @@
     </button>
 </div>
 
-<script src="league-manager.js"></script>
 <script>
-    let lastRenderedMatch = null;
+    let allMatchesHistory = []; // Store the clean list of matches globally
 
-    // 1. SAVE: Grabs the live game data from browser memory
+    // --- SAVE/EXPORT FUNCTIONS (No changes needed here) ---
     function saveActiveMatch() {
-        const data = localStorage.getItem('happy4u_data') || localStorage.getItem('latestMatch');
+        const data = localStorage.getItem('happy4u_data');
         if (!data) return alert("No active match found! Play a game on the scoreboard first.");
 
         const state = JSON.parse(data);
-        const fileName = `Match_${(state.gameState?.p1Name || state.p1Name || 'P1')}_vs_${(state.gameState?.p2Name || state.p2Name || 'P2')}_${Date.now()}.json`;
+        const fileName = `Match_${state.gameState.p1Name}_vs_${state.gameState.p2Name}_${Date.now()}.json`;
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = fileName;
         a.click();
-        alert("Match exported! Save this to your 'MyOpponent' folder.");
+        URL.revokeObjectURL(url);
+        alert("Active match exported!");
     }
 
-    function exportRenderedMatch() {
-        const match = lastRenderedMatch || JSON.parse(localStorage.getItem('happy4u_data') || localStorage.getItem('latestMatch') || '{}');
-        if (!match || Object.keys(match).length === 0) return alert("No match available to export.");
-
-        const text = match.reportText || JSON.stringify(match, null, 2);
-        const fileName = `MatchExport_${(match.gameState?.p1Name || match.p1Name || 'P1')}_vs_${(match.gameState?.p2Name || match.p2Name || 'P2')}_${Date.now()}.txt`;
-        const blob = new Blob([text], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        alert("Match export downloaded.");
-    }
-
-    // 2. LOAD: Reads the JSON file you select
+    // --- LOAD/IMPORT FUNCTIONS ---
     function readSDFile(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -105,98 +89,117 @@
         reader.onload = function(e) {
             try {
                 const json = JSON.parse(e.target.result);
-                renderStats(json);
+                // Check if it's a valid match file from our app
+                if (json.gameState) {
+                    renderStats(json.gameState);
+                } else {
+                    alert("Error: This file does not appear to be a valid match report from HAPPY4U.");
+                }
             } catch (err) {
-                alert("Error: This file is not a valid match report.");
+                alert("Error: Could not read or parse the file.");
             }
         };
         reader.readAsText(file);
     }
 
-    // 3. RENDER: Displays the data from the stored match payload
-    function renderStats(match) {
-        lastRenderedMatch = match;
+    // --- RENDER/DISPLAY FUNCTIONS ---
+    function renderStats(gameState) {
         const area = document.getElementById('display-area');
-        const stats = document.getElementById('m-stats');
-        const name1 = match.gameState?.p1Name || match.p1Name || 'Unknown';
-        const name2 = match.gameState?.p2Name || match.p2Name || 'Unknown';
-        const score1 = match.gameState?.p1Score ?? match.p1Score ?? 0;
-        const score2 = match.gameState?.p2Score ?? match.p2Score ?? 0;
-        const raceTo = match.gameState?.raceTo || match.raceTo || 'N/A';
-        const matchId = match.gameState?.matchID || match.matchID || match.id || 'N/A';
+        const statsEl = document.getElementById('m-stats');
+        
+        const name1 = gameState.p1Name || 'Player 1';
+        const name2 = gameState.p2Name || 'Player 2';
+        const score1 = gameState.p1Score ?? 0;
+        const score2 = gameState.p2Score ?? 0;
 
         document.getElementById('m-names').innerText = `${name1} vs ${name2}`;
-        stats.innerHTML = `
+        statsEl.innerHTML = `
             <div class="stat-row"><span>Final Score</span> <span class="val">${score1} - ${score2}</span></div>
-            <div class="stat-row"><span>Race To</span> <span class="val">${raceTo}</span></div>
-            <div class="stat-row"><span>P1 Dishes</span> <span class="val">${match.gameState?.p1Dishes ?? 0}</span></div>
-            <div class="stat-row"><span>P2 Dishes</span> <span class="val">${match.gameState?.p2Dishes ?? 0}</span></div>
-            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.75rem">${matchId}</span></div>
-            <div class="stat-row"><span>Timestamp</span> <span class="val">${match.timestamp || 'N/A'}</span></div>
+            <div class="stat-row"><span>Race To</span> <span class="val">${gameState.raceTo || 'N/A'}</span></div>
+            <div class="stat-row"><span>${name1} Dishes</span> <span class="val">${gameState.p1Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>${name2} Dishes</span> <span class="val">${gameState.p2Dishes ?? 0}</span></div>
+            <div class="stat-row"><span>Match ID</span> <span class="val" style="font-size:0.75rem">${gameState.matchID || 'N/A'}</span></div>
         `;
         area.style.display = 'block';
     }
 
+    /**
+     * --- FIX ---
+     * This function now reads 'happy4u_profiles' and builds the list of completed matches.
+     */
     function renderCompletedMatches() {
-        const list = document.getElementById('completed-list');
-        const history = window.LeagueManager ? window.LeagueManager.loadHistory() : {};
-        const completedEntries = Object.entries(history).filter(([_, item]) => item.state === 'COMPLETED');
+        const listEl = document.getElementById('completed-list');
+        const playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
+        allMatchesHistory = []; // Reset the global history
+        const processedMatchIDs = new Set();
 
-        if (!completedEntries.length) {
-            list.innerHTML = '<p style="color: #888; text-align: center;">No completed league matches yet.</p>';
+        // Loop through all players and collect their match history
+        for (const playerName in playerProfiles) {
+            const profile = playerProfiles[playerName];
+            if (profile && profile.history) {
+                profile.history.forEach(matchRecord => {
+                    if (matchRecord.matchID && !processedMatchIDs.has(matchRecord.matchID)) {
+                        allMatchesHistory.push({
+                            p1Name: playerName,
+                            p2Name: matchRecord.opponent,
+                            score: matchRecord.score,
+                            matchID: matchRecord.matchID,
+                            result: matchRecord.result
+                        });
+                        processedMatchIDs.add(matchRecord.matchID);
+                    }
+                });
+            }
+        }
+
+        if (allMatchesHistory.length === 0) {
+            listEl.innerHTML = '<p style="color: #888; text-align: center;">No completed league matches found.</p>';
             return;
         }
 
-        list.innerHTML = completedEntries.map(([matchId, item]) => {
-            const match = window.LeagueManager.schedule.find(m => m.id === matchId) || {};
-            const label = `${match.p1 || 'P1'} vs ${match.p2 || 'P2'}`;
+        // Generate the HTML for the list
+        listEl.innerHTML = allMatchesHistory.map(match => {
+            const winnerName = match.result === 'WIN' ? match.p1Name : match.p2Name;
+            const loserName = match.result === 'WIN' ? match.p2Name : match.p1Name;
             return `
                 <div class="stat-row" style="flex-wrap: wrap; gap: 10px;">
-                    <div>${label}</div>
-                    <div class="val">${item.score || 'N/A'}</div>
-                    <button class="btn" style="flex: 1; background: #222; color: var(--neon-green); border: 1px solid var(--neon-green);" onclick="viewMatch('${matchId}')">VIEW</button>
+                    <div>${winnerName} vs ${loserName}</div>
+                    <div class="val">${match.score}</div>
+                    <button class="btn" style="flex-basis: 100%; background: #222; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 10px;" onclick="viewMatch('${match.matchID}')">
+                        VIEW DETAILS
+                    </button>
                 </div>
             `;
         }).join('');
     }
 
+    /**
+     * --- FIX ---
+     * This function now finds the match in our globally stored `allMatchesHistory` array.
+     */
     function viewMatch(matchId) {
-        const history = window.LeagueManager ? window.LeagueManager.loadHistory() : {};
-        const entry = history[matchId];
-        if (!entry) return alert('Match record not found.');
-
-        const match = window.LeagueManager.schedule.find(m => m.id === matchId) || {};
-        const payload = {
-            gameState: entry.gameState || {},
-            p1Name: match.p1,
-            p2Name: match.p2,
-            timestamp: entry.timestamp,
-            score: entry.score,
-            reportText: entry.reportText
+        const matchData = allMatchesHistory.find(m => m.matchID === matchId);
+        if (!matchData) return alert('Match record not found.');
+        
+        // To render stats, we need a gameState object. We'll reconstruct one.
+        const scores = matchData.score.split('-').map(s => parseInt(s.trim()));
+        const reconstructedGameState = {
+            p1Name: matchData.p1Name,
+            p2Name: matchData.p2Name,
+            p1Score: scores[0],
+            p2Score: scores[1],
+            matchID: matchData.matchID,
+            // We don't have dish data in the summary, so we show 0
+            p1Dishes: 'N/A',
+            p2Dishes: 'N/A',
+            raceTo: 'N/A' // Also not in summary
         };
-        renderStats(payload);
+        renderStats(reconstructedGameState);
     }
-
-    function addReturnToWinnerLink() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('from') !== 'winner') return;
-        const container = document.getElementById('return-to-winner-container');
-        if (!container) return;
-        const btn = document.createElement('button');
-        btn.className = 'btn home-btn';
-        btn.style.background = '#111';
-        btn.style.color = '#00ff44';
-        btn.style.border = '1px solid #00ff44';
-        btn.textContent = '← RETURN TO WINNER';
-        btn.onclick = () => {
-            window.location.href = 'index.html?returnToWinner=1';
-        };
-        container.appendChild(btn);
-    }
-
+    
+    // Initial load function
     window.addEventListener('load', () => {
         renderCompletedMatches();
-        addReturnToWinnerLink();
     });
 </script>
 
