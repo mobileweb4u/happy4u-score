@@ -1,0 +1,92 @@
+How to test your app
+Open the app
+Open index.html in your browser or in Acode on Android.
+This is the main scoreboard entry point.
+Test a league match flow
+Select a league match from the dropdown on index.html.
+Play the match until one player reaches the race-to target.
+Confirm the match ends, the winner modal appears, and the report/save flow is triggered.
+Verify completed match persistence
+Open ChampionsLeague.html
+Confirm the match row changes from ● PENDING to COMPLETED ✅
+Confirm the Score column shows the final score
+Click the completed row or Review Match button and verify the review modal shows the saved match data
+Verify archive browsing
+Open archive.html
+Confirm completed matches appear in the list
+Click VIEW for a completed match
+Verify match statistics and score details appear correctly
+Use browser dev tools if needed
+Open Console to see errors
+Check localStorage for key champions_season_history
+Confirm completed match entries exist with score, gameState, and timestamp
+Repeat for edge cases
+Try a draw match if your game supports it
+Try a second completed match
+Refresh pages to confirm persistence still works
+Best test route: index.html → finish a league match → ChampionsLeague.html → check completed score → archive.html → view match stats.
+
+If you want, I can also give you a short checklist for Acode on Android specifically.
+
+Raptor mini (Preview) • 1x
+
+CONGRATULATIONS WINNER
+I want the button to link to these three files
+archive.html
+ChampionsLeague.html
+Division(Red).html
+
+
+CONGRATULATIONS WINNER here
+To have a button that returned back To where it came from
+archive.html
+ChampionsLeague.html
+Division(Red).html
+the button you go from will return back to the CONGRATULATIONS WINNER here
+
+
+Archive Center I want to have export button
+
+
+what is claude skill
+
+
+want a Practice Night record of all player number of time player
+number of 5.0
+number of 5.1
+number of 5.2
+number of 5.3
+number of 5.4
+number of 5.5
+number of player win and lost
+Explain your understanding of how you'd Implement this
+
+
+race to 5 is over a number of game on the night,
+when target or met you can race again to continue
+the game till you end that match
+Explain your understanding of how you'd Implement this
+
+
+Summarize Need to implement the best solution for my app
+
+want to use Practice Night Statistics Ledger the best solution for my app
+
+I ready to start my update to Version 4.5.4 best solution for my app
+
+Explain your understanding and what is best for my app
+
+
+
+
+
+then this next
+
+Summarize Need to implement the best solution for my app
+
+I ready to start my update Version 4.5.4 best solution for my app
+
+Explain your understanding and what is best for my app          
+
+
+

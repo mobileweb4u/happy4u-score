@@ -1,0 +1,35 @@
+Here is the comprehensive architectural summary and deployment guide to implement the Practice Night Statistics Ledger for Version 4.5.4 of your application.
+
+1. Understanding the App's Practice Ecosystem
+Based on menu.js, choosing "Practice Night" activates a specific format with a base target score (raceInput.value = 5) designed for training or casual club play. However, unlike strict league fixtures, a true practice session at the table is continuous.
+
+Instead of exiting the application when a single race concludes, players want to run consecutive sub-races (Game 1, Game 2, Game 3...) back-to-back. To track performance accurately over an entire evening, your data structure must record each individual milestone leg while maintaining a single, unified text transcript log.
+
+2. The Best Architectural Solution
+The absolute best approach for your app is to separate your tournament data from your practice records by introducing a dedicated local storage collection key: practice_night_history. This guarantees that casual training metrics never mix with or corrupt your competitive championship league arrays.
+
+The Data Collection Pipeline
+The Frame Monitor: Your main scoring loop monitors live points. The exact millisecond either player hits 5 frames, a snapshot of that specific leg (e.g., 5-2, 5-1) is appended to practice_night_history.
+
+The Session Counter (* X): Instead of a fixed text label, the report engine tracks how many total sets of 5 were completed during the night. If you reset and play 3 complete sets, the header updates dynamically to read: TYPE: STANDARD RACE TO 5 * 3.
+
+The Non-Blocking Reset: After a 5-frame leg is captured, the app clears the on-screen scores back to 0-0 instantly, tracking overall session totals and allowing continuous play without disrupting the flow at the table.
+
+3. Production Deployment Files
+To install this version completely, create or update these two components inside your Acode workspace:
+
+File A: The Calculation Engine & Dashboard UI (PracticeLedger.html)
+This interface processes the raw match histories from your cache, compiles player summary columns, and uses an optimized style sheet that automatically dims 0 values so that high-performance trends stand out instantly.
+
+------------
+Code Block B: The Scoreboard Continuous Pipeline Log Script
+Integrate this logical tracker straight into your live scoreboard controller system to safely intercept the 5-frame milestone without crashing or ending your active evening session workspace context:
+
+
+---------------
+4. Why Version 4.5.4 is Optimized for Your App
+Clean Data Boundaries: Your tournament modules and your practice modules remain entirely isolated. Logging a casual training game won't accidentally overwrite or disrupt active Champions League fixture standings.
+
+Dynamic Format Adaptation: Changing the TYPE output label dynamically based on total completed legs (e.g., * 1, * 2, * 3) ensures your text reports remain completely accurate, no matter how long a session lasts.
+
+High Contrast Scannability: Graying out empty table rows (0 fields) improves visual hierarchy on mobile screens. It lets players quickly scan the ledger and instantly track exactly which frames (like a dominant 5-1 or a highly competitive 5-4) occur most frequently during training. Everything is configured and ready to be deployed into your workspace files.

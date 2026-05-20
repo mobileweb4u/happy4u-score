@@ -1,3 +1,81 @@
+Golden Duck
+		
+Minus players frames			Minus players frames
+KINGSLEY WHITE [-5] vs RYAN NUTCHEY [1]
+
+
+MATCH PROGRESS LOG:
+  [✔] FRAME  0      |Starting players frames       | players frames| SCORE:    KINGSLEY (-5) - RYAN (1)
+  [✔] FRAME  1      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (-4) - RYAN (1)
+  [✔] FRAME  2      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (-3) - RYAN (1)
+  [✔] FRAME  3      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (-2) - RYAN (1)
+  [✔] FRAME  4      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (-1) - RYAN (1) 
+  [✔] FRAME  5      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 0) - RYAN (1)
+  [✔] FRAME  6      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 0) - RYAN (1)
+  [✔] FRAME  7      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 0) - RYAN (2)
+  [✔] FRAME  8      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 0) - RYAN (3) 
+  [✔] FRAME  9      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 1) - RYAN (3) 
+  [✔] FRAME 10      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 2) - RYAN (3)
+  [✔] FRAME 11      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 2) - RYAN (4) 
+  [✔] FRAME 12      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 3) - RYAN (4)
+  [✔] FRAME 13      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 3) - RYAN (5) 
+  [✔] FRAME 14      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 4) - RYAN (5) 
+  [✔] FRAME 15      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 5) - RYAN (5) 
+  [✔] FRAME 16      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 5) - RYAN (6)  
+  [✔] FRAME 17      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 6) - RYAN (6) 
+  [✔] FRAME 18      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 7) - RYAN (6)
+  [✔] FRAME 19      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 8) - RYAN (6)
+  [✔] FRAME 20      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 8) - RYAN (7)
+  [✔] FRAME 21      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 8) - RYAN (8) 
+  [✔] FRAME 22      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY ( 9) - RYAN (7)
+  [✔] FRAME 23      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (10) - RYAN (8) 
+  [✔] FRAME 24      | WINNER: RYAN                 | TYPE: NORMAL  | SCORE:    KINGSLEY ( 7) - RYAN (9)
+  [✔] FRAME 25      | WINNER: KINGSLEY             | TYPE: NORMAL  | SCORE:    KINGSLEY (11) - RYAN (9)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Explain how you'd Implement this For my Champion League report
 Explain how I can save this match in this folder once I've played
 I want to be able to save all my match files in this folder Is this possible?

@@ -1,3 +1,7 @@
+KINGSLEY WHITE [-5]
+
+
+
 The practice.js file you've created is a specialized controller that manages the transition between a standard scoreboard and a "Practice Night" match.
 
 It works by connecting your data (the list of players) to the user interface (the dropdown and text boxes) through a three-step process:

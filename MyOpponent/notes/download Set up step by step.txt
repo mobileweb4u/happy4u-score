@@ -1,4 +1,5 @@
-I understand perfectly. You want to transform your Happy4u Scoreboard into a professional archiving system where match results are stored as JSON files inside your MyOpponent folder on your 128GB SD card.
+I understand perfectly. You want to transform your Happy4u Scoreboard into a professional archiving system where match results are stored as JSON files inside your
+ MyOpponent folder on your 128GB SD card.
 
 This setup ensures that even if you "Factory Reset" the app, your match history is safely backed up on your physical hardware.
 
@@ -45,4 +46,5 @@ You are using JSON as the "Language" for the data.
 
 You are using Acode as the "Deployment Tool."
 
-Ready to proceed? If you have already saved the download.js file in Acode, try refreshing your app and tapping the "Save" button—your tablet should immediately ask you where on the SD card you want to put the file!
+Ready to proceed? If you have already saved the download.js file in Acode, try refreshing your app and tapping the "Save" button—your 
+tablet should immediately ask you where on the SD card you want to put the file!
