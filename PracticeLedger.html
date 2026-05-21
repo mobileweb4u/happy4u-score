@@ -28,32 +28,64 @@
 
         .ledger-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
         }
 
         .header-section {
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
             margin-bottom: 25px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
         }
+
+        .nav-home-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 220px;
+        }
+        .nav-home-link:hover { text-decoration: underline; }
 
         .header-section h2 {
             margin: 0;
-            color: #ffffff;
+            color: var(--accent-cyan);
             font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: 2px;
             text-transform: uppercase;
+            text-align: center;
+            flex: 1;
         }
 
-        .subtitle {
-            color: var(--accent-cyan);
+        .backup-controls {
+            display: flex;
+            gap: 10px;
+            min-width: 220px;
+            justify-content: flex-end;
+        }
+
+        .backup-btn {
+            background: #161616;
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .backup-btn:hover {
+            background: #222222;
+            border-color: var(--accent-cyan);
         }
 
         .table-wrapper {
@@ -105,7 +137,7 @@
             font-size: 1rem;
         }
         
-        .badge-played { color: var(--accent-cyan); }
+        .badge-played { color: #ffffff; }
         .badge-win { color: var(--accent-green); }
         .badge-loss { color: var(--accent-magenta); }
         
@@ -117,30 +149,125 @@
         .score-zero {
             color: #333333 !important;
         }
+
+        .view-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            background: var(--accent-cyan);
+            color: #000000;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 760px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-close-x {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .modal-close-x:hover { color: #ffffff; }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            background-color: #080808;
+        }
+
+        .raw-log-block {
+            background: #040404;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #dcdcdc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
 
     <div class="ledger-container">
         <div class="header-section">
-            <h2>🎯 Practice Night Performance Ledger</h2>
-            <div class="subtitle">Historical Matrix & Score Frequency Breakdown</div>
+            <a class="nav-home-link" href="PracticeCalendar.html">📅 Open Practice Calendar View</a>
+            <h2>PRACTICE NIGHT RECORDS</h2>
+            <div class="backup-controls">
+                <button class="backup-btn" onclick="exportPracticeJson()">📤 Export JSON</button>
+                <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importPracticeJson(event)">
+            </div>
         </div>
 
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th style="text-align: left; padding-left: 20px;">Player</th>
-                        <th>Played</th>
+                        <th style="text-align: left; padding-left: 20px;">Player Identity</th>
+                        <th>Played Matches</th>
                         <th>Wins</th>
                         <th>Losses</th>
-                        <th>5 - 0</th>
-                        <th>5 - 1</th>
-                        <th>5 - 2</th>
-                        <th>5 - 3</th>
-                        <th>5 - 4</th>
-                        <th>5 - 5</th> </tr>
+                        <th>S50</th>
+                        <th>S51</th>
+                        <th>S52</th>
+                        <th>S53</th>
+                        <th>S54</th>
+                        <th>Action</th>
+                    </tr>
                 </thead>
                 <tbody id="ledger-rows">
                 </tbody>
@@ -148,95 +275,108 @@
         </div>
     </div>
 
+    <div id="breakdown-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Session Frame Breakdown</h3>
+                <button class="modal-close-x" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <pre class="raw-log-block" id="modal-content"></pre>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let globalStatsTracker = {};
+        let rawStorageHistoryRef = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             calculatePracticeStats();
+            setupModalDismiss();
         });
 
         function calculatePracticeStats() {
-            const practiceHistory = JSON.parse(localStorage.getItem('practice_night_history')) || [];
-            const statsMap = {};
+            rawStorageHistoryRef = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            globalStatsTracker = {};
 
             function initPlayerRow(name) {
-                if (!statsMap[name]) {
-                    statsMap[name] = {
+                if (!globalStatsTracker[name]) {
+                    globalStatsTracker[name] = {
                         name: name, played: 0, wins: 0, losses: 0,
-                        s50: 0, s51: 0, s52: 0, s53: 0, s54: 0, s55: 0 // Fixed: Added s55 property map initialization entry
+                        s50: 0, s51: 0, s52: 0, s53: 0, s54: 0
                     };
                 }
             }
 
-            practiceHistory.forEach(match => {
-                // Safeguard name references to read from either schema structure variations
-                const p1 = match.player1 || match.p1Name;
-                const p2 = match.player2 || match.p2Name;
+            rawStorageHistoryRef.forEach(logEntry => {
+                const rawString = (typeof logEntry === 'string' ? logEntry : '');
+                if (!rawString.trim()) return;
 
-                if (!p1 || !p2) return; // Skip corrupted rows safely
+                const matchesList = rawString.split(/(?=╔═════════════════════════════════════════════════════╗)/);
 
-                initPlayerRow(p1);
-                initPlayerRow(p2);
+                matchesList.forEach(blockContent => {
+                    if (!blockContent.trim() || !blockContent.includes("HAPPY4U MATCH REPORT")) return;
 
-                statsMap[p1].played++;
-                statsMap[p2].played++;
+                    let p1 = "PLAYER A"; let p2 = "PLAYER B";
+                    let s1 = 0; let s2 = 0;
 
-                if (match.winner === p1) {
-                    statsMap[p1].wins++;
-                    statsMap[p2].losses++;
-                } else if (match.winner === p2) {
-                    statsMap[p2].wins++;
-                    statsMap[p1].losses++;
-                }
+                    const scoreLineMatch = blockContent.match(/SCORE:\s*([A-Za-z0-9_-]+)\s*\((\d+)\)\s*-\s*([A-Za-z0-9_-]+)\s*\((\d+)\)/i);
+                    if (scoreLineMatch) {
+                        p1 = scoreLineMatch[1].toUpperCase();
+                        s1 = parseInt(scoreLineMatch[2], 10);
+                        p2 = scoreLineMatch[3].toUpperCase();
+                        s2 = parseInt(scoreLineMatch[4], 10);
+                    }
 
-                const s1 = parseInt(match.p1Score, 10);
-                const s2 = parseInt(match.p2Score, 10);
+                    initPlayerRow(p1);
+                    initPlayerRow(p2);
 
-                // Track Scorelines for Player 1
-                if (s1 === 5) {
-                    if (s2 === 0) statsMap[p1].s50++;
-                    if (s2 === 1) statsMap[p1].s51++;
-                    if (s2 === 2) statsMap[p1].s52++;
-                    if (s2 === 3) statsMap[p1].s53++;
-                    if (s2 === 4) statsMap[p1].s54++;
-                    if (s2 === 5) statsMap[p1].s55++; // Fixed: Increments 5-5 scores cleanly
-                } else if (s2 === 5) {
-                    if (s1 === 0) statsMap[p1].s50++;
-                    if (s1 === 1) statsMap[p1].s51++;
-                    if (s1 === 2) statsMap[p1].s52++;
-                    if (s1 === 3) statsMap[p1].s53++;
-                    if (s1 === 4) statsMap[p1].s54++;
-                }
+                    globalStatsTracker[p1].played++;
+                    globalStatsTracker[p2].played++;
 
-                // Track Scorelines for Player 2
-                if (s2 === 5) {
-                    if (s1 === 0) statsMap[p2].s50++;
-                    if (s1 === 1) statsMap[p2].s51++;
-                    if (s1 === 2) statsMap[p2].s52++;
-                    if (s1 === 3) statsMap[p2].s53++;
-                    if (s1 === 4) statsMap[p2].s54++;
-                    if (s1 === 5) statsMap[p2].s55++; // Fixed: Increments 5-5 scores cleanly
-                } else if (s1 === 5) {
-                    if (s2 === 0) statsMap[p2].s50++;
-                    if (s2 === 1) statsMap[p2].s51++;
-                    if (s2 === 2) statsMap[p2].s52++;
-                    if (s2 === 3) statsMap[p2].s53++;
-                    if (s2 === 4) statsMap[p2].s54++;
-                }
+                    if (s1 > s2) {
+                        globalStatsTracker[p1].wins++;
+                        globalStatsTracker[p2].losses++;
+                        if (s2 === 0) globalStatsTracker[p1].s50++;
+                        if (s2 === 1) globalStatsTracker[p1].s51++;
+                        if (s2 === 2) globalStatsTracker[p1].s52++;
+                        if (s2 === 3) globalStatsTracker[p1].s53++;
+                        if (s2 === 4) globalStatsTracker[p1].s54++;
+                    } else if (s2 > s1) {
+                        globalStatsTracker[p2].wins++;
+                        globalStatsTracker[p1].losses++;
+                        if (s1 === 0) globalStatsTracker[p2].s50++;
+                        if (s1 === 1) globalStatsTracker[p2].s51++;
+                        if (s1 === 2) globalStatsTracker[p2].s52++;
+                        if (s1 === 3) globalStatsTracker[p2].s53++;
+                        if (s1 === 4) globalStatsTracker[p2].s54++;
+                    }
+                });
             });
 
+            renderTableRows();
+        }
+
+        function renderTableRows() {
             const tbody = document.getElementById('ledger-rows');
             tbody.innerHTML = '';
 
-            const players = Object.values(statsMap);
+            const players = Object.values(globalStatsTracker).sort((a,b) => {
+                if(a.name.includes("FREDDIE")) return -1;
+                if(b.name.includes("FREDDIE")) return 1;
+                return 0;
+            });
+
             if (players.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-muted); padding: 30px;">No practice records found. Log matches in Practice Mode to generate stats.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-muted); padding: 30px;">No practice records found.</td></tr>`;
                 return;
             }
 
-            // Fallback evaluation condition: Safely handle undefined numbers dynamically
-            const formatValue = (val) => (val === 0 || val === undefined) ? `<span class="score-zero">0</span>` : val;
+            const formatValue = (val) => val === 0 ? `<span class="score-zero">0</span>` : val;
 
             players.forEach(p => {
-                const rowHTML = `
+                tbody.innerHTML += `
                     <tr>
                         <td class="player-cell">${p.name}</td>
                         <td class="count-badge badge-played">${p.played}</td>
@@ -247,10 +387,146 @@
                         <td class="score-col">${formatValue(p.s52)}</td>
                         <td class="score-col">${formatValue(p.s53)}</td>
                         <td class="score-col">${formatValue(p.s54)}</td>
-                        <td class="score-col">${formatValue(p.s55)}</td> </tr>
+                        <td>
+                            <button class="view-btn" onclick="openBreakdownModal('${p.name}')">View</button>
+                        </td>
+                    </tr>
                 `;
-                tbody.innerHTML += rowHTML;
             });
+        }
+
+        window.openBreakdownModal = function(playerName) {
+            if (rawStorageHistoryRef.length === 0) return;
+            document.getElementById('modal-title').innerText = `Complete Career Frame Breakdown`;
+
+            let finalOutputString = "CAREER LIFETIME SESSION DATA ENTRIES BREAKDOWN\n======================================================\n\n";
+            let summaryConcsTextList = "";
+            let playerStatsCounter = {};
+
+            rawStorageHistoryRef.forEach((sessionText) => {
+                const blocks = sessionText.split(/(?=╔═════════════════════════════════════════════════════╗)/);
+                
+                blocks.forEach(block => {
+                    if(!block.trim() || !block.includes("HAPPY4U MATCH REPORT")) return;
+                    finalOutputString += `${block.trim()}\n\n\n`;
+
+                    const lines = block.split('\n');
+                    let winnerName = "UNKNOWN";
+                    let scoreLineStr = "0-0";
+
+                    lines.forEach(line => {
+                        const scoreMatch = line.match(/SCORE:\s*([A-Za-z0-9_-]+)\s*\((\d+)\)\s*-\s*([A-Za-z0-9_-]+)\s*\((\d+)\)/i);
+                        const winMsgMatch = line.match(/CONGRATULATIONS WINNER\s+([A-Za-z0-9_-]+)/i);
+
+                        if (scoreMatch) {
+                            const p1 = scoreMatch[1].toUpperCase();
+                            const s1 = parseInt(scoreMatch[2], 10);
+                            const p2 = scoreMatch[3].toUpperCase();
+                            const s2 = parseInt(scoreMatch[4], 10);
+
+                            if (!playerStatsCounter[p1]) playerStatsCounter[p1] = { name: p1, framesFor: 0, framesAgainst: 0, wins: 0, losses: 0 };
+                            if (!playerStatsCounter[p2]) playerStatsCounter[p2] = { name: p2, framesFor: 0, framesAgainst: 0, wins: 0, losses: 0 };
+
+                            playerStatsCounter[p1].framesFor += s1;
+                            playerStatsCounter[p1].framesAgainst += s2;
+                            playerStatsCounter[p2].framesFor += s2;
+                            playerStatsCounter[p2].framesAgainst += s1;
+                            scoreLineStr = `${s1}-${s2}`;
+                        }
+                        if (winMsgMatch) {
+                            winnerName = winMsgMatch[1].toUpperCase();
+                        }
+                    });
+
+                    if (winnerName !== "UNKNOWN") {
+                        Object.keys(playerStatsCounter).forEach(pKey => {
+                            if (pKey === winnerName) playerStatsCounter[pKey].wins++;
+                            else playerStatsCounter[pKey].losses++;
+                        });
+                        summaryConcsTextList += `CONGRATULATIONS WINNER ${winnerName}\nFINAL SCORE: ${scoreLineStr}\n\n`;
+                    }
+                });
+            });
+
+            finalOutputString = finalOutputString.trimEnd() + `\n\n------------------------------------------------------\n`;
+            finalOutputString += summaryConcsTextList;
+            finalOutputString += `Total \n`;
+
+            const sortedPlayers = Object.values(playerStatsCounter).sort((a, b) => {
+                if (a.name.includes("FREDDIE")) return -1;
+                if (b.name.includes("FREDDIE")) return 1;
+                return 0;
+            });
+
+            sortedPlayers.forEach(player => {
+                const spacesCount = 16 - player.name.length;
+                const spaces = " ".repeat(spacesCount > 0 ? spacesCount : 1);
+                finalOutputString += `${player.name}${spaces}| FRAME-F: ${player.framesFor} | FRAME-A: ${player.framesAgainst}\n`;
+                finalOutputString += `${player.name} (${player.wins}-${player.losses}) \n\n`;
+            });
+
+            finalOutputString = finalOutputString.trimEnd();
+            finalOutputString += `\n____________________________________________________\n`;
+            finalOutputString += `____________________________________________________\n`;
+            finalOutputString += `            GENERATED BY Freddie Russell                    `;
+
+            document.getElementById('modal-content').textContent = finalOutputString;
+            document.getElementById('breakdown-modal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('breakdown-modal').style.display = 'none';
+        };
+
+        function setupModalDismiss() {
+            const modal = document.getElementById('breakdown-modal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // --- JSON IMPORT & EXPORT FUNCTIONS ---
+        function exportPracticeJson() {
+            const history = localStorage.getItem('completed_matches_history');
+            if (!history || JSON.parse(history).length === 0) {
+                alert("No practice data exists to export.");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(history);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `practice_history_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importPracticeJson(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (Array.isArray(parsedData)) {
+                        if (confirm("This will merge imported entries into your local storage. Proceed?")) {
+                            let currentHistory = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+                            // Avoid adding duplicates
+                            parsedData.forEach(entry => {
+                                if (!currentHistory.includes(entry)) {
+                                    currentHistory.push(entry);
+                                }
+                            });
+                            localStorage.setItem('completed_matches_history', JSON.stringify(currentHistory));
+                            alert("Practice history successfully imported!");
+                            window.location.reload();
+                        }
+                    } else {
+                        alert("Invalid backup file format. Must be a JSON array.");
+                    }
+                } catch (err) {
+                    alert("Error parsing the JSON backup file.");
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
