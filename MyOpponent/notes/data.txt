@@ -1,0 +1,197 @@
+const threeDayTestData = [
+// ==========================================
+// DAY 1: MAY 20th, 2026 (Freddie wins 2-1)
+// ==========================================
+`SESSION DATE:
+ 20/05/2026, 14:22:05SESSION ID:
+ MATCH-1779358111222
+COMPLETE FULL FRAME BREAKDOWN
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      20/05/2026, 14:22:05
+MATCH ID:  MATCH-1779358111222
+SCORE:     FREDDIE (5) - CHRIS (3)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 1      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 2      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 3      | WINNER: FREDDIE           | TYPE: BREAK-DISH
+[✔] FRAME 4      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 5      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 6      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 7      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 8      | WINNER: FREDDIE           | TYPE: NORMAL
+
+CONGRATULATIONS WINNER FREDDIE
+FINAL SCORE: 5-3
+
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      20/05/2026, 14:40:12
+MATCH ID:  MATCH-1779358222333
+SCORE:     FREDDIE (3) - CHRIS (5)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 9      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 10     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 11     | WINNER: CHRIS             | TYPE: REVERSE-DISH
+[✔] FRAME 12     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 13     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 14     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 15     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 16     | WINNER: CHRIS             | TYPE: NORMAL
+
+CONGRATULATIONS WINNER CHRIS
+FINAL SCORE: 3-5
+
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      20/05/2026, 15:05:44
+MATCH ID:  MATCH-1779358333444
+SCORE:     FREDDIE (5) - CHRIS (2)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 17     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 18     | WINNER: FREDDIE           | TYPE: BREAK-DISH
+[✔] FRAME 19     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 20     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 21     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 22     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 23     | WINNER: FREDDIE           | TYPE: NORMAL
+
+CONGRATULATIONS WINNER FREDDIE
+FINAL SCORE: 5-2`,
+
+// ==========================================
+// DAY 2: MAY 21st, 2026 (Your original benchmark data)
+// ==========================================
+`SESSION DATE:
+ 21/05/2026, 11:17:11SESSION ID:
+ MATCH-1779358557878
+COMPLETE FULL FRAME BREAKDOWN
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      21/05/2026, 11:17:11
+MATCH ID:  MATCH-1779358557878
+SCORE:     FREDDIE (4) - CHRIS (5)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 1      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 2      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 3      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 4      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 5      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 6      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 7      | WINNER: CHRIS             | TYPE: REVERSE-DISH
+[✔] FRAME 8      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 9      | WINNER: CHRIS             | TYPE: NORMAL
+
+CONGRATULATIONS WINNER CHRIS
+FINAL SCORE: 4-5
+
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      21/05/2026, 11:18:35
+MATCH ID:  MATCH-1779358673340
+SCORE:     FREDDIE (5) - CHRIS (2)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 10     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 11     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 12     | WINNER: FREDDIE           | TYPE: REVERSE-DISH
+[✔] FRAME 13     | WINNER: FREDDIE           | TYPE: BREAK-DISH
+[✔] FRAME 14     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 15     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 16     | WINNER: FREDDIE           | TYPE: NORMAL
+
+CONGRATULATIONS WINNER FREDDIE
+FINAL SCORE: 5-2
+
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      21/05/2026, 11:27:28
+MATCH ID:  MATCH-1779358910331
+SCORE:     FREDDIE (5) - CHRIS (1)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 17     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 18     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 19     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 20     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 21     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 22     | WINNER: FREDDIE           | TYPE: BREAK-DISH`,
+
+// ==========================================
+// DAY 3: MAY 22nd, 2026 (Chris wins 2-0)
+// ==========================================
+`SESSION DATE:
+ 22/05/2026, 19:10:00SESSION ID:
+ MATCH-1779358777888
+COMPLETE FULL FRAME BREAKDOWN
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      22/05/2026, 19:10:00
+MATCH ID:  MATCH-1779358777888
+SCORE:     FREDDIE (2) - CHRIS (5)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 1      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 2      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 3      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 4      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 5      | WINNER: CHRIS             | TYPE: BREAK-DISH
+[✔] FRAME 6      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 7      | WINNER: CHRIS             | TYPE: NORMAL
+
+CONGRATULATIONS WINNER CHRIS
+FINAL SCORE: 2-5
+
+
+╔═════════════════════════════════════════════════════╗
+║               HAPPY4U MATCH REPORT                  ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      22/05/2026, 19:45:30
+MATCH ID:  MATCH-1779358999000
+SCORE:     FREDDIE (3) - CHRIS (5)
+------------------------------------------------------
+MATCH LOG:
+[✔] FRAME 8      | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 9      | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 10     | WINNER: CHRIS             | TYPE: REVERSE-DISH
+[✔] FRAME 11     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 12     | WINNER: FREDDIE           | TYPE: NORMAL
+[✔] FRAME 13     | WINNER: CHRIS             | TYPE: NORMAL
+[✔] FRAME 14     | WINNER: CHRIS             | TYPE: NORMAL
+
+CONGRATULATIONS WINNER CHRIS
+FINAL SCORE: 3-5`
+];
+
+// Clean out existing datasets to prevent pollution and save the new 3-day history array
+localStorage.setItem('completed_matches_history', JSON.stringify(threeDayTestData));
+
+// Reload the active page to see the new dashboard statistics
+window.location.reload();
+console.log("🚀 3 Days of test data cleanly injected into 'completed_matches_history'!");
