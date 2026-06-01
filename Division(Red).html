@@ -11,177 +11,404 @@
             padding: 20px;
             color: #333;
         }
-        .container {
-            max-width: 1100px;
+        .table-container {
+            max-width: 1200px;
             margin: auto;
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 30px;
         }
+        
+        /* Top Navigation Breadcrumbs style from Image 1 */
+        .nav-links {
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+        .nav-links a {
+            color: #1abc9c;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: 500;
+        }
+        .nav-links a:hover { text-decoration: underline; }
+
+        /* Header Layout Styling */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+        }
+        .header-controls h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .load-btn { background-color: #2ecc71; color: white; }
+        .load-btn:hover { background-color: #27ae60; }
+        .reset-btn { background-color: #e74c3c; color: white; }
+        .reset-btn:hover { background-color: #c0392b; }
+        
+        /* Table Structure matching Image 1 exactly */
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
+            margin-top: 10px;
         }
         th {
-            background-color: #eee;
+            background-color: #f8f9fa;
             text-align: left;
-            padding: 12px 15px;
-            color: #666;
+            padding: 15px;
+            color: #7f8c8d;
             text-transform: uppercase;
             font-weight: 600;
-            border-bottom: 2px solid #ddd;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #edf2f7;
         }
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
+            padding: 16px 15px;
+            border-bottom: 1px solid #edf2f7;
+            color: #4a5568;
+            vertical-align: middle;
         }
-        .date {
-            color: #d35400; /* Orange color from image */
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        .comp {
-            color: #777;
-        }
-        .matchup {
-            font-weight: bold;
-            text-align: center;
-        }
+        tr:hover { background-color: #f8fafc; }
+        
+        .date { color: #e67e22; font-weight: bold; }
+        .comp { color: #7f8c8d; }
+        .matchup { font-weight: 600; color: #2d3748; }
+        
         .v-badge {
-            background: #1abc9c;
-            color: white;
+            background: #e2e8f0;
+            color: #4a5568;
             border-radius: 50%;
             display: inline-block;
-            width: 18px;
-            height: 18px;
-            line-height: 18px;
-            font-size: 10px;
-            margin: 0 10px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            margin: 0 8px;
         }
-        .venue {
-            color: #888;
+        .venue { color: #7f8c8d; }
+        .score-display { font-size: 15px; font-weight: bold; color: #2d3748; }
+
+        /* Status Badges */
+        .status-pending { color: #e67e22; font-weight: bold; }
+        .status-finished { color: #2ecc71; font-weight: bold; }
+
+        /* Review Button style matching Image 1 */
+        .review-btn {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
             font-size: 12px;
+            text-transform: uppercase;
+            transition: background 0.2s;
         }
-        tr:hover {
-            background-color: #fff9f5;
+        .review-btn:hover { background-color: #16a085; }
+
+        /* Modal Overlay for Paste Mechanism */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-content h3 { margin-top: 0; color: #2c3e50; }
+        .modal-content textarea {
+            width: 100%;
+            height: 220px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            margin: 15px 0;
+            resize: vertical;
+        }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .cancel-btn { background-color: #95a5a6; color: white; }
     </style>
 </head>
 <body>
 
 <div class="table-container">
-    <a id="back-home" href="index.html">← Back Home</a>
-    <a id="player-list" href="player-list.html">← player-list</a>
-    <a id="ChampionsLeague" href="ChampionsLeague.html">← ChampionsLeague</a>
-    <a id="Division(Red)" href="Division(Red).html">← Division(Red)</a>
-    <div id="winner-return-link" style="margin: 10px 0;"></div>
-    <h2>POT 2 - Player Rankings</h2>
-    <table>
+    <!-- Breadcrumb links from your original source -->
+    <div class="nav-links">
+        <a href="index.html">← Back Home</a>
+        <a href="player-list.html">← player-list</a>
+        <a href="ChampionsLeague.html">← ChampionsLeague</a>
+        <a href="Division(Red).html">← Division(Red)</a>
+    </div>
+
+    <div id="winner-return-link"></div>
+
+    <!-- Match control center block -->
+    <div class="header-controls">
+        <h2>POT 2 - Player Rankings</h2>
+        <div class="btn-group">
+            <button class="action-btn load-btn" onclick="openPasteModal()">📋 LOAD FROM PERFORMANCE LOG</button>
+            <button class="action-btn reset-btn" onclick="resetLeagueData()">RESET ALL DATA</button>
+        </div>
+    </div>
+
+    <table id="fixtures-table">
         <thead>
             <tr>
                 <th>Date | Time</th>
                 <th>Competition</th>
-                <th style="text-align: center;">Matchup</th>
+                <th>Matchup</th>
                 <th>Venue</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="date">01/05/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> JOHN CROFT</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/06/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">MICK COBURN <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/07/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> PAUL RODD</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">31/07/26 | 00:00</td>
-                <td class="comp">Singles League Cup</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> PAUL BEASLEY</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">31/07/26 | 00:00</td>
-                <td class="comp">Singles League Tier 1 - Inter Divisional Cup</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> BEN HOLLIS</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/08/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">CHRIS ISAACS <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/09/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">GUY SMITH <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/10/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> ALEX BURNETT</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/11/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">DAVID ODWELL <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/12/26 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> STUART SMITH</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/01/27 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">AARON WATERER <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/02/27 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">FREDERICK RUSSELL <span class="v-badge">V</span> WILLIAM STURDY</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
-            <tr>
-                <td class="date">01/03/27 | 00:00</td>
-                <td class="comp">Division 1 Singles League (Red)</td>
-                <td class="matchup">IAN CABLE <span class="v-badge">V</span> FREDERICK RUSSELL</td>
-                <td class="venue">📍 Bar 8 Singles League</td>
-            </tr>
+            <!-- Javascript dynamic tracking lines render here -->
         </tbody>
     </table>
 </div>
+
+<!-- Paste Interactive Portal System -->
+<div id="paste-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Paste Match Log Data</h3>
+        <p style="font-size: 12px; color: #7f8c8d; margin: 0;">Paste your system generated match text box report block directly below:</p>
+        <textarea id="raw-report-input" placeholder="Paste report summary text content rules here..."></textarea>
+        <div class="modal-actions">
+            <button class="action-btn cancel-btn" onclick="closePasteModal()">Cancel</button>
+            <button class="action-btn load-btn" onclick="processPastedReport()">Process Update</button>
+        </div>
+    </div>
+</div>
+
+<div id="review-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3 id="review-title">Match Review</h3>
+        <div id="review-body" style="font-family: monospace; font-size: 13px; color: #2d3748; line-height: 1.5; white-space: pre-wrap; background: #f8f9fa; border: 1px solid #e2e8f0; padding: 18px; border-radius: 6px; margin-bottom: 18px; min-height: 120px;"></div>
+        <div class="modal-actions">
+            <button class="action-btn cancel-btn" onclick="closeReviewModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Master data pool sourced entirely from your unique Division(Red).html array
+    const defaultFixtures = [
+        { id: 1, date: "01/05/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "FREDERICK RUSSELL", p2: "JOHN CROFT", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 2, date: "01/06/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "MICK COBURN", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 3, date: "01/07/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "FREDERICK RUSSELL", p2: "PAUL RODD", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 4, date: "31/07/26 | 00:00", comp: "Singles League Cup", p1: "FREDERICK RUSSELL", p2: "PAUL BEASLEY", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 5, date: "31/07/26 | 00:00", comp: "Singles League Tier 1 - Inter Divisional Cup", p1: "FREDERICK RUSSELL", p2: "BEN HOLLIS", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 6, date: "01/08/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "CHRIS ISAACS", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 7, date: "01/09/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "GUY SMITH", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 8, date: "01/10/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "FREDERICK RUSSELL", p2: "ALEX BURNETT", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 9, date: "01/11/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "DAVID ODWELL", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 10, date: "01/12/26 | 00:00", comp: "Division 1 Singles League (Red)", p1: "FREDERICK RUSSELL", p2: "STUART SMITH", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 11, date: "01/01/27 | 00:00", comp: "Division 1 Singles League (Red)", p1: "AARON WATERER", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 12, date: "01/02/27 | 00:00", comp: "Division 1 Singles League (Red)", p1: "FREDERICK RUSSELL", p2: "WILLIAM STURDY", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" },
+        { id: 13, date: "01/03/27 | 00:00", comp: "Division 1 Singles League (Red)", p1: "IAN CABLE", p2: "FREDERICK RUSSELL", score1: null, score2: null, venue: "Bar 8 Singles League", status: "Pending" }
+    ];
+
+    let liveFixtures = [];
+
+    function initPage() {
+        const cached = localStorage.getItem('red_division_fixtures');
+        if (cached) {
+            liveFixtures = JSON.parse(cached);
+        } else {
+            liveFixtures = [...defaultFixtures];
+            localStorage.setItem('red_division_fixtures', JSON.stringify(liveFixtures));
+        }
+        renderTable();
+        addWinnerReturnLink();
+    }
+
+    function renderTable() {
+        const tbody = document.querySelector("#fixtures-table tbody");
+        tbody.innerHTML = "";
+
+        liveFixtures.forEach(match => {
+            const tr = document.createElement("tr");
+            
+            const scoreText = (match.score1 !== null) ? `${match.score1} - ${match.score2}` : "- -";
+            const statusClass = match.status === "Pending" ? "status-pending" : "status-finished";
+
+            tr.innerHTML = `
+                <td class="date">${match.date}</td>
+                <td class="comp">${match.comp}</td>
+                <td class="matchup">${match.p1} <span class="v-badge">VS</span> ${match.p2}</td>
+                <td class="venue">📍 ${match.venue}</td>
+                <td class="score-display">${scoreText}</td>
+                <td class="${statusClass}">${match.status}</td>
+                <td><button class="review-btn" onclick="openMatchReview(${match.id})">Review</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.openPasteModal = function() {
+        document.getElementById('raw-report-input').value = "";
+        document.getElementById('paste-modal').style.display = 'flex';
+    };
+
+    window.closePasteModal = function() {
+        document.getElementById('paste-modal').style.display = 'none';
+    };
+
+    window.processPastedReport = function() {
+        const inputData = document.getElementById('raw-report-input').value;
+        if (!inputData.trim()) return alert("Paste clean report tracking content before saving!");
+
+        // Regex matrix identifying score parameters e.g., SCORE: FREDDIE  (11) - STEVE (6)
+        const scoreRegex = /SCORE:\s*(.+?)\s*\((\d+)\)\s*-\s*(.+?)\s*\((\d+)\)/i;
+        const matchResult = inputData.match(scoreRegex);
+
+        if (!matchResult) {
+            alert("Unable to parse text. Please make sure the pasted data contains the valid score row format:\nSCORE: PLAYER (X) - PLAYER (Y)");
+            return;
+        }
+
+        const reportP1 = matchResult[1].trim().toUpperCase();
+        const score1 = parseInt(matchResult[2], 10);
+        const reportP2 = matchResult[3].trim().toUpperCase();
+        const score2 = parseInt(matchResult[4], 10);
+
+        const normalize = (name) => name.replace(/[^A-Z0-9 ]+/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
+        const alias = (name) => normalize(name)
+            .replace(/\bFREDDY\b/, 'FREDDIE')
+            .replace(/\bFREDDIE\b/, 'FREDERICK');
+
+        const reportA = normalize(reportP1);
+        const reportB = normalize(reportP2);
+
+        const nameMatches = (fixtureName, reportName) => {
+            const fixtureNorm = normalize(fixtureName);
+            if (fixtureNorm === reportName) return true;
+            if (fixtureNorm.includes(reportName) || reportName.includes(fixtureNorm)) return true;
+            const fixtureAlias = alias(fixtureName);
+            const reportAlias = alias(reportName);
+            if (fixtureAlias === reportName || reportAlias === fixtureNorm) return true;
+            if (fixtureAlias.includes(reportName) || reportAlias.includes(fixtureNorm)) return true;
+            if (fixtureNorm.includes(reportAlias) || reportName.includes(fixtureAlias)) return true;
+            return false;
+        };
+
+        let foundMatch = liveFixtures.find(m => 
+            nameMatches(m.p1, reportA) && nameMatches(m.p2, reportB)
+        );
+
+        if (!foundMatch) {
+            foundMatch = liveFixtures.find(m => 
+                nameMatches(m.p2, reportA) && nameMatches(m.p1, reportB)
+            );
+        }
+
+        if (!foundMatch) {
+            alert(`No fixture entry matching players "${reportP1}" vs "${reportP2}" was discovered inside this league division register.`);
+            return;
+        }
+
+        // Apply scores relative to positional matching structure orientation entries
+        if (foundMatch.p1.includes(reportP1) || reportP1.includes(foundMatch.p1) || (foundMatch.p1.includes("FREDERICK") && reportP1 === "FREDDIE")) {
+            foundMatch.score1 = score1;
+            foundMatch.score2 = score2;
+        } else {
+            foundMatch.score1 = score2;
+            foundMatch.score2 = score1;
+        }
+
+        foundMatch.status = "Finished";
+        localStorage.setItem('red_division_fixtures', JSON.stringify(liveFixtures));
+        renderTable();
+        closePasteModal();
+    };
+
+    window.openMatchReview = function(matchId) {
+        const match = liveFixtures.find(m => m.id === matchId);
+        if (!match) return alert('Match not found.');
+
+        const reviewBody = document.getElementById('review-body');
+        const reviewTitle = document.getElementById('review-title');
+        reviewTitle.textContent = `REVIEW: ${match.p1} vs ${match.p2}`;
+
+        const scoreLine = (match.score1 !== null && match.score2 !== null) ? `${match.score1} - ${match.score2}` : 'N/A';
+        const statusLine = match.status === 'Finished' ? 'FINISHED ✅' : match.status.toUpperCase();
+
+        reviewBody.textContent = `DATE:      ${match.date}\n` +
+            `COMP:      ${match.comp}\n` +
+            `MATCHUP:   ${match.p1} vs ${match.p2}\n` +
+            `VENUE:     ${match.venue}\n` +
+            `SCORE:     ${scoreLine}\n` +
+            `STATUS:    ${statusLine}\n`;
+
+        document.getElementById('review-modal').style.display = 'flex';
+    };
+
+    window.closeReviewModal = function() {
+        document.getElementById('review-modal').style.display = 'none';
+    };
+
+    window.resetLeagueData = function() {
+        if (confirm("Reset current records and re-initialize raw default table configurations?")) {
+            localStorage.removeItem('red_division_fixtures');
+            initPage();
+        }
+    };
+
     function addWinnerReturnLink() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('from') !== 'winner') return;
         const placeholder = document.getElementById('winner-return-link');
         if (!placeholder) return;
+        placeholder.innerHTML = "";
         const link = document.createElement('a');
         link.href = 'index.html?returnToWinner=1';
         link.textContent = '← RETURN TO WINNER';
-        link.style.cssText = 'display: inline-block; margin: 0 12px 0 0; color: #ff4444; font-weight: 700;';
+        link.style.cssText = 'display: inline-block; margin: 0 0 15px 0; color: #ff4444; font-weight: 700; text-decoration: none; font-size: 13px;';
         placeholder.appendChild(link);
     }
-    window.addEventListener('load', addWinnerReturnLink);
+
+    window.onload = initPage;
 </script>
 </body>
 </html>

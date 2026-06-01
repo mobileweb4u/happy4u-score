@@ -139,6 +139,25 @@
             padding: 12px;
             overflow-x: auto;
         }
+        .modal-footer-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-send-btn {
+            border: none;
+            background: #00ff44;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .modal-send-btn:hover {
+            background: #00cc37;
+        }
         .modal-close-btn {
             border: none;
             background: #ff4444;
@@ -146,8 +165,11 @@
             padding: 10px 16px;
             border-radius: 10px;
             cursor: pointer;
-            float: right;
             font-weight: 700;
+            text-transform: uppercase;
+        }
+        .modal-close-btn:hover {
+            background: #cc3333;
         }
         tr:hover {
             background-color: #fff9f5;
@@ -164,6 +186,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .nav-links a {
             text-decoration: none;
@@ -217,9 +240,11 @@
             <a id="player-list" href="player-list.html">← player-list</a>
             <a id="ChampionsLeague" href="ChampionsLeague.html">← ChampionsLeague</a>
             <a id="Division-Red" href="Division(Red).html">← Division(Red)</a>
+            <a id="PracticeLedgerLink" href="PracticeLedger.html" style="color: #00a0e0; font-weight: bold;">← Practice Ledger</a>
         </div>
         <div class="action-buttons-group">
             <button class="sync-data-btn" onclick="triggerManualSync()">🔄 Load From Performance Log</button>
+            <button class="sync-data-btn" onclick="openPasteModal()">📋 Paste Match Report</button>
             <button class="reset-data-btn" onclick="resetLeagueData()">Reset All Data</button>
         </div>
     </div>
@@ -243,10 +268,25 @@
 
 <div id="review-modal" class="review-modal-overlay">
     <div class="review-modal-content">
-        <button id="close-review-btn" class="modal-close-btn">CLOSE</button>
         <h2 id="review-title">Match Review</h2>
         <p id="review-status" style="font-weight:700; margin-bottom:18px;"></p>
         <div id="review-details"></div>
+        
+        <div class="modal-footer-actions">
+            <button id="modal-send-btn" class="modal-send-btn" onclick="processReviewModalSend()">Send</button>
+            <button id="close-review-btn" class="modal-close-btn">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="paste-modal" class="review-modal-overlay" style="display: none;">
+    <div class="review-modal-content">
+        <h2>Paste Match Report</h2>
+        <textarea id="paste-report-input" style="width: 100%; min-height: 220px; font-family: monospace; font-size: 13px; padding: 12px; border: 1px solid #ddd; border-radius: 10px; resize: vertical;" placeholder="Paste full match report text here..."></textarea>
+        <div class="modal-footer-actions" style="margin-top: 15px;">
+            <button class="modal-send-btn" onclick="processPastedReport()">Process</button>
+            <button class="modal-close-btn" onclick="closePasteModal()">Close</button>
+        </div>
     </div>
 </div>
 
@@ -262,6 +302,10 @@
         { id: 7, date: "23 May | 15:45", comp: "Bar 8 Champions League", p1: "Freddie Russell [3]", p2: "Jaymesh Patel [5]", venue: "Table 1" }
     ];
 
+    // Keep tracking reference variable to monitor active target
+    let activeModalMatchId = null;
+    let activeModalRawText = "";
+
     document.addEventListener("DOMContentLoaded", () => {
         renderFixturesTable();
         setupModalEvents();
@@ -272,34 +316,113 @@
         alert("Performance logs processed! Table records are now synchronized.");
     }
 
-    /**
-     * --- FIX ---
-     * This is the new, more robust name normalization function.
-     * It takes any name string (e.g., "Alastair 'kiwi' Key" or "Alastair Key [5]")
-     * and reliably returns the primary identifier (e.g., "alastair").
-     */
-    const getBaseName = (name) => {
+    function openPasteModal() {
+        document.getElementById('paste-report-input').value = '';
+        document.getElementById('paste-modal').style.display = 'flex';
+    }
+
+    function closePasteModal() {
+        document.getElementById('paste-modal').style.display = 'none';
+    }
+
+    function processPastedReport() {
+        const text = document.getElementById('paste-report-input').value;
+        if (!text || !text.trim()) {
+            return alert('Please paste a valid match report before processing.');
+        }
+
+        const inputData = text.trim();
+        const scoreRegex = /SCORE:\s*(.+?)\s*\((\d+)\)\s*-\s*(.+?)\s*\((\d+)\)/i;
+        const matchResult = inputData.match(scoreRegex);
+        const idMatch = inputData.match(/MATCH ID:\s*(MATCH-\d+)/i);
+
+        if (!matchResult) {
+            alert('Unable to parse text. Please make sure the pasted data contains the valid score row format:\nSCORE: PLAYER (X) - PLAYER (Y)');
+            return;
+        }
+
+        const reportP1 = matchResult[1].trim();
+        const score1 = parseInt(matchResult[2], 10);
+        const reportP2 = matchResult[3].trim();
+        const score2 = parseInt(matchResult[4], 10);
+
+        let foundMatch = leagueMatches.find(m => nameMatches(m.p1, reportP1) && nameMatches(m.p2, reportP2));
+        if (!foundMatch) {
+            foundMatch = leagueMatches.find(m => nameMatches(m.p2, reportP1) && nameMatches(m.p1, reportP2));
+        }
+
+        if (!foundMatch) {
+            alert(`No fixture entry matching players "${reportP1}" vs "${reportP2}" was discovered inside this league register.`);
+            return;
+        }
+
+        const history = JSON.parse(localStorage.getItem('completed_matches_history') || '[]');
+        const matchId = idMatch ? idMatch[1] : `TXT-${Date.now()}`;
+        const exactDuplicate = history.some(item => item.trim() === inputData);
+        const idDuplicate = idMatch ? history.some(item => item.includes(matchId)) : false;
+
+        if (exactDuplicate) {
+            return alert('This exact match report has already been added.');
+        }
+        if (idDuplicate) {
+            return alert(`This match report has already been added because MATCH ID ${matchId} already exists.`);
+        }
+
+        history.push(inputData);
+        localStorage.setItem('completed_matches_history', JSON.stringify(history));
+
+        renderFixturesTable();
+        closePasteModal();
+        alert('Match report saved and synchronized.');
+    }
+
+    const normalizePlayerName = (name) => {
         if (!name) return '';
-        return name.toString().toLowerCase().split(' ')[0].replace(/'/g, '');
+        return name.toString().toUpperCase()
+            .replace(/\[.*?\]/g, '')
+            .replace(/[^A-Z0-9 ]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+
+    const aliasPlayerName = (name) => {
+        const normalized = normalizePlayerName(name);
+        return normalized
+            .replace(/\bFREDDY\b/g, 'FREDDIE')
+            .replace(/\bFREDDIE\b/g, 'FREDERICK');
+    };
+
+    const nameMatches = (fixtureName, reportName) => {
+        const fixtureNorm = normalizePlayerName(fixtureName);
+        const reportNorm = normalizePlayerName(reportName);
+        if (!fixtureNorm || !reportNorm) return false;
+        if (fixtureNorm === reportNorm) return true;
+        if (fixtureNorm.includes(reportNorm) || reportNorm.includes(fixtureNorm)) return true;
+
+        const fixtureAlias = aliasPlayerName(fixtureName);
+        const reportAlias = aliasPlayerName(reportName);
+        if (fixtureAlias === reportNorm || reportAlias === fixtureNorm) return true;
+        if (fixtureAlias.includes(reportNorm) || reportAlias.includes(fixtureNorm)) return true;
+        if (fixtureNorm.includes(reportAlias) || reportNorm.includes(fixtureAlias)) return true;
+        return false;
     };
 
     function renderFixturesTable() {
-        // --- FIX 1: Read the correct data from localStorage ('happy4u_profiles') ---
         const playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
         const allMatches = [];
-        const processedMatchIDs = new Set(); // Use a Set to easily prevent duplicate matches
+        const processedMatchIDs = new Set();
 
-        // --- FIX 2: Create a clean, flat list of every match played from all profiles ---
+        // 1. Check Profile Base Data Storage 
         for (const playerName in playerProfiles) {
             if (playerProfiles[playerName] && playerProfiles[playerName].history) {
                 playerProfiles[playerName].history.forEach(matchRecord => {
-                    // Only add a match if it has an ID and we haven't already processed it
                     if (matchRecord.matchID && !processedMatchIDs.has(matchRecord.matchID)) {
                         allMatches.push({
                             p1Name: playerName,
                             p2Name: matchRecord.opponent,
-                            score: matchRecord.score, // The score is a string like "11-3"
-                            matchID: matchRecord.matchID
+                            score: matchRecord.score, 
+                            matchID: matchRecord.matchID,
+                            rawLog: null
                         });
                         processedMatchIDs.add(matchRecord.matchID);
                     }
@@ -307,53 +430,71 @@
             }
         }
 
+        // 2. Read Scoreboard Log Sub-system Text Storage
+        const rawHistoryTextLogs = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+        rawHistoryTextLogs.forEach((reportText, index) => {
+            if (typeof reportText !== 'string') return;
+
+            const scoreLineMatch = reportText.match(/SCORE:\s*([A-Za-z0-9\s\.'-]+?)\s*\((\d+)\)\s*-\s*([A-Za-z0-9\s\.'-]+?)\s*\((\d+)\)/i);
+            const idLineMatch = reportText.match(/MATCH ID:\s*(MATCH-\d+)/i);
+            const entryMatchID = idLineMatch ? idLineMatch[1] : `TXT-${Date.now()}-${index}`;
+
+            if (!scoreLineMatch) return;
+
+            const p1Name = scoreLineMatch[1].trim();
+            const p2Name = scoreLineMatch[3].trim();
+            const score = `${scoreLineMatch[2]}-${scoreLineMatch[4]}`;
+
+            if (!processedMatchIDs.has(entryMatchID)) {
+                allMatches.push({
+                    p1Name,
+                    p2Name,
+                    score,
+                    matchID: entryMatchID,
+                    rawLog: reportText
+                });
+                processedMatchIDs.add(entryMatchID);
+            }
+        });
+
         const tbody = document.getElementById('schedule-body');
         tbody.innerHTML = '';
 
-        // --- FIX 3: Loop through the official schedule and try to find a result for each fixture ---
+        // 3. Render Match Array
         leagueMatches.forEach(scheduledMatch => {
             let liveRecord = null;
             
-            const scheduledP1Base = getBaseName(scheduledMatch.p1);
-            const scheduledP2Base = getBaseName(scheduledMatch.p2);
-
-            // Find a matching result from our clean `allMatches` list
             for (const recordedMatch of allMatches) {
-                const recordedP1Base = getBaseName(recordedMatch.p1Name);
-                const recordedP2Base = getBaseName(recordedMatch.p2Name);
-
-                // Check if the players match in either order (P1 vs P2 or P2 vs P1)
-                if ((scheduledP1Base === recordedP1Base && scheduledP2Base === recordedP2Base) ||
-                    (scheduledP1Base === recordedP2Base && scheduledP2Base === recordedP1Base)) {
+                if ((nameMatches(scheduledMatch.p1, recordedMatch.p1Name) && nameMatches(scheduledMatch.p2, recordedMatch.p2Name)) ||
+                    (nameMatches(scheduledMatch.p1, recordedMatch.p2Name) && nameMatches(scheduledMatch.p2, recordedMatch.p1Name))) {
                     liveRecord = recordedMatch;
-                    break; // Found the match, no need to keep searching
+                    break;
                 }
             }
             
             let scoreText = "- -";
             let statusText = "Pending";
             let isCompleted = false;
+            let finalRawLog = null;
 
             if (liveRecord) {
                 isCompleted = true;
-                statusText = "Completed";
+                statusText = "Completed ✅";
+                finalRawLog = liveRecord.rawLog;
 
-                // --- FIX 4: Correctly parse the score and display it in the right order ---
                 const scores = liveRecord.score.split('-').map(s => parseInt(s.trim()));
                 let p1Score = scores[0];
                 let p2Score = scores[1];
                 
-                // If the stored P1 name doesn't match the scheduled P1 name, flip the score
-                if (getBaseName(liveRecord.p1Name) !== scheduledP1Base) {
+                if (!nameMatches(liveRecord.p1Name, scheduledMatch.p1)) {
                     scoreText = `${p2Score} - ${p1Score}`;
                 } else {
                     scoreText = `${p1Score} - ${p2Score}`;
                 }
             }
 
-            const rowClass = isCompleted ? "completed-row clickable-row" : "pending-row";
             const tr = document.createElement('tr');
-            tr.className = rowClass;
+            tr.className = isCompleted ? "completed-row clickable-row" : "pending-row";
             
             tr.innerHTML = `
                 <td class="date">${scheduledMatch.date}</td>
@@ -365,51 +506,113 @@
                     <span style="font-weight: bold; color: ${isCompleted ? '#27ae60' : '#f39c12'}">${statusText}</span>
                 </td>
                 <td class="action-cell">
-                    ${isCompleted ? 
-                        `<button class="review-btn" onclick="openReviewModal(${scheduledMatch.id}, '${scoreText}', '${statusText}')">REVIEW</button>` : 
-                        `<span class="locked-badge">Locked</span>`
-                    }
+                    <button class="review-btn" data-id="${scheduledMatch.id}" data-score="${scoreText}" data-status="${statusText}">REVIEW</button>
                 </td>
             `;
 
-            if (isCompleted) {
-                tr.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('review-btn')) {
-                        openReviewModal(scheduledMatch.id, scoreText, statusText);
-                    }
+            // All rows are now clickable to support opening review previews
+            tr.addEventListener('click', () => {
+                openReviewModal(scheduledMatch.id, scoreText, statusText, finalRawLog);
+            });
+            
+            const btn = tr.querySelector('.review-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openReviewModal(scheduledMatch.id, scoreText, statusText, finalRawLog);
                 });
             }
 
             tbody.appendChild(tr);
         });
+
     }
 
-    window.openReviewModal = function(id, liveScore, liveStatus) {
+    window.openReviewModal = function(id, liveScore, liveStatus, alternativeLog) {
         const match = leagueMatches.find(m => m.id === id);
         if (!match) return;
 
+        activeModalMatchId = id;
+        
         document.getElementById('review-title').innerText = `Match Details (ID: #${match.id})`;
         document.getElementById('review-status').innerHTML = `
-            Scoreline Status: <span style="color:#27ae60;">${liveStatus}</span>
+            Scoreline Status: <span style="font-weight: bold; color:${liveStatus.includes('✅') ? '#27ae60' : '#f39c12'};">${liveStatus}</span>
         `;
-        document.getElementById('review-details').innerHTML = `
-            <pre>
-<strong>Competition:</strong> ${match.comp}
-<strong>Scheduled:</strong>   ${match.date}
-<strong>Arena Venue:</strong> ${match.venue}
------------------------------------------
-<strong>Player 1:</strong>    ${match.p1}
-<strong>Player 2:</strong>    ${match.p2}
------------------------------------------
-<strong>FINAL SCORE:</strong>  ${liveScore}
-            </pre>
-        `;
+
+        if (alternativeLog) {
+            activeModalRawText = alternativeLog;
+            document.getElementById('review-details').innerHTML = `
+                <pre style="white-space: pre-wrap; font-family: monospace; text-align: left; font-size: 11px; background: #222; color: #00ff44; padding: 15px;">${alternativeLog}</pre>
+            `;
+        } else {
+            // Generate standard mock block structure text if no alternate scoreboard log string file exists
+            const fallbackGeneratedLog = `MATCH REPORT PREVIEW
+╔═════════════════════════════════════════════════════╗
+║         Bar 8 Champions League Active         ║
+╚═════════════════════════════════════════════════════╝
+
+DATE:      ${match.date}
+MATCH ID:  MATCH-${1780305867800 + match.id}
+TYPE:      STANDARD RACE TO 11
+STATUS:    FINISHED ✅
+------------------------------------------------------
+SCORE:     ${match.p1.split(' ')[0].toUpperCase()} (11) - ${match.p2.split(' ')[0].toUpperCase()} (4)
+------------------------------------------------------`;
+            
+            activeModalRawText = fallbackGeneratedLog;
+            document.getElementById('review-details').innerHTML = `
+                <pre style="white-space: pre-wrap; font-family: monospace; text-align: left; font-size: 11px; background: #222; color: #00ff44; padding: 15px;">${fallbackGeneratedLog}</pre>
+            `;
+        }
         document.getElementById('review-modal').style.display = 'flex';
+    };
+
+    // 🟢 NEW AUTOMATED INJECTOR AND STORAGE SAVE OPERATION HANDLER
+    window.processReviewModalSend = function() {
+        if (activeModalMatchId === null) return;
+
+        const match = leagueMatches.find(m => m.id === activeModalMatchId);
+        if (!match) return;
+
+        // Parse names and find corresponding points variables from active text log container
+        const reportText = activeModalRawText;
+        const scoreLineMatch = reportText.match(/SCORE:\s*([A-Za-z0-9\s\.'-]+?)\s*\((\d+)\)\s*-\s*([A-Za-z0-9\s\.'-]+?)\s*\((\d+)\)/i);
+        
+        let p1Score = "11";
+        let p2Score = "4";
+
+        if (scoreLineMatch) {
+            p1Score = scoreLineMatch[2];
+            p2Score = scoreLineMatch[4];
+        }
+
+        // Commit newly modified details back into browser profile memory structure
+        let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
+        const p1CleanKey = match.p1;
+        
+        if (!playerProfiles[p1CleanKey]) playerProfiles[p1CleanKey] = { history: [] };
+        
+        // Append entry log to confirm state transition across file links
+        playerProfiles[p1CleanKey].history.push({
+            opponent: match.p2,
+            score: `${p1Score}-${p2Score}`,
+            matchID: "MATCH-GEN-" + activeModalMatchId + "-" + Date.now()
+        });
+
+        localStorage.setItem('happy4u_profiles', JSON.stringify(playerProfiles));
+        
+        // Refresh display to reveal grid transformation
+        renderFixturesTable();
+        
+        // Hide overlay and notify user
+        document.getElementById('review-modal').style.display = 'none';
+        alert(`Match status updated successfully! Row marked as Completed ✅ with score ${p1Score} - ${p2Score}.`);
     };
 
     window.resetLeagueData = function() {
         if (confirm("Clear all player profiles and tournament history? This cannot be undone.")) {
             localStorage.removeItem('happy4u_profiles');
+            localStorage.removeItem('completed_matches_history');
             renderFixturesTable();
             alert("All tournament records successfully reset.");
         }

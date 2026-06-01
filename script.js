@@ -36,6 +36,7 @@ let gameState = {
     isFinished: false,
     matchID: null,
     leagueMatchId: null,
+    isLeagueMatch: false,
     matchMode: 'standard'
 };
 
@@ -150,37 +151,47 @@ window.addEventListener('load', () => {
 });
 
 // Toggle Bar 8 Selector Visibility
+const leagueModeCheck = document.getElementById('leagueMode');
 const bar8Check = document.getElementById('bar8HandicapActive');
 const bar8Div = document.getElementById('bar8-match-selector');
 const raceIn = document.getElementById('race-input');
+const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
+const singlesDiv = document.getElementById('singles-league-selector');
+
+function refreshRaceInputLock() {
+    if (bar8Check && bar8Check.checked) {
+        raceIn.value = 11;
+        raceIn.disabled = true;
+    } else if ((leagueModeCheck && leagueModeCheck.checked) || (singlesCheck && singlesCheck.checked)) {
+        raceIn.value = 12;
+        raceIn.disabled = true;
+    } else if (raceIn) {
+        raceIn.disabled = false;
+    }
+}
 
 if (bar8Check) {
     bar8Check.addEventListener('change', function() {
         bar8Div.style.display = this.checked ? 'block' : 'none';
-        if (this.checked) {
-            raceIn.value = 11;
-            raceIn.disabled = true;
-        } else {
-            raceIn.disabled = false;
-        }
+        refreshRaceInputLock();
     });
 }
 
 // Toggle Singles League Selector Visibility
-const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
-const singlesDiv = document.getElementById('singles-league-selector');
+if (leagueModeCheck) {
+    leagueModeCheck.addEventListener('change', function() {
+        refreshRaceInputLock();
+    });
+}
 
 if (singlesCheck) {
     singlesCheck.addEventListener('change', function() {
         singlesDiv.style.display = this.checked ? 'block' : 'none';
-        if (this.checked) {
-            raceIn.value = 12;
-            raceIn.disabled = true;
-        } else {
-            raceIn.disabled = false;
-        }
+        refreshRaceInputLock();
     });
 }
+
+refreshRaceInputLock();
 
 const setupBtn = document.getElementById('save-setup-btn');
 if(setupBtn) {
@@ -193,18 +204,25 @@ if(setupBtn) {
         const practiceActive = document.getElementById('PracticeNightActive');
         const practiceDropdown = document.getElementById('practice-match-dropdown');
         const singlesCheck = document.getElementById('SinglesLeague(Red)Active');
+        const leagueMode = document.getElementById('leagueMode');
         
         const isBar8 = bar8Check ? bar8Check.checked : false;
         const isSingles = singlesCheck ? singlesCheck.checked : false;
+        const isLeagueMode = leagueMode ? leagueMode.checked : false;
         const isPractice = practiceActive ? practiceActive.checked : false;
+        const isLeagueMatch = isSingles || isLeagueMode;
 
         // Reset game state for a clean start
         gameState.p1Score = 0;
         gameState.p2Score = 0;
-        gameState.matchMode = isPractice ? 'practice' : 'standard';
+        gameState.matchMode = isPractice ? 'practice' : isLeagueMatch ? 'league' : 'standard';
         gameState.practiceLegSaved = false;
+        gameState.isLeagueMatch = isLeagueMatch;
 
-        if (isBar8 && matchDropdown.value !== "") {
+        if (isBar8) {
+            if (!matchDropdown || matchDropdown.value === "") {
+                return alert('Please select a Bar 8 Champions League match before saving.');
+            }
             // LOAD FROM LEAGUEMANAGER (Centralized Source of Truth)
             const match = window.LeagueManager ? window.LeagueManager.getMatchByIndex(matchDropdown.value) : ChampionsLeague.matches[matchDropdown.value];
             if (match) {
@@ -220,7 +238,10 @@ if(setupBtn) {
                 gameState.raceTo = 11;
                 gameState.leagueMatchId = match.id; // Store league match ID for review modal integration
             }
-        } else if (isSingles && singlesMatchDropdown.value !== "") {
+        } else if (isSingles) {
+            if (!singlesMatchDropdown || singlesMatchDropdown.value === "") {
+                return alert('Please select a Division 1 Singles League match before saving.');
+            }
             const match = window.LeagueManager ? window.LeagueManager.getSinglesMatchByIndex(singlesMatchDropdown.value) : null;
             if (match) {
                 if (window.LeagueManager && window.LeagueManager.isMatchCompleted(match.id)) {
@@ -234,7 +255,15 @@ if(setupBtn) {
                 gameState.p2ScoreStart = match.p2Start;
                 gameState.raceTo = 12; // League matches are race to 12
                 gameState.leagueMatchId = match.id;
+                gameState.isLeagueMatch = true;
             }
+        } else if (isLeagueMode) {
+            gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
+            gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
+            gameState.raceTo = 12;
+            gameState.p1ScoreStart = 0;
+            gameState.p2ScoreStart = 0;
+            gameState.leagueMatchId = null;
         } else if (isPractice) {
             gameState.raceTo = 5;
             gameState.p1ScoreStart = 0;
@@ -458,7 +487,8 @@ function checkWinner(newsEvent) {
     const p1 = gameState.p1Score;
     const p2 = gameState.p2Score;
 
-    if (gameState.raceTo === 12) {
+    const isActiveLeagueMatch = gameState.isLeagueMatch && gameState.raceTo === 12;
+    if (isActiveLeagueMatch) {
         if (p1 === 9) { gameState.p1Matches++; return showWinner(gameState.p1Name); }
         if (p2 === 9) { gameState.p2Matches++; return showWinner(gameState.p2Name); }
         if (totalFramesPlayed === 12) {
@@ -687,7 +717,7 @@ function updateUI() {
 
 function updateTicker(message) {
     if (!tickerElement) return;
-    const isLeague = (gameState.raceTo === 12);
+    const isLeague = gameState.isLeagueMatch && gameState.raceTo === 12;
     const raceToHighlight = `RULE: <span class="ticker-highlight">${isLeague ? 'LEAGUE (9-WIN / MAX 12)' : 'RACE TO ' + gameState.raceTo}</span>`;
     const liveScore = `LIVE SCORE: ${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
     const isGoldenActive = localStorage.getItem('goldenBreakEnabled') === 'true';
@@ -805,7 +835,7 @@ function refreshHistoryModal() {
         if (f.winner === gameState.p1Name) { p1FrameF++; p2FrameA++; }
         else { p2FrameF++; p1FrameA++; }
     });
-    const isLeague = (gameState.raceTo === 12);
+    const isLeague = gameState.isLeagueMatch && gameState.raceTo === 12;
     const typeColor = isLeague ? "var(--neon-cyan)" : "#fff"; 
     const statusColor = gameState.isFinished ? "var(--neon-magenta)" : "var(--neon-green)";
     const statusText = gameState.isFinished ? "FINISHED ✅" : "IN PROGRESS 🏃";
