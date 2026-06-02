@@ -12,7 +12,6 @@
             --accent-cyan: #00e5ff;
             --text-bright: #e0e0e0;
             --text-muted: #777777;
-            --grid-active: #1e293b;
         }
 
         body {
@@ -25,7 +24,7 @@
             justify-content: center;
         }
 
-        .ledger-container {
+        .calendar-container {
             width: 100%;
             max-width: 1100px;
         }
@@ -35,197 +34,221 @@
             padding-bottom: 20px;
             margin-bottom: 25px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .nav-home-link {
+        .nav-back-link {
             color: var(--accent-cyan);
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
             width: 250px;
         }
-        .nav-home-link:hover { text-decoration: underline; }
+        .nav-back-link:hover { text-decoration: underline; }
 
-        .header-section h1 {
+        .header-section h2 {
             margin: 0;
+            color: var(--text-bright);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             flex: 1;
             text-align: center;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            color: #ffffff;
-            font-weight: 800;
-            text-transform: uppercase;
         }
 
-        .calendar-dashboard {
+        .layout-grid {
             display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 24px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
         }
 
-        @media (max-width: 850px) {
-            .calendar-dashboard { grid-template-columns: 1fr; }
-        }
-
-        .calendar-card {
-            background: var(--bg-card);
+        .card-panel {
+            background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
 
-        .calendar-controls {
+        /* Calendar Matrix Layout */
+        .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 25px;
         }
 
-        .calendar-controls h3 {
+        .calendar-header h3 {
             margin: 0;
-            font-size: 1.3rem;
-            letter-spacing: 1.5px;
-            color: #fff;
-            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.3rem;
         }
 
         .nav-btn {
-            background: #1c1c1c;
+            background: #222;
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 6px 16px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.2s;
         }
-        .nav-btn:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-        }
+        .nav-btn:hover { background: #333; }
 
-        .calendar-grid {
+        .weekdays-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
             text-align: center;
-        }
-
-        .weekday-label {
+            font-weight: bold;
             font-size: 11px;
             color: var(--text-muted);
-            font-weight: 700;
             text-transform: uppercase;
-            padding-bottom: 8px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
         }
 
-        .calendar-day {
-            background: #0d0d0d;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            aspect-ratio: 1.1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
         }
-        .calendar-day:hover { border-color: #555; }
-        .calendar-day.empty { background: transparent; border: none; cursor: default; }
-        
-        .calendar-day .day-num {
+
+        .day-box {
+            background: #111111;
+            border: 1px solid var(--border-color);
+            aspect-ratio: 1 / 1;
+            border-radius: 6px;
+            padding: 10px;
+            font-weight: bold;
             font-size: 14px;
-            font-weight: 700;
-            align-self: flex-start;
-            color: #aaa;
-        }
-
-        .calendar-day.has-records {
-            border-color: rgba(0, 229, 255, 0.3);
-            background: linear-gradient(145deg, #0d0d0d 0%, #101f24 100%);
-        }
-        .calendar-day.has-records .day-num {
-            color: #ffffff;
-        }
-        .calendar-day.has-records::after {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            align-self: center;
-            margin-bottom: 4px;
-            box-shadow: 0 0 8px var(--accent-cyan);
-        }
-
-        .calendar-day.selected-day {
-            background: var(--grid-active) !important;
-            border-color: var(--accent-cyan) !important;
-        }
-
-        .sidebar-records-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-date-header {
-            font-size: 12px;
             color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            margin-top: 0;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-
-        .match-history-item-list {
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .match-mini-card {
-            background: #0d0d0d;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 14px;
-            margin-bottom: 12px;
+            position: relative;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .match-mini-card:hover {
+        .day-box:hover {
             border-color: var(--accent-cyan);
-            background: #111;
+        }
+        .day-box.has-data {
+            color: #ffffff;
+        }
+        .day-box.selected {
+            border: 1px solid var(--accent-cyan);
+            box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.2);
         }
 
-        .match-mini-time {
-            font-size: 11px;
+        .day-box.today {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.18);
+        }
+
+        .day-box.today.selected {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.25);
+        }
+
+        .data-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        /* Sidebar Styling */
+        .sidebar-title-header {
             color: var(--text-muted);
-            font-family: monospace;
-            margin-bottom: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .sidebar-counter-headline {
+            font-size: 12px;
+            color: #888;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
             text-transform: uppercase;
         }
-        .match-mini-players {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 0.5px;
+
+        .session-entry-card {
+            background: #0d0d0d;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
         }
 
+        .session-timestamp-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .breakdown-trigger-link {
+            display: block;
+            background: #181818;
+            border: 1px solid #2d2d2d;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .breakdown-trigger-link:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+        }
+
+        .paste-action-btn {
+            background: #1a4d4d;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+        .paste-action-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .empty-sidebar-msg {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0,0,0,0.85);
             display: none;
             align-items: center;
             justify-content: center;
@@ -239,11 +262,10 @@
             border-radius: 12px;
             width: 100%;
             max-width: 760px;
-            max-height: 90vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
         }
 
         .modal-header {
@@ -255,23 +277,21 @@
             background: #1a1a1a;
         }
 
-        .modal-header h3 { 
-            margin: 0; 
-            color: var(--accent-cyan); 
-            font-size: 1.1rem; 
+        .modal-header h3 {
+            margin: 0;
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .modal-close-x {
+        .modal-close-btn {
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 26px;
+            font-size: 24px;
             cursor: pointer;
-            line-height: 1;
         }
-        .modal-close-x:hover { color: #fff; }
+        .modal-close-btn:hover { color: #fff; }
 
         .modal-body {
             padding: 20px;
@@ -282,308 +302,319 @@
 
         .raw-log-block {
             background: #040404;
-            border: 1px solid #161616;
+            border: 1px solid #1a1a1a;
             border-radius: 6px;
             padding: 20px;
             font-family: monospace;
             font-size: 13px;
-            color: #d8d8d8;
+            color: #dcdcdc;
             white-space: pre-wrap;
-            overflow-x: auto;
             line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-<div class="ledger-container">
-    <div class="header-section">
-        <a class="nav-home-link" href="PracticeLedger.html">← Back To Ledger Stats Table</a>
-        <h1>Practice Night Calendar</h1>
-        <div style="width: 250px;"></div>
-    </div>
+    <div class="calendar-container">
+        <div class="header-section">
+            <a class="nav-back-link" href="PracticeLedger.html">← Back To Ledger Stats Table</a>
+            <h2>PRACTICE NIGHT CALENDAR</h2>
+            <button class="paste-action-btn" onclick="openPasteModal()" style="width: 250px;">📋 Paste Match Report</button>
+        </div>
 
-    <div class="calendar-dashboard">
-        <div class="calendar-card">
-            <div class="calendar-controls">
-                <button class="nav-btn" onclick="adjustMonth(-1)">◀ Prev</button>
-                <h3 id="calendar-month-title">Month Year</h3>
-                <button class="nav-btn" onclick="adjustMonth(1)">Next ▶</button>
+        <div class="layout-grid">
+            <div class="card-panel">
+                <div class="calendar-header">
+                    <button class="nav-btn" onclick="adjustMonth(-1)">◀ Prev</button>
+                    <h3 id="calendar-month-year-title">MAY 2026</h3>
+                    <button class="nav-btn" onclick="adjustMonth(1)">Next ▶</button>
+                </div>
+
+                <div class="weekdays-grid">
+                    <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+                </div>
+
+                <div class="days-grid" id="calendar-days-matrix"></div>
             </div>
-            <div class="calendar-grid" id="calendar-grid-target"></div>
-        </div>
 
-        <div class="sidebar-records-panel">
-            <h3 class="sidebar-date-header" id="panel-date-title">Select A Date</h3>
-            <div class="match-history-item-list" id="panel-history-list">
-                <p style="color: var(--text-muted); font-size: 13px; text-align: center; padding-top: 30px; line-height: 1.6;">
-                    Select any calendar day highlighted with an indicator badge to analyze performance reports.
-                </p>
+            <div class="card-panel" style="min-height: 400px;">
+                <div id="sidebar-date-header" class="sidebar-title-header">Select a date</div>
+                <div id="sidebar-content-view">
+                    <div class="empty-sidebar-msg">Click a marked calendar block day to view session records details.</div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="records-modal" class="modal-overlay">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Complete Full Frame Breakdown</h3>
-            <button class="modal-close-x" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <pre class="raw-log-block" id="modal-log-content"></pre>
+    <div id="text-report-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-window-title">Match Performance Log Breakdown</h3>
+                <button class="modal-close-btn" onclick="closeReportModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <pre class="raw-log-block" id="modal-text-content"></pre>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    let organizedHistoryMap = {};
-    let activeCalendarDate = new Date(2026, 4, 21); // Defaults directly to May 2026
+    <div id="paste-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Paste Match Report</h3>
+                <button class="modal-close-btn" onclick="closePasteModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="paste-report-input" style="width:100%; min-height:320px; background:#050607; color:#00e5ff; border:1px solid #262626; border-radius:8px; padding:16px; font-family:monospace; font-size:13px; white-space:pre-wrap;" placeholder="Paste full match report text here..."></textarea>
+                <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#00e5ff; color:#000; border:none; padding:10px 20px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="processPastedReport()">Process</button>
+                    <button style="background:#333; color:#fff; border:1px solid #555; padding:10px 20px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="closePasteModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    document.addEventListener("DOMContentLoaded", () => {
-        parseStorageDataToCalendarMap();
-        buildCalendarViewGrid();
-        setupModalDismissEvents();
-    });
+    <script>
+        const currentDate = new Date();
+        const todayYear = currentDate.getFullYear();
+        const todayMonth = currentDate.getMonth();
+        const todayDay = currentDate.getDate();
+        let trackingCalendarDateRef = new Date(todayYear, todayMonth, 1); // Defaults to current month
+        const monthNamesList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    function parseStorageDataToCalendarMap() {
-        const rawHistory = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
-        organizedHistoryMap = {};
-
-        rawHistory.forEach(logString => {
-            const rawText = (typeof logString === 'string' ? logString : '');
-            if (!rawText.trim()) return;
-
-            // Group multiple match reports within a single item block
-            const subBlocks = rawText.split(/(?=╔═════════════════════════════════════════════════════╗)/);
-            
-            // Look for general session timestamp data at the top of the item block
-            const sessionDateMatch = rawText.match(/SESSION DATE:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
-            const sessionTimeMatch = rawText.match(/SESSION DATE:\s*\d{2}\/\d{2}\/\d{4},\s*([^\n\r]+)/i);
-            const sessionIdMatch = rawText.match(/SESSION ID:\s*([A-Za-z0-9_-]+)/i);
-
-            let fallbackDateKey = null;
-            let fallbackDateRaw = "";
-            let fallbackTime = "11:17:11";
-            let fallbackId = "MATCH-UNKNOWN";
-
-            if (sessionDateMatch) {
-                fallbackDateKey = `${sessionDateMatch[3]}-${sessionDateMatch[2]}-${sessionDateMatch[1]}`;
-                fallbackDateRaw = `${sessionDateMatch[1]}/${sessionDateMatch[2]}/${sessionDateMatch[3]}`;
-                if (sessionTimeMatch) fallbackTime = sessionTimeMatch[1].replace(/SESSION ID:/i, '').trim();
-                if (sessionIdMatch) fallbackId = sessionIdMatch[1].replace(/COMPLETE/i, '').trim();
-            }
-
-            let collectedMatchesForThisDay = [];
-
-            subBlocks.forEach(block => {
-                if (!block.trim() || !block.includes("HAPPY4U MATCH REPORT")) return;
-                
-                const dateMatch = block.match(/DATE:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
-                const timeMatch = block.match(/DATE:\s*\d{2}\/\d{2}\/\d{4},\s*([^\n\r]+)/i);
-                const idMatch = block.match(/MATCH ID:\s*([A-Za-z0-9_-]+)/i);
-
-                let currentKey = fallbackDateKey;
-                let currentDateRaw = fallbackDateRaw;
-                let currentTime = fallbackTime;
-                let currentId = fallbackId;
-
-                if (dateMatch) {
-                    currentKey = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
-                    currentDateRaw = `${dateMatch[1]}/${dateMatch[2]}/${dateMatch[3]}`;
-                    if (timeMatch) currentTime = timeMatch[1].trim();
-                    if (idMatch) currentId = idMatch[1].trim();
-                }
-
-                if (currentKey) {
-                    collectedMatchesForThisDay.push({
-                        key: currentKey,
-                        time: currentTime,
-                        id: currentId,
-                        dateRaw: currentDateRaw,
-                        fullPayload: block.trim()
-                    });
-                }
-            });
-
-            // Bucket array data mapped to calendar days dynamically
-            collectedMatchesForThisDay.forEach(matchObj => {
-                if (!organizedHistoryMap[matchObj.key]) {
-                    organizedHistoryMap[matchObj.key] = [];
-                }
-                organizedHistoryMap[matchObj.key].push(matchObj);
-            });
-        });
-    }
-
-    function buildCalendarViewGrid() {
-        const grid = document.getElementById('calendar-grid-target');
-        const title = document.getElementById('calendar-month-title');
-        grid.innerHTML = '';
-
-        const year = activeCalendarDate.getFullYear();
-        const month = activeCalendarDate.getMonth();
-
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        title.innerText = `${monthNames[month]} ${year}`;
-
-        const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        weekDays.forEach(day => {
-            grid.innerHTML += `<div class="weekday-label">${day}</div>`;
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAndGroupStorageData();
+            buildCalendarLayoutGrid();
+            setupModalOverlayDismiss();
         });
 
-        const initialDayIndex = new Date(year, month, 1).getDay();
-        const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
+        function loadAndGroupStorageData() {
+            parsedDateMapDatabase = {};
+            const rawHistoryArray = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
 
-        for (let i = 0; i < initialDayIndex; i++) {
-            grid.innerHTML += `<div class="calendar-day empty"></div>`;
-        }
+            rawHistoryArray.forEach((textReportBlock, nativeArrayIndex) => {
+                if (!textReportBlock.trim()) return;
 
-        for (let day = 1; day <= daysInCurrentMonth; day++) {
-            const paddedDay = String(day).padStart(2, '0');
-            const paddedMonth = String(month + 1).padStart(2, '0');
-            const lookupKey = `${year}-${paddedMonth}-${paddedDay}`;
+                // Standardize layout lines by flattening linebreaks and whitespace gaps
+                const cleanBlock = textReportBlock.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
 
-            const sessionRecords = organizedHistoryMap[lookupKey] || [];
-            const hasSessionsClass = sessionRecords.length > 0 ? 'has-records' : '';
+                // Extract date matching regardless of structural formatting variants
+                // Pattern: DD/MM/YYYY -> group 1: DD (day), group 2: MM (month), group 3: YYYY (year)
+                const dateDiscoveryMatch = cleanBlock.match(/(?:DATE|SESSION DATE):\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+                if (!dateDiscoveryMatch) return;
 
-            const dayTile = document.createElement('div');
-            dayTile.className = `calendar-day ${hasSessionsClass}`;
-            dayTile.innerHTML = `<span class="day-num">${day}</span>`;
-            
-            dayTile.addEventListener('click', () => {
-                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected-day'));
-                dayTile.classList.add('selected-day');
-                displayDailySessionPanelList(lookupKey, day, monthNames[month]);
-            });
+                const dayKeyStr = parseInt(dateDiscoveryMatch[1], 10);       // DD to day number
+                const monthKeyStr = parseInt(dateDiscoveryMatch[2], 10) - 1; // MM to 0-indexed month
+                const yearKeyStr = parseInt(dateDiscoveryMatch[3], 10);
 
-            grid.appendChild(dayTile);
-        }
-    }
-
-    function displayDailySessionPanelList(dateKey, dayNum, monthName) {
-        document.getElementById('panel-date-title').innerText = `${monthName} ${dayNum}, ${activeCalendarDate.getFullYear()}`;
-        const listContainer = document.getElementById('panel-history-list');
-        listContainer.innerHTML = '';
-
-        const matches = organizedHistoryMap[dateKey] || [];
-
-        if (matches.length === 0) {
-            listContainer.innerHTML = `<p style="color: var(--text-muted); font-size:13px; text-align:center; padding-top:20px;">No logs recorded for this day.</p>`;
-            return;
-        }
-
-        const itemCard = document.createElement('div');
-        itemCard.className = "match-mini-card";
-        itemCard.innerHTML = `
-            <div class="match-mini-time">LOGGED ENTRIES: ${matches.length} RACES</div>
-            <div class="match-mini-players">VIEW COMPLETE BREAKDOWN</div>
-        `;
-        
-        itemCard.addEventListener('click', () => {
-            renderAggregatedSessionReport(matches);
-        });
-
-        listContainer.appendChild(itemCard);
-    }
-
-    function renderAggregatedSessionReport(matchesArray) {
-        if (matchesArray.length === 0) return;
-
-        const rootMatch = matchesArray[0];
-        let compiledOutputText = `SESSION DATE:\n ${rootMatch.dateRaw}, ${rootMatch.time}\nSESSION ID:\n ${rootMatch.id}\nCOMPLETE FULL FRAME BREAKDOWN\n\n`;
-
-        let summaryConcsTextList = "";
-        let playerStatsCounter = {};
-
-        matchesArray.forEach((match) => {
-            compiledOutputText += `${match.fullPayload}\n\n\n`;
-
-            const lines = match.fullPayload.split('\n');
-            let winnerName = "UNKNOWN";
-            let scoreLineStr = "0-0";
-
-            lines.forEach(line => {
-                const scoreMatch = line.match(/SCORE:\s*([A-Za-z0-9_-]+)\s*\((\d+)\)\s*-\s*([A-Za-z0-9_-]+)\s*\((\d+)\)/i);
-                const winMsgMatch = line.match(/CONGRATULATIONS WINNER\s+([A-Za-z0-9_-]+)/i);
-
-                if (scoreMatch) {
-                    const p1 = scoreMatch[1].toUpperCase();
-                    const s1 = parseInt(scoreMatch[2], 10);
-                    const p2 = scoreMatch[3].toUpperCase();
-                    const s2 = parseInt(scoreMatch[4], 10);
-
-                    if (!playerStatsCounter[p1]) playerStatsCounter[p1] = { name: p1, framesFor: 0, framesAgainst: 0, matchesWon: 0, matchesLost: 0 };
-                    if (!playerStatsCounter[p2]) playerStatsCounter[p2] = { name: p2, framesFor: 0, framesAgainst: 0, matchesWon: 0, matchesLost: 0 };
-
-                    playerStatsCounter[p1].framesFor += s1;
-                    playerStatsCounter[p1].framesAgainst += s2;
-                    playerStatsCounter[p2].framesFor += s2;
-                    playerStatsCounter[p2].framesAgainst += s1;
-                    
-                    scoreLineStr = `${s1}-${s2}`;
+                // Isolate timestamp signatures
+                let extractedTimeLabel = "Session Match Entry";
+                const timestampMatch = textReportBlock.match(/(\d{2}):(\d{2}):(\d{2})/);
+                if (timestampMatch) {
+                    extractedTimeLabel = `SESSION TIME: ${timestampMatch[0]}`;
                 }
 
-                if (winMsgMatch) {
-                    winnerName = winMsgMatch[1].toUpperCase();
+                const internalDbKey = `${yearKeyStr}-${monthKeyStr}-${dayKeyStr}`;
+                if (!parsedDateMapDatabase[internalDbKey]) {
+                    parsedDateMapDatabase[internalDbKey] = [];
                 }
-            });
 
-            if (winnerName !== "UNKNOWN") {
-                Object.keys(playerStatsCounter).forEach(pKey => {
-                    if (pKey === winnerName) {
-                        playerStatsCounter[pKey].matchesWon++;
-                    } else {
-                        playerStatsCounter[pKey].matchesLost++;
-                    }
+                parsedDateMapDatabase[internalDbKey].push({
+                    timeLabel: extractedTimeLabel,
+                    rawText: textReportBlock,
+                    globalIndex: nativeArrayIndex
                 });
-                summaryConcsTextList += `CONGRATULATIONS WINNER ${winnerName}\nFINAL SCORE: ${scoreLineStr}\n\n`;
+            });
+        }
+
+        function buildCalendarLayoutGrid() {
+            const matrixTargetGrid = document.getElementById("calendar-days-matrix");
+            const titleLabelTarget = document.getElementById("calendar-month-year-title");
+            matrixTargetGrid.innerHTML = "";
+
+            const targetYear = trackingCalendarDateRef.getFullYear();
+            const targetMonth = trackingCalendarDateRef.getMonth();
+
+            titleLabelTarget.innerText = `${monthNamesList[targetMonth]} ${targetYear}`.toUpperCase();
+
+            const shouldAutoSelectToday = targetYear === todayYear && targetMonth === todayMonth;
+            const startingDayOfWeekOffset = (new Date(targetYear, targetMonth, 1).getDay() + 6) % 7;
+            const daysInCurrentMonthCount = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+            // Populate empty calendar block cells for Monday-first weeks
+            for (let i = 0; i < startingDayOfWeekOffset; i++) {
+                const voidCell = document.createElement("div");
+                voidCell.style.background = "transparent";
+                matrixTargetGrid.appendChild(voidCell);
             }
-        });
 
-        compiledOutputText = compiledOutputText.trimEnd() + `\n\n------------------------------------------------------\n`;
-        compiledOutputText += summaryConcsTextList;
-        compiledOutputText += `Total \n`;
+            // Populate date active box elements
+            for (let dayNum = 1; dayNum <= daysInCurrentMonthCount; dayNum++) {
+                const cellBoxNode = document.createElement("div");
+                cellBoxNode.classList.add("day-box");
+                cellBoxNode.innerText = dayNum;
 
-        const sortedPlayers = Object.values(playerStatsCounter).sort((a, b) => {
-            if (a.name.includes("FREDDIE")) return -1;
-            if (b.name.includes("FREDDIE")) return 1;
-            return 0;
-        });
+                const trackingKey = `${targetYear}-${targetMonth}-${dayNum}`;
+                if (parsedDateMapDatabase[trackingKey] && parsedDateMapDatabase[trackingKey].length > 0) {
+                    cellBoxNode.classList.add("has-data");
+                    
+                    const markerDot = document.createElement("div");
+                    markerDot.classList.add("data-dot");
+                    cellBoxNode.appendChild(markerDot);
+                }
 
-        sortedPlayers.forEach(player => {
-            const spacesCount = 16 - player.name.length;
-            const spaces = " ".repeat(spacesCount > 0 ? spacesCount : 1);
-            compiledOutputText += `${player.name}${spaces}| FRAME-F: ${player.framesFor} | FRAME-A: ${player.framesAgainst}\n`;
-            compiledOutputText += `${player.name} (${player.matchesWon}-${player.matchesLost}) \n\n`;
-        });
+                if (shouldAutoSelectToday && dayNum === todayDay) {
+                    cellBoxNode.classList.add("today");
+                    handleDayBoxSelection(dayNum, cellBoxNode, trackingKey);
+                } else if (targetYear === todayYear && targetMonth === todayMonth && dayNum === todayDay) {
+                    cellBoxNode.classList.add("today");
+                }
 
-        compiledOutputText = compiledOutputText.trimEnd();
-        compiledOutputText += `\n____________________________________________________\n`;
-        compiledOutputText += `____________________________________________________\n`;
-        compiledOutputText += `            GENERATED BY Freddie Russell                    `;
+                cellBoxNode.addEventListener("click", () => handleDayBoxSelection(dayNum, cellBoxNode, trackingKey));
+                matrixTargetGrid.appendChild(cellBoxNode);
+            }
+        }
 
-        document.getElementById('modal-log-content').textContent = compiledOutputText;
-        document.getElementById('records-modal').style.display = 'flex';
-    }
+        function handleDayBoxSelection(selectedDay, cellDOMReference, storageLookupKey) {
+            document.querySelectorAll(".day-box").forEach(cell => cell.classList.remove("selected"));
+            cellDOMReference.classList.add("selected");
 
-    window.closeModal = function() {
-        document.getElementById('records-modal').style.display = 'none';
-    };
+            const formattedDateHeaderLabel = `${selectedDay} ${monthNamesList[trackingCalendarDateRef.getMonth()]} ${trackingCalendarDateRef.getFullYear()}`;
+            document.getElementById("sidebar-date-header").innerText = formattedDateHeaderLabel;
 
-    window.adjustMonth = function(direction) {
-        activeCalendarDate.setMonth(activeCalendarDate.getMonth() + direction);
-        buildCalendarViewGrid();
-        document.getElementById('panel-date-title').innerText = "Select A Date";
-        document.getElementById('panel-history-list').innerHTML = `<p style="color: var(--text-muted); font-size: 13px; text-align: center; padding-top: 30px; line-height: 1.6;">Select any calendar day highlighted with an indicator badge to analyze performance reports.</p>`;
-    };
+            const sidebarContentWrapper = document.getElementById("sidebar-content-view");
+            sidebarContentWrapper.innerHTML = "";
 
-    function setupModalDismissEvents() {
-        const modal = document.getElementById('records-modal');
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-    }
-</script>
+            const matchedEntriesArray = parsedDateMapDatabase[storageLookupKey] || [];
+
+            if (matchedEntriesArray.length === 0) {
+                sidebarContentWrapper.innerHTML = `<div class="empty-sidebar-msg">No practice records logged on this date.</div>`;
+                return;
+            }
+
+            // Fixed layout suffix calculation to support plural races cleanly
+            const dynamicPluralSuffix = matchedEntriesArray.length === 1 ? "RACE" : "RACES";
+            
+            let panelHtmlAccumulator = `
+                <div class="sidebar-counter-headline">
+                    LOGGED ENTRIES: ${matchedEntriesArray.length} ${dynamicPluralSuffix}
+                </div>
+            `;
+
+            matchedEntriesArray.forEach((sessionItem) => {
+                panelHtmlAccumulator += `
+                    <div class="session-entry-card">
+                        <div class="session-timestamp-label">${sessionItem.timeLabel}</div>
+                        <div class="breakdown-trigger-link" onclick="openReportModal(${sessionItem.globalIndex})">
+                            VIEW COMPLETE BREAKDOWN
+                        </div>
+                    </div>
+                `;
+            });
+
+            sidebarContentWrapper.innerHTML = panelHtmlAccumulator;
+        }
+
+        function adjustMonth(deltaOffsetValue) {
+            trackingCalendarDateRef.setMonth(trackingCalendarDateRef.getMonth() + deltaOffsetValue);
+            buildCalendarLayoutGrid();
+            
+            document.getElementById("sidebar-date-header").innerText = "Select a date";
+            document.getElementById("sidebar-content-view").innerHTML = `
+                <div class="empty-sidebar-msg">Click a marked calendar block day to view session records details.</div>
+            `;
+        }
+
+        window.openReportModal = function(targetStorageIndex) {
+            const historyCollection = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            const targetedTextLog = historyCollection[targetStorageIndex];
+
+            if (!targetedTextLog) return;
+
+            document.getElementById("modal-text-content").textContent = targetedTextLog.trim();
+            document.getElementById("text-report-modal").style.display = "flex";
+        };
+
+        window.closeReportModal = function() {
+            document.getElementById("text-report-modal").style.display = "none";
+        };
+
+        function setupModalOverlayDismiss() {
+            const elementModalOverlay = document.getElementById("text-report-modal");
+            elementModalOverlay.addEventListener("click", (eventReference) => {
+                if (eventReference.target === elementModalOverlay) closeReportModal();
+            });
+            const pasteModalElement = document.getElementById('paste-modal');
+            if (pasteModalElement) {
+                pasteModalElement.addEventListener('click', (e) => {
+                    if (e.target === pasteModalElement) closePasteModal();
+                });
+            }
+        }
+
+        window.openPasteModal = function() {
+            document.getElementById('paste-report-input').value = '';
+            document.getElementById('paste-modal').style.display = 'flex';
+        };
+
+        window.closePasteModal = function() {
+            document.getElementById('paste-modal').style.display = 'none';
+        };
+
+        window.processPastedReport = function() {
+            const text = document.getElementById('paste-report-input').value;
+            if (!text || !text.trim()) {
+                return alert('Paste the full match report text before processing.');
+            }
+
+            // Split by box-drawing borders or by DATE: pattern
+            const reportBlocks = text.trim().split(/(?=╔═════════════════════════════════════════════════════╗)/g).map(b => b.trim()).filter(Boolean);
+            const blocks = reportBlocks.length > 1 ? reportBlocks : text.trim().split(/(?=DATE:\s*\d{2}\/\d{2}\/\d{4})/i).map(b => b.trim()).filter(Boolean);
+            
+            if (blocks.length === 0) {
+                return alert('Could not parse report blocks. Ensure reports contain "DATE: DD/MM/YYYY" lines.');
+            }
+
+            const history = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            let addedCount = 0;
+
+            blocks.forEach(block => {
+                const normalizedBlock = block.trim();
+                if (!normalizedBlock) return;
+
+                // Create unique fingerprint based on date and score for duplicate detection
+                const dateMatch = normalizedBlock.match(/DATE:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+                const scoreMatch = normalizedBlock.match(/SCORE:\s*([^\n\r]+)/i);
+                
+                if (!dateMatch || !scoreMatch) return; // Skip blocks without date or score
+
+                const fingerprint = `${dateMatch[1]}/${dateMatch[2]}/${dateMatch[3]}|${scoreMatch[1].trim()}`;
+                
+                // Check if this exact match already exists
+                const isDuplicate = history.some(item => {
+                    const existingDate = item.match(/DATE:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+                    const existingScore = item.match(/SCORE:\s*([^\n\r]+)/i);
+                    if (!existingDate || !existingScore) return false;
+                    const existingFingerprint = `${existingDate[1]}/${existingDate[2]}/${existingDate[3]}|${existingScore[1].trim()}`;
+                    return fingerprint === existingFingerprint;
+                });
+
+                if (isDuplicate) return;
+                
+                history.push(normalizedBlock);
+                addedCount++;
+            });
+
+            if (addedCount === 0) {
+                return alert('No new reports were added. All pasted reports already exist.');
+            }
+
+            localStorage.setItem('completed_matches_history', JSON.stringify(history));
+            loadAndGroupStorageData();
+            buildCalendarLayoutGrid();
+            closePasteModal();
+            alert(`${addedCount} report(s) saved. Calendar updated.`);
+        };
+    </script>
 </body>
 </html>

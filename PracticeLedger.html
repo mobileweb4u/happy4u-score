@@ -6,178 +6,267 @@
     <title>Practice Night Statistics Ledger</title>
     <style>
         :root {
-            --bg-main: #0a0a0a;
-            --bg-card: #141414;
-            --border-color: #262626;
-            --accent-cyan: #00e5ff;
-            --accent-green: #00ff44;
-            --accent-magenta: #e040fb;
-            --text-bright: #e0e0e0;
-            --text-muted: #777777;
+            --bg-main: #060608;
+            --bg-card: #0b0c10;
+            --border-color: #1f2833;
+            --accent-cyan: #66fcf1;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --accent-amber: #f39c12;
+            --text-bright: #c5c6c7;
+            --text-muted: #45f3ff;
+            --text-dark-gray: #6b7c96;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-bright);
             margin: 0;
-            padding: 20px;
+            padding: 30px 20px;
             display: flex;
             justify-content: center;
         }
 
         .ledger-container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1300px;
         }
 
         .header-section {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 24px;
+            margin-bottom: 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 15px;
         }
 
-        .nav-home-link {
+        .nav-link {
             color: var(--accent-cyan);
             text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            min-width: 220px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s ease;
         }
-        .nav-home-link:hover { text-decoration: underline; }
+        .nav-link:hover { color: #ffffff; }
 
         .header-section h2 {
             margin: 0;
-            color: var(--accent-cyan);
-            font-size: 1.6rem;
+            color: #ffffff;
+            font-size: 1.8rem;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             text-align: center;
             flex: 1;
         }
 
-        .backup-controls {
+        .dynamic-alert-wrapper {
+            width: 320px; 
+            text-align: right;
             display: flex;
-            gap: 10px;
-            min-width: 220px;
             justify-content: flex-end;
         }
 
-        .backup-btn {
-            background: #161616;
+        .dynamic-return-btn {
+            display: inline-block;
+            text-align: right;
+            text-decoration: none;
+            color: #e040fb;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 1px;
+            line-height: 1.5;
+            text-transform: uppercase;
+            transition: opacity 0.2s ease;
+        }
+        .dynamic-return-btn:hover {
+            opacity: 0.8;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
             border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-top: 8px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
             color: #ffffff;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        }
+        #total-sessions-val { color: var(--accent-cyan); }
+        #total-frames-val { color: var(--accent-green); }
+        #overall-winrate-val { color: #e040fb; }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-dark-gray);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
         }
 
-        .backup-btn:hover {
-            background: #222222;
-            border-color: var(--accent-cyan);
-        }
-
-        .table-wrapper {
+        .panel-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .panel-title {
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::after {
+            content: '';
+            flex: 1;
+            margin-left: 20px;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .table-responsive {
             overflow-x: auto;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 100%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: center;
-            font-size: 0.95rem;
+            text-align: left;
         }
 
         th {
-            background-color: #1c1c1c;
-            color: #ffffff;
-            font-weight: 700;
+            font-size: 11px;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            padding: 14px 10px;
+            color: #ffffff;
+            padding: 16px 12px;
             border-bottom: 2px solid var(--border-color);
+            letter-spacing: 1px;
+            font-weight: 700;
+            background: rgba(31, 40, 51, 0.4);
         }
 
         td {
-            padding: 14px 10px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(31, 40, 51, 0.5);
+            font-size: 14px;
+            vertical-align: middle;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        tr:hover td {
+            background-color: rgba(102, 252, 241, 0.02);
         }
 
-        .player-cell {
-            text-align: left;
+        .player-identity {
             font-weight: 700;
             color: #ffffff;
-            padding-left: 20px;
-            min-width: 150px;
+            font-size: 15px;
+            letter-spacing: 0.5px;
         }
 
-        .count-badge {
+        .numeric-cell {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 15px;
+            color: var(--text-bright);
+        }
+
+        .win-rate-badge {
+            font-family: 'SFMono-Regular', Consolas, monospace;
             font-weight: 700;
-            font-family: monospace;
-            font-size: 1rem;
-        }
-        
-        .badge-played { color: #ffffff; }
-        .badge-win { color: var(--accent-green); }
-        .badge-loss { color: var(--accent-magenta); }
-        
-        .score-col {
-            color: #aaaaaa;
-            font-family: monospace;
-        }
-        
-        .score-zero {
-            color: #333333 !important;
+            font-size: 14px;
+            color: var(--accent-cyan);
+            background: rgba(102, 252, 241, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
-        .view-btn {
+        .session-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .session-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 6px 10px;
+            min-width: 35px;
+        }
+
+        .session-label {
+            font-size: 9px;
+            color: var(--text-dark-gray);
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .session-val {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent-amber);
+        }
+
+        .action-link-btn {
             background: transparent;
             border: 1px solid var(--accent-cyan);
             color: var(--accent-cyan);
-            padding: 6px 14px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 11px;
             font-weight: 700;
-            font-size: 0.75rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.2s ease;
         }
-
-        .view-btn:hover {
+        .action-link-btn:hover {
             background: var(--accent-cyan);
-            color: #000000;
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+            color: var(--bg-main);
+            box-shadow: 0 0 12px rgba(102, 252, 241, 0.3);
         }
 
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(3, 4, 6, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
             z-index: 9999;
+            backdrop-filter: blur(4px);
         }
 
         .modal-card {
@@ -185,7 +274,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             width: 100%;
-            max-width: 760px;
+            max-width: 700px;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
@@ -194,49 +283,49 @@
         }
 
         .modal-header {
-            padding: 16px 20px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1a1a1a;
+            background: rgba(31, 40, 51, 0.3);
         }
 
         .modal-header h3 {
             margin: 0;
             color: var(--accent-cyan);
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .modal-close-x {
+        .modal-close-btn {
             background: transparent;
             border: none;
-            color: var(--text-muted);
-            font-size: 24px;
+            color: var(--text-dark-gray);
+            font-size: 26px;
             cursor: pointer;
+            transition: color 0.2s ease;
         }
-        .modal-close-x:hover { color: #ffffff; }
+        .modal-close-btn:hover { color: #ffffff; }
 
         .modal-body {
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             flex: 1;
-            background-color: #080808;
+            background-color: #030406;
         }
 
-        .raw-log-block {
-            background: #040404;
-            border: 1px solid #1a1a1a;
-            border-radius: 6px;
+        .raw-text-block {
+            background: #07080b;
+            border: 1px solid rgba(31, 40, 51, 0.7);
+            border-radius: 8px;
             padding: 20px;
-            font-family: monospace;
+            font-family: 'SFMono-Regular', Consolas, monospace;
             font-size: 13px;
-            color: #dcdcdc;
+            color: var(--accent-green);
             white-space: pre-wrap;
-            overflow-x: auto;
-            line-height: 1.5;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -244,234 +333,380 @@
 
     <div class="ledger-container">
         <div class="header-section">
-            <a class="nav-home-link" href="PracticeCalendar.html">📅 Open Practice Calendar View</a>
-            <h2>PRACTICE NIGHT RECORDS</h2>
-            <div class="backup-controls">
-                <button class="backup-btn" onclick="exportPracticeJson()">📤 Export JSON</button>
-                <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
-                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importPracticeJson(event)">
+            <a class="nav-link" href="PracticeCalendar.html">📅 Open Night Calendar</a>
+            <h2>Practice Night Statistics Ledger</h2>
+            <div class="dynamic-alert-wrapper">
+                <a class="dynamic-return-btn" id="dynamic-return-link" href="index.html">
+                    ← Return to Scoreboard
+                </a>
+                <button class="action-link-btn" style="margin-left: 12px;" onclick="openPasteModal()">📋 Paste Match Report</button>
             </div>
         </div>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="text-align: left; padding-left: 20px;">Player Identity</th>
-                        <th>Played Matches</th>
-                        <th>Wins</th>
-                        <th>Losses</th>
-                        <th>S50</th>
-                        <th>S51</th>
-                        <th>S52</th>
-                        <th>S53</th>
-                        <th>S54</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="ledger-rows">
-                </tbody>
-            </table>
+        <div class="dashboard-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Match Sessions</div>
+                <div class="metric-value" id="total-sessions-val">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Logged Frames</div>
+                <div class="metric-value" id="total-frames-val">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Freddie Global Win-Rate</div>
+                <div class="metric-value" id="overall-winrate-val">0.0%</div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-title">Head-to-Head Match Performance Matrix</div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Head-to-Head Matchup</th>
+                            <th>Matches Played</th>
+                            <th style="color: var(--accent-green);">P1 Wins</th>
+                            <th style="color: var(--accent-red);">P2 Wins</th>
+                            <th>P1 Frames</th>
+                            <th>P2 Frames</th>
+                            <th>Win Efficiency</th>
+                            <th>Session History Breakdown (S50 - S54)</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-data-rows">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <div id="breakdown-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 id="modal-title">Session Frame Breakdown</h3>
-                <button class="modal-close-x" onclick="closeModal()">×</button>
+                <h3>Calculated Ledger Compilation Output</h3>
+                <button class="modal-close-btn" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body">
-                <pre class="raw-log-block" id="modal-content"></pre>
+                <pre class="raw-text-block" id="modal-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="paste-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Paste Match Report</h3>
+                <button class="modal-close-btn" onclick="closePasteModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="paste-report-input" style="width:100%; min-height:320px; background:#050607; color:#66fcf1; border:1px solid rgba(31,40,51,0.7); border-radius:10px; padding:18px; font-family:'SFMono-Regular', Consolas, monospace; font-size:13px; white-space:pre-wrap;" placeholder="Paste full match report text here..."></textarea>
+                <div style="margin-top:18px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="modal-send-btn" onclick="processPastedReport()">Process</button>
+                    <button class="modal-close-btn" onclick="closePasteModal()">Close</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let globalStatsTracker = {};
-        let rawStorageHistoryRef = [];
+        let accumulatedMatchupsData = {};
+        let globalSessionsCount = 0;
+        let globalFramesSumCount = 0;
 
         document.addEventListener("DOMContentLoaded", () => {
-            calculatePracticeStats();
+            loadAndParseLedgerData();
+            updateDashboardMetricsDOM();
+            renderLeaderboardTable();
             setupModalDismiss();
+            updateDynamicReturnLink();
         });
 
-        function calculatePracticeStats() {
-            rawStorageHistoryRef = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
-            globalStatsTracker = {};
+        function updateDynamicReturnLink() {
+            const returnLinkElement = document.getElementById("dynamic-return-link");
+            const storedHistoryArray = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            
+            if (storedHistoryArray.length === 0) return;
 
-            function initPlayerRow(name) {
-                if (!globalStatsTracker[name]) {
-                    globalStatsTracker[name] = {
-                        name: name, played: 0, wins: 0, losses: 0,
-                        s50: 0, s51: 0, s52: 0, s53: 0, s54: 0
-                    };
+            const newestLogReport = storedHistoryArray[storedHistoryArray.length - 1];
+            const winnerMatch = newestLogReport.match(/CONGRATULATIONS WINNER\s+([A-Za-z0-9 ]+)/i);
+            const scoreMatch = newestLogReport.match(/(?:FINAL SCORE|SCORE):\s*([0-9]+-[0-9]+|\w+\s*\(\d+\)\s*-\s*\w+\s*\(\d+\))/i);
+
+            if (winnerMatch && scoreMatch) {
+                const winnerName = winnerMatch[1].trim().toUpperCase();
+                let displayScore = scoreMatch[1].trim();
+
+                const detailedScoreExtract = displayScore.match(/[A-Za-z0-9 ]+\s*\((\d+)\)\s*-\s*[A-Za-z0-9 ]+\s*\((\d+)\)/);
+                if (detailedScoreExtract) {
+                    displayScore = `${detailedScoreExtract[1]}-${detailedScoreExtract[2]}`;
                 }
+
+                returnLinkElement.innerHTML = `CONGRATULATIONS WINNER ${winnerName}<br>FINAL SCORE: ${displayScore}`;
             }
-
-            rawStorageHistoryRef.forEach(logEntry => {
-                const rawString = (typeof logEntry === 'string' ? logEntry : '');
-                if (!rawString.trim()) return;
-
-                const matchesList = rawString.split(/(?=╔═════════════════════════════════════════════════════╗)/);
-
-                matchesList.forEach(blockContent => {
-                    if (!blockContent.trim() || !blockContent.includes("HAPPY4U MATCH REPORT")) return;
-
-                    let p1 = "PLAYER A"; let p2 = "PLAYER B";
-                    let s1 = 0; let s2 = 0;
-
-                    const scoreLineMatch = blockContent.match(/SCORE:\s*([A-Za-z0-9_-]+)\s*\((\d+)\)\s*-\s*([A-Za-z0-9_-]+)\s*\((\d+)\)/i);
-                    if (scoreLineMatch) {
-                        p1 = scoreLineMatch[1].toUpperCase();
-                        s1 = parseInt(scoreLineMatch[2], 10);
-                        p2 = scoreLineMatch[3].toUpperCase();
-                        s2 = parseInt(scoreLineMatch[4], 10);
-                    }
-
-                    initPlayerRow(p1);
-                    initPlayerRow(p2);
-
-                    globalStatsTracker[p1].played++;
-                    globalStatsTracker[p2].played++;
-
-                    if (s1 > s2) {
-                        globalStatsTracker[p1].wins++;
-                        globalStatsTracker[p2].losses++;
-                        if (s2 === 0) globalStatsTracker[p1].s50++;
-                        if (s2 === 1) globalStatsTracker[p1].s51++;
-                        if (s2 === 2) globalStatsTracker[p1].s52++;
-                        if (s2 === 3) globalStatsTracker[p1].s53++;
-                        if (s2 === 4) globalStatsTracker[p1].s54++;
-                    } else if (s2 > s1) {
-                        globalStatsTracker[p2].wins++;
-                        globalStatsTracker[p1].losses++;
-                        if (s1 === 0) globalStatsTracker[p2].s50++;
-                        if (s1 === 1) globalStatsTracker[p2].s51++;
-                        if (s1 === 2) globalStatsTracker[p2].s52++;
-                        if (s1 === 3) globalStatsTracker[p2].s53++;
-                        if (s1 === 4) globalStatsTracker[p2].s54++;
-                    }
-                });
-            });
-
-            renderTableRows();
         }
 
-        function renderTableRows() {
-            const tbody = document.getElementById('ledger-rows');
-            tbody.innerHTML = '';
+        function loadAndParseLedgerData() {
+            accumulatedMatchupsData = {};
+            globalSessionsCount = 0;
+            globalFramesSumCount = 0;
 
-            const players = Object.values(globalStatsTracker).sort((a,b) => {
-                if(a.name.includes("FREDDIE")) return -1;
-                if(b.name.includes("FREDDIE")) return 1;
-                return 0;
+            const storedHistoryArray = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            const totalSessions = storedHistoryArray.length;
+            
+            storedHistoryArray.forEach((rawTextReport, reportIndex) => {
+                if (!rawTextReport.trim()) return;
+
+                let calculatedDateMatch = rawTextReport.includes("SESSION DATE:") 
+                    ? rawTextReport.match(/SESSION DATE:\s*[\r\n\s]*(\d{2})\/(\d{2})\/(\d{4})/i)
+                    : rawTextReport.match(/DATE:\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+
+                if (!calculatedDateMatch) return;
+
+                globalSessionsCount++;
+                
+                // Track which of the last 5 sessions this match belongs to (S50-S54)
+                // S50 = most recent, S51 = 2nd most recent, ..., S54 = 5th most recent
+                const distanceFromEnd = totalSessions - reportIndex;
+                let sessionLabel = null;
+                if (distanceFromEnd >= 1 && distanceFromEnd <= 5) {
+                    sessionLabel = `s${49 + distanceFromEnd}`;
+                }
+
+                const scoreLineMatch = rawTextReport.match(/SCORE:\s*([^\n\r]+)/i) || rawTextReport.match(/FINAL SCORE:\s*(\d+)-(\d+)/i);
+                let p1Name = "FREDDIE", p2Name = "CHRIS";
+                let p1Score = 0, p2Score = 0;
+
+                if (scoreLineMatch) {
+                    const lineText = scoreLineMatch[1];
+                    const detailsExtract = lineText.match(/([A-Za-z0-9 ]+)\s*\((\d+)\)(?:[^-]*?)\s*-\s*([A-Za-z0-9 ]+)\s*\((\d+)\)/);
+                    if (detailsExtract) {
+                        p1Name = detailsExtract[1].trim().toUpperCase();
+                        p1Score = parseInt(detailsExtract[2], 10);
+                        p2Name = detailsExtract[3].trim().toUpperCase();
+                        p2Score = parseInt(detailsExtract[4], 10);
+                    } else {
+                        const fallbackScoreExtract = lineText.match(/(\d+)-(\d+)/);
+                        if (fallbackScoreExtract) {
+                            p1Score = parseInt(fallbackScoreExtract[1], 10);
+                            p2Score = parseInt(fallbackScoreExtract[2], 10);
+                        }
+                    }
+                }
+
+                globalFramesSumCount += (p1Score + p2Score);
+                
+                // Create TWO entries: one for each player's individual perspective
+                // Entry 1: p1Name VS p2Name (from p1's viewpoint)
+                const matchKey1 = `${p1Name} VS ${p2Name}`;
+                initializeMatchupNode(matchKey1, p1Name, p2Name);
+                const matchup1 = accumulatedMatchupsData[matchKey1];
+                matchup1.matchesPlayed++;
+                matchup1.p1Frames += p1Score;
+                matchup1.p2Frames += p2Score;
+                if (p1Score > p2Score) matchup1.p1Wins++;
+                if (p2Score > p1Score) matchup1.p2Wins++;
+                
+                // Track session occurrence (S50-S54 only)
+                if (sessionLabel && sessionLabel in matchup1) {
+                    matchup1[sessionLabel]++;
+                }
+
+                // Entry 2: p2Name VS p1Name (from p2's viewpoint)
+                const matchKey2 = `${p2Name} VS ${p1Name}`;
+                initializeMatchupNode(matchKey2, p2Name, p1Name);
+                const matchup2 = accumulatedMatchupsData[matchKey2];
+                matchup2.matchesPlayed++;
+                matchup2.p1Frames += p2Score;
+                matchup2.p2Frames += p1Score;
+                if (p2Score > p1Score) matchup2.p1Wins++;
+                if (p1Score > p2Score) matchup2.p2Wins++;
+                
+                // Track session occurrence (S50-S54 only)
+                if (sessionLabel && sessionLabel in matchup2) {
+                    matchup2[sessionLabel]++;
+                }
+            });
+        }
+
+        function initializeMatchupNode(matchKey, name1, name2) {
+            if (!accumulatedMatchupsData[matchKey]) {
+                accumulatedMatchupsData[matchKey] = {
+                    matchupIdentity: matchKey,
+                    p1Name: name1,
+                    p2Name: name2,
+                    matchesPlayed: 0,
+                    p1Wins: 0,
+                    p2Wins: 0,
+                    p1Frames: 0,
+                    p2Frames: 0,
+                    s50: 0, s51: 0, s52: 0, s53: 0, s54: 0
+                };
+            }
+        }
+
+        function updateDashboardMetricsDOM() {
+            document.getElementById("total-sessions-val").innerText = globalSessionsCount;
+            document.getElementById("total-frames-val").innerText = globalFramesSumCount;
+
+            // Find match records involving Freddie to deduce global win rate
+            let totalFreddieMatches = 0;
+            let totalFreddieWins = 0;
+            
+            Object.values(accumulatedMatchupsData).forEach(m => {
+                if (m.p1Name === "FREDDIE") {
+                    totalFreddieMatches += m.matchesPlayed;
+                    totalFreddieWins += m.p1Wins;
+                } else if (m.p2Name === "FREDDIE") {
+                    totalFreddieMatches += m.matchesPlayed;
+                    totalFreddieWins += m.p2Wins;
+                }
             });
 
-            if (players.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="color: var(--text-muted); padding: 30px;">No practice records found.</td></tr>`;
+            if (totalFreddieMatches > 0) {
+                const efficiencyRate = ((totalFreddieWins / totalFreddieMatches) * 100).toFixed(1);
+                document.getElementById("overall-winrate-val").innerText = `${efficiencyRate}%`;
+            } else {
+                document.getElementById("overall-winrate-val").innerText = "0.0%";
+            }
+        }
+
+        function renderLeaderboardTable() {
+            const tableTargetContainer = document.getElementById("leaderboard-data-rows");
+            tableTargetContainer.innerHTML = "";
+
+            const sortedList = Object.values(accumulatedMatchupsData).sort((x, y) => y.matchesPlayed - x.matchesPlayed);
+
+            if (sortedList.length === 0) {
+                tableTargetContainer.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-dark-gray); padding:40px;">No historical session records processed yet.</td></tr>`;
                 return;
             }
 
-            const formatValue = (val) => val === 0 ? `<span class="score-zero">0</span>` : val;
-
-            players.forEach(p => {
-                tbody.innerHTML += `
+            sortedList.forEach(matchup => {
+                const totalWins = matchup.p1Wins + matchup.p2Wins;
+                const ratingPercent = totalWins > 0 ? ((matchup.p1Wins / matchup.matchesPlayed) * 100).toFixed(1) : "0.0";
+                
+                const tableRowHtml = `
                     <tr>
-                        <td class="player-cell">${p.name}</td>
-                        <td class="count-badge badge-played">${p.played}</td>
-                        <td class="count-badge badge-win">${p.wins}</td>
-                        <td class="count-badge badge-loss">${p.losses}</td>
-                        <td class="score-col">${formatValue(p.s50)}</td>
-                        <td class="score-col">${formatValue(p.s51)}</td>
-                        <td class="score-col">${formatValue(p.s52)}</td>
-                        <td class="score-col">${formatValue(p.s53)}</td>
-                        <td class="score-col">${formatValue(p.s54)}</td>
+                        <td class="player-identity">${matchup.matchupIdentity}</td>
+                        <td class="numeric-cell">${matchup.matchesPlayed}</td>
+                        <td class="numeric-cell" style="color: var(--accent-green); font-weight: bold;">${matchup.p1Wins}</td>
+                        <td class="numeric-cell" style="color: var(--accent-red); font-weight: bold;">${matchup.p2Wins}</td>
+                        <td class="numeric-cell">${matchup.p1Frames}</td>
+                        <td class="numeric-cell">${matchup.p2Frames}</td>
+                        <td><span class="win-rate-badge">${ratingPercent}%</span></td>
                         <td>
-                            <button class="view-btn" onclick="openBreakdownModal('${p.name}')">View</button>
+                            <div class="session-container">
+                                <div class="session-item"><span class="session-label">S50</span><span class="session-val">${matchup.s50}</span></div>
+                                <div class="session-item"><span class="session-label">S51</span><span class="session-val">${matchup.s51}</span></div>
+                                <div class="session-item"><span class="session-label">S52</span><span class="session-val">${matchup.s52}</span></div>
+                                <div class="session-item"><span class="session-label">S53</span><span class="session-val">${matchup.s53}</span></div>
+                                <div class="session-item"><span class="session-label">S54</span><span class="session-val">${matchup.s54}</span></div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <button class="action-link-btn" onclick="openBreakdownModal('${matchup.matchupIdentity}')">View Report</button>
                         </td>
                     </tr>
                 `;
+                tableTargetContainer.innerHTML += tableRowHtml;
             });
         }
 
-        window.openBreakdownModal = function(playerName) {
-            if (rawStorageHistoryRef.length === 0) return;
-            document.getElementById('modal-title').innerText = `Complete Career Frame Breakdown`;
+        window.openBreakdownModal = function(targetedMatchupKey) {
+            const currentTimestampRef = new Date();
+            const formattedSystemDate = `${String(currentTimestampRef.getDate()).padStart(2, '0')}/${String(currentTimestampRef.getMonth() + 1).padStart(2, '0')}/${currentTimestampRef.getFullYear()}`;
+            
+            const selectedDataNode = accumulatedMatchupsData[targetedMatchupKey];
+            if (!selectedDataNode) return;
 
-            let finalOutputString = "CAREER LIFETIME SESSION DATA ENTRIES BREAKDOWN\n======================================================\n\n";
-            let summaryConcsTextList = "";
-            let playerStatsCounter = {};
+            let compiledOutputReport = `====================================================\n`;
+            compiledOutputReport += `     COMPREHENSIVE LEDGER RECORD BREAKDOWN REPORT     \n`;
+            compiledOutputReport += `====================================================\n`;
+            compiledOutputReport += `COMPILED ON : ${formattedSystemDate}\n`;
+            compiledOutputReport += `TARGET SCOPE : DATA INTEGRITY FOR ${targetedMatchupKey}\n\n`;
 
-            rawStorageHistoryRef.forEach((sessionText) => {
-                const blocks = sessionText.split(/(?=╔═════════════════════════════════════════════════════╗)/);
-                
-                blocks.forEach(block => {
-                    if(!block.trim() || !block.includes("HAPPY4U MATCH REPORT")) return;
-                    finalOutputString += `${block.trim()}\n\n\n`;
+            compiledOutputReport += `SUMMARY STATISTICS:\n`;
+            compiledOutputReport += `----------------------------------------------------\n`;
+            compiledOutputReport += `Total Matchups Cataloged : ${selectedDataNode.matchesPlayed}\n`;
+            compiledOutputReport += `${selectedDataNode.p1Name} Wins             : ${selectedDataNode.p1Wins}\n`;
+            compiledOutputReport += `${selectedDataNode.p2Name} Wins             : ${selectedDataNode.p2Wins}\n`;
+            compiledOutputReport += `${selectedDataNode.p1Name} Total Frames     : ${selectedDataNode.p1Frames}\n`;
+            compiledOutputReport += `${selectedDataNode.p2Name} Total Frames     : ${selectedDataNode.p2Frames}\n\n`;
 
-                    const lines = block.split('\n');
-                    let winnerName = "UNKNOWN";
-                    let scoreLineStr = "0-0";
+            compiledOutputReport += `SESSION HISTORY BREAKDOWN:\n`;
+            compiledOutputReport += `----------------------------------------------------\n`;
+            compiledOutputReport += `S50: ${selectedDataNode.s50} | S51: ${selectedDataNode.s51} | S52: ${selectedDataNode.s52} | S53: ${selectedDataNode.s53} | S54: ${selectedDataNode.s54}\n\n`;
 
-                    lines.forEach(line => {
-                        const scoreMatch = line.match(/SCORE:\s*([A-Za-z0-9_-]+)\s*\((\d+)\)\s*-\s*([A-Za-z0-9_-]+)\s*\((\d+)\)/i);
-                        const winMsgMatch = line.match(/CONGRATULATIONS WINNER\s+([A-Za-z0-9_-]+)/i);
+            compiledOutputReport += `GLOBAL LEDGER RANKINGS:\n`;
+            compiledOutputReport += `----------------------------------------------------\n`;
 
-                        if (scoreMatch) {
-                            const p1 = scoreMatch[1].toUpperCase();
-                            const s1 = parseInt(scoreMatch[2], 10);
-                            const p2 = scoreMatch[3].toUpperCase();
-                            const s2 = parseInt(scoreMatch[4], 10);
-
-                            if (!playerStatsCounter[p1]) playerStatsCounter[p1] = { name: p1, framesFor: 0, framesAgainst: 0, wins: 0, losses: 0 };
-                            if (!playerStatsCounter[p2]) playerStatsCounter[p2] = { name: p2, framesFor: 0, framesAgainst: 0, wins: 0, losses: 0 };
-
-                            playerStatsCounter[p1].framesFor += s1;
-                            playerStatsCounter[p1].framesAgainst += s2;
-                            playerStatsCounter[p2].framesFor += s2;
-                            playerStatsCounter[p2].framesAgainst += s1;
-                            scoreLineStr = `${s1}-${s2}`;
-                        }
-                        if (winMsgMatch) {
-                            winnerName = winMsgMatch[1].toUpperCase();
-                        }
-                    });
-
-                    if (winnerName !== "UNKNOWN") {
-                        Object.keys(playerStatsCounter).forEach(pKey => {
-                            if (pKey === winnerName) playerStatsCounter[pKey].wins++;
-                            else playerStatsCounter[pKey].losses++;
-                        });
-                        summaryConcsTextList += `CONGRATULATIONS WINNER ${winnerName}\nFINAL SCORE: ${scoreLineStr}\n\n`;
-                    }
-                });
-            });
-
-            finalOutputString = finalOutputString.trimEnd() + `\n\n------------------------------------------------------\n`;
-            finalOutputString += summaryConcsTextList;
-            finalOutputString += `Total \n`;
-
-            const sortedPlayers = Object.values(playerStatsCounter).sort((a, b) => {
-                if (a.name.includes("FREDDIE")) return -1;
-                if (b.name.includes("FREDDIE")) return 1;
-                return 0;
-            });
-
-            sortedPlayers.forEach(player => {
-                const spacesCount = 16 - player.name.length;
+            Object.values(accumulatedMatchupsData).forEach(matchup => {
+                const spacesCount = 20 - matchup.matchupIdentity.length;
                 const spaces = " ".repeat(spacesCount > 0 ? spacesCount : 1);
-                finalOutputString += `${player.name}${spaces}| FRAME-F: ${player.framesFor} | FRAME-A: ${player.framesAgainst}\n`;
-                finalOutputString += `${player.name} (${player.wins}-${player.losses}) \n\n`;
+                compiledOutputReport += `${matchup.matchupIdentity}${spaces}| ${matchup.p1Name}: ${matchup.p1Frames} | ${matchup.p2Name}: ${matchup.p2Frames}\n`;
+                compiledOutputReport += `${matchup.matchupIdentity} (${matchup.p1Wins}-${matchup.p2Wins}) \n\n`;
             });
 
-            finalOutputString = finalOutputString.trimEnd();
-            finalOutputString += `\n____________________________________________________\n`;
-            finalOutputString += `____________________________________________________\n`;
-            finalOutputString += `            GENERATED BY Freddie Russell                    `;
+            compiledOutputReport = compiledOutputReport.trimEnd();
+            compiledOutputReport += `\n____________________________________________________\n`;
+            compiledOutputReport += `____________________________________________________\n`;
+            compiledOutputReport += `            GENERATED BY Freddie Russell                    `;
 
-            document.getElementById('modal-content').textContent = finalOutputString;
+            document.getElementById('modal-content').textContent = compiledOutputReport;
             document.getElementById('breakdown-modal').style.display = 'flex';
+        };
+
+        window.openPasteModal = function() {
+            document.getElementById('paste-report-input').value = '';
+            document.getElementById('paste-modal').style.display = 'flex';
+        };
+
+        window.closePasteModal = function() {
+            document.getElementById('paste-modal').style.display = 'none';
+        };
+
+        window.processPastedReport = function() {
+            const text = document.getElementById('paste-report-input').value;
+            if (!text || !text.trim()) {
+                return alert('Paste the full match report text before processing.');
+            }
+
+            const reportBlocks = text.trim().split(/(?=╔═════════════════════════════════════════════════════╗)/g).map(b => b.trim()).filter(Boolean);
+            const blocks = reportBlocks.length > 1 ? reportBlocks : text.trim().split(/(?=DATE:\s*\d{2}\/\d{2}\/\d{4},)/g).map(b => b.trim()).filter(Boolean);
+            if (blocks.length === 0) {
+                return alert('No valid report blocks found. Make sure the pasted text contains full MATCH REPORT entries.');
+            }
+
+            const history = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
+            let addedCount = 0;
+
+            blocks.forEach(block => {
+                const normalizedBlock = block.trim();
+                if (!normalizedBlock) return;
+
+                const idMatch = normalizedBlock.match(/MATCH ID:\s*(MATCH-\d+)/i);
+                const matchId = idMatch ? idMatch[1] : `TXT-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const exactDuplicate = history.some(item => item.trim() === normalizedBlock);
+                const idDuplicate = idMatch ? history.some(item => item.includes(matchId)) : false;
+
+                if (exactDuplicate || idDuplicate) return;
+                history.push(normalizedBlock);
+                addedCount++;
+            });
+
+            if (addedCount === 0) {
+                return alert('No new reports were added. They may already exist or be duplicates.');
+            }
+
+            localStorage.setItem('completed_matches_history', JSON.stringify(history));
+            loadAndParseLedgerData();
+            updateDashboardMetricsDOM();
+            renderLeaderboardTable();
+            updateDynamicReturnLink();
+            closePasteModal();
+            alert(`${addedCount} report(s) saved and synchronized.`);
         };
 
         window.closeModal = function() {
@@ -479,54 +714,22 @@
         };
 
         function setupModalDismiss() {
+            const breakdownModal = document.getElementById('breakdown-modal');
+            if (breakdownModal) {
+                breakdownModal.addEventListener('click', (e) => {
+                    if (e.target === breakdownModal) closeModal();
+                });
+            }
+            const pasteModal = document.getElementById('paste-modal');
+            if (pasteModal) {
+                pasteModal.addEventListener('click', (e) => {
+                    if (e.target === pasteModal) closePasteModal();
+                });
+            }
             const modal = document.getElementById('breakdown-modal');
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
-        }
-
-        // --- JSON IMPORT & EXPORT FUNCTIONS ---
-        function exportPracticeJson() {
-            const history = localStorage.getItem('completed_matches_history');
-            if (!history || JSON.parse(history).length === 0) {
-                alert("No practice data exists to export.");
-                return;
-            }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(history);
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `practice_history_backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importPracticeJson(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                try {
-                    const parsedData = JSON.parse(e.target.result);
-                    if (Array.isArray(parsedData)) {
-                        if (confirm("This will merge imported entries into your local storage. Proceed?")) {
-                            let currentHistory = JSON.parse(localStorage.getItem('completed_matches_history')) || [];
-                            // Avoid adding duplicates
-                            parsedData.forEach(entry => {
-                                if (!currentHistory.includes(entry)) {
-                                    currentHistory.push(entry);
-                                }
-                            });
-                            localStorage.setItem('completed_matches_history', JSON.stringify(currentHistory));
-                            alert("Practice history successfully imported!");
-                            window.location.reload();
-                        }
-                    } else {
-                        alert("Invalid backup file format. Must be a JSON array.");
-                    }
-                } catch (err) {
-                    alert("Error parsing the JSON backup file.");
-                }
-            };
-            fileReader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
