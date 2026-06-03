@@ -1,4 +1,37 @@
 
+       You are only limited by your imagination
+
+
+Can I rotate the image in this folder every 20 sec
+
+
+
+  <script>
+        // 1. List the files inside your /ads/ folder that you want to cycle through
+        const imagesList = [
+            "ads/sponsor1.png",
+            "ads/sponsor2.png", // Add your other image filenames here
+            "ads/sponsor3.png",
+            "ads/sponsor4.png", // Add your other image filenames here
+            "ads/sponsor5.png",
+            "ads/sponsor6.png", // Add your other image filenames here
+            "ads/sponsor7.png",
+            "ads/sponsor8.png", // Add your other image filenames here
+            "ads/sponsor9.png",
+            "ads/sponsor10.png", // Add your other image filenames here
+            "ads/sponsor11.png",
+            "ads/sponsor12.png", // Add your other image filenames here
+            "ads/sponsor13.png",
+            "ads/sponsor14.png", // Add your other image filenames here
+            "ads/sponsor15.png",
+            "ads/sponsor16.png", // Add your other image filenames here
+            "ads/sponsor17.png",
+            "ads/sponsor18.png", // Add your other image filenames here
+            "ads/sponsor19.png"
+        ];
+        
+        
+
 
 --------------
 
