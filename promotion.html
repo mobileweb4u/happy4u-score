@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY4U Pool Promotion - Coaching Clinic</title>
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --card-dark: #12141c;
+            --accent-red: #b81d24;
+            --accent-gold: #f1c40f;
+            --text-light: #ffffff;
+            --text-muted: #a0a5b5;
+            --border-color: #242936;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Container scales up to fit the viewport dimensions */
+        .promo-container {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: var(--card-dark);
+            overflow: hidden;
+        }
+/* Image Section - Centered container */
+        .image-panel {
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .image-panel img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            /* CHANGED TO CONTAIN: Fits the whole image into the box without cropping */
+            object-fit: contain; 
+            object-position: center;
+            transition: opacity 0.5s ease-in-out; 
+            opacity: 1;
+        }
+
+        /* Content Section */
+        .content-panel {
+            padding: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .tagline {
+            color: var(--accent-gold);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0 0 20px 0;
+            letter-spacing: 0.5px;
+        }
+
+        h1 span {
+            color: var(--accent-red);
+        }
+
+        .badge-bar {
+            display: inline-block;
+            background-color: var(--accent-red);
+            color: #fff;
+            padding: 8px 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .info-item strong {
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .info-item span {
+            color: var(--text-muted);
+        }
+
+        /* Action Form */
+        .booking-box {
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+        }
+
+        .booking-box h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="email"] {
+            flex: 1;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        .btn-submit {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+        }
+
+        /* Mobile Breakpoint Optimization */
+        @media (max-width: 850px) {
+            .promo-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 45vh 55vh;
+                height: 100vh;
+                width: 100vw;
+            }
+            .content-panel {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="promo-container">
+        <div class="image-panel">
+            <img id="promo-image" src="ads/sponsor2.png" alt="Freddie HAPPY4U Pool Promotion Coaching Clinic">
+        </div>
+
+        <div class="content-panel">
+            <div class="tagline">Coming Soon — Friday Nights</div>
+            <h1>HAPPY4U Pool<br><span>Coaching Clinic</span></h1>
+            
+            <div>
+                <span class="badge-bar">4 Players Only — Limited Spaces</span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>⏰ Time:</strong> 
+                    <span>18:00 - 22:00</span>
+                </div>
+                <div class="info-item">
+                    <strong>📍 Venue:</strong> 
+                    <span>BAR 8, RUGBY (2-5 Bank St, Rugby, ENG CV21 2QA)</span>
+                </div>
+                <div class="info-item">
+                    <strong>🎱 Features:</strong> 
+                    <span>Beginner & Advanced players welcome. Play frames together, learn shot selection, and gain deep insight into master pattern approaches.</span>
+                </div>
+            </div>
+
+            <div class="booking-box">
+                <h3>Secure Your Spot / Enquire</h3>
+                <form action="mailto:entries@happy4upoolleague.co.uk" method="GET" enctype="text/plain">
+                    <input type="hidden" name="subject" value="HAPPY4U Coaching Clinic Inquiry">
+                    <div class="form-group">
+                        <input type="email" placeholder="Enter your email address" required>
+                        <button type="submit" class="btn-submit">Register Interest</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="footer-note">
+                Train Like A Pro. Think Like A Champion.
+            </div>
+        </div>
+    </div>
+
+    <script>
+      // 1. List the files inside your /ads/ folder that you want to cycle through
+        const imagesList = [
+            "ads/sponsor1.png",
+            "ads/sponsor2.png", // Add your other image filenames here
+            "ads/sponsor3.png",
+            "ads/sponsor4.png", // Add your other image filenames here
+            "ads/sponsor5.png",
+            "ads/sponsor6.png", // Add your other image filenames here
+            "ads/sponsor7.png",
+            "ads/sponsor8.png", // Add your other image filenames here
+            "ads/sponsor9.png",
+            "ads/sponsor10.png", // Add your other image filenames here
+            "ads/sponsor11.png",
+            "ads/sponsor12.png", // Add your other image filenames here
+            "ads/sponsor13.png",
+            "ads/sponsor14.png", // Add your other image filenames here
+            "ads/sponsor15.png",
+            "ads/sponsor16.png", // Add your other image filenames here
+            "ads/sponsor17.png",
+            "ads/sponsor18.png", // Add your other image filenames here
+            "ads/sponsor19.png"
+        ];
+
+        let currentImageIndex = 0;
+        const imageElement = document.getElementById("promo-image");
+
+        function rotatePromoImage() {
+            imageElement.style.opacity = 0;
+
+            setTimeout(() => {
+                currentImageIndex = (currentImageIndex + 1) % imagesList.length;
+                imageElement.src = imagesList[currentImageIndex];
+                imageElement.style.opacity = 1;
+            }, 500);
+        }
+
+        setInterval(rotatePromoImage, 10000);
+    </script>
+
+</body>
+</html>
