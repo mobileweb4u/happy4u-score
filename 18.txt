@@ -21,6 +21,41 @@ Then go straight to the image that I've displayed.
 Here is how to modify script.js so that when a match ends, the app automatically records the match into local storage 
 for your GAME-MATCH-DAY sheet, and displays the exact Winner Modal popup directly (without auto-opening the report view over it):
 
+_________________
+Yes, exactly! Your understanding is 100% spot on.
+
+Here is the step-by-step flow of what happens before, during, and after a match:
+
+1. Starting the Match (Unchanged)
+It starts exactly like before with your MATCH SETUP screen (as shown in your image).
+
+You select player names, set the race length, choose options like Practice Night, Golden Break, etc., and tap SAVE & START.
+
+The live scoring interface opens up and you tap WIN FRAME for either player as frames are played.
+
+2. Playing the Match (100% Offline at the Bar 8 Pool all)
+You score the frames live on your Samsung tablet.
+
+You don't need internet, Wi-Fi, or Hotspot active while playing.
+
+3. When Match Criteria Are Met (Winning Score or Draw)
+The instant a player hits the winning frame (e.g. 5 wins in a Race to 5):
+
+Background Action: The app silently generates the full terminal match report and archives it into the tablet's local storage for your GAME-MATCH-DAY sheet.
+
+Screen Display: The screen moves directly to the CONGRATULATIONS WINNER modal overlay (without opening or blocking your view with the raw text report popup).
+
+4. Saving & Viewing in your GAME-MATCH-DAY Sheet
+Whenever you're ready (either via your iPhone Personal Hotspot at the venue or back home on Wi-Fi):
+
+Open the app menu and tap GAME-MATCH-DAY to export your saved match day data.
+
+Copy/paste or import the data into your GAME-MATCH-DAY Google Sheet.
+
+You or anyone with your shared sheet link can open and view it in real-time on an iPhone, tablet, or PC!
+
+____________________________
+
 
   <script>
         // 1. List the files inside your /ads/ folder that you want to cycle through
