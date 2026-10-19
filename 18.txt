@@ -4,6 +4,22 @@
 
 Can I rotate the image in this folder every 20 sec
 
+v4.5.4 to 5.0.0
+happy4u-score-main
+MATCH REPORT PREVIEW
+GAME-MATCH-DAY records!
+
+v4.5.4 to 5.0.0 to this version here. 
+The reason is because I want to be able to, when the criteria are met, 
+to be able to go from match report to GAME-MATCH-DAY to record the sheet in a Google sheets.
+
+I want the App write to my Google Sheet.
+
+GAME-MATCH-DAY to record the sheet in a Google sheets 
+Then go straight to the image that I've displayed.
+
+Here is how to modify script.js so that when a match ends, the app automatically records the match into local storage 
+for your GAME-MATCH-DAY sheet, and displays the exact Winner Modal popup directly (without auto-opening the report view over it):
 
 
   <script>
