@@ -23,9 +23,7 @@ for your GAME-MATCH-DAY sheet, and displays the exact Winner Modal popup directl
 
 /home/config/Desktop/happy4u-score-main-11/GAME-MATCH-DAY.xlsx
 
-AKfycbzydIx5bl7-TbWWsOE5hs1VpNsW2pEoFfhg8oBKgxDdYbXcbOVrjfqI3BXsE70OWQDItw
 
-https://script.google.com/macros/s/AKfycbzydIx5bl7-TbWWsOE5hs1VpNsW2pEoFfhg8oBKgxDdYbXcbOVrjfqI3BXsE70OWQDItw/exec
 
 _________________
 Yes, exactly! Your understanding is 100% spot on.
