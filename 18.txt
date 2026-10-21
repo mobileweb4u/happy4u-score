@@ -21,6 +21,8 @@ Then go straight to the image that I've displayed.
 Here is how to modify script.js so that when a match ends, the app automatically records the match into local storage 
 for your GAME-MATCH-DAY sheet, and displays the exact Winner Modal popup directly (without auto-opening the report view over it):
 
+/home/config/Desktop/happy4u-score-main-11/GAME-MATCH-DAY.xlsx
+
 _________________
 Yes, exactly! Your understanding is 100% spot on.
 
