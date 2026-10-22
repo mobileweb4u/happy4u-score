@@ -6,7 +6,9 @@ Can you give me just a quick step-by-step on how to do this?
 I want full script with all the update of all the functions That we agreed on
 
 -------------------
-
+Can you check my JS file to see if we've got all the 
+functionality that we've agreed with? So whether the synchronization 
+and everything is set up properly
 
 
 
