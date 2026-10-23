@@ -1,3 +1,14 @@
+The app is already updated to v5.0.0. I checked the version in the scoreboard title and badges, update checker, 
+app logic, service-worker cache, and package metadata. The 10 top-level HTML pages also contain no old v4.5.x markers.
+
+The version check passed. Historical notes and archived documents remain unchanged. 
+Key files: index.html, script.js, sw.js, and package.json.
+
+
+
+
+
+
 Before I update GAME-MATCH-DAY Google Sheet
 ready to update the Version 2 - Live Sync 
 Can you give me just a quick step-by-step on how to do this?
