@@ -1,16 +1,33 @@
 // ==========================================
-// --- HAPPY4U SCOREBOARD LOGIC V4.5.4 ---
-// 
+// --- HAPPY4U SCOREBOARD LOGIC V5.0.0 ---
+// ==========================================
 
 // --- State Management ---
 let matchHistory = []; 
 let totalFramesPlayed = 0; 
 let activeScoringPlayer = null; 
-const APP_VERSION = "4.5.4";
+const APP_VERSION = "5.0.0";
+
+// --- GOOGLE SHEETS LIVE SYNC CONFIGURATION ---
+const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzAG2yKqBz5g_ylvYHAEF3IFm3MrbgLo2UuERfL9sb-4FB_dHMAS1TbVZ40zGQkgrGW4Q/exec";
+
+// Helper to format tab name dynamically (e.g., "Oct 22nd 26")
+function getTabName() {
+    const d = new Date();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = months[d.getMonth()];
+    const day = d.getDate();
+    let suffix = "th";
+    if (day === 1 || day === 31) suffix = "st";
+    else if (day === 2 || day === 22) suffix = "nd";
+    else if (day === 3 || day === 23) suffix = "rd";
+    const year = d.getFullYear().toString().slice(-2);
+    return `${month} ${day}${suffix} ${year}`;
+}
 
 // Profiles added for the League Match Hall of Fame
 let playerProfiles = JSON.parse(localStorage.getItem('happy4u_profiles')) || {};
-// NEW: Tracks Head-to-Head rivalry stats
+// Tracks Head-to-Head rivalry stats
 let rivalryHistory = JSON.parse(localStorage.getItem('happy4u_rivalries')) || {};
 // Practice Night ledger storage
 let practiceNightHistory = JSON.parse(localStorage.getItem('practice_night_history') || '[]');
@@ -138,9 +155,7 @@ window.addEventListener('resize', () => {
     updateUI(); 
 });
 
-// --- 1. Match Setup Logic (Integrated with Bar 8 Champions League via LeagueManager) ---
-
-// Initialize League Dropdown on load
+// --- 1. Match Setup Logic ---
 window.addEventListener('load', () => {
     if (window.LeagueManager) {
         LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
@@ -148,9 +163,9 @@ window.addEventListener('load', () => {
     } else if (window.ChampionsLeague) {
         ChampionsLeague.populateDropdown('match-list-dropdown');
     }
+    syncPendingGoogleSheetReports();
 });
 
-// Toggle Bar 8 Selector Visibility
 const leagueModeCheck = document.getElementById('leagueMode');
 const bar8Check = document.getElementById('bar8HandicapActive');
 const bar8Div = document.getElementById('bar8-match-selector');
@@ -177,7 +192,6 @@ if (bar8Check) {
     });
 }
 
-// Toggle Singles League Selector Visibility
 if (leagueModeCheck) {
     leagueModeCheck.addEventListener('change', function() {
         refreshRaceInputLock();
@@ -212,9 +226,14 @@ if(setupBtn) {
         const isPractice = practiceActive ? practiceActive.checked : false;
         const isLeagueMatch = isSingles || isLeagueMode;
 
-        // Reset game state for a clean start
         gameState.p1Score = 0;
         gameState.p2Score = 0;
+        gameState.p1Dishes = 0;
+        gameState.p1RevDishes = 0;
+        gameState.p1GoldenBreaks = 0;
+        gameState.p2Dishes = 0;
+        gameState.p2RevDishes = 0;
+        gameState.p2GoldenBreaks = 0;
         gameState.matchMode = isPractice ? 'practice' : isLeagueMatch ? 'league' : 'standard';
         gameState.practiceLegSaved = false;
         gameState.isLeagueMatch = isLeagueMatch;
@@ -223,7 +242,6 @@ if(setupBtn) {
             if (!matchDropdown || matchDropdown.value === "") {
                 return alert('Please select a Bar 8 Champions League match before saving.');
             }
-            // LOAD FROM LEAGUEMANAGER (Centralized Source of Truth)
             const match = window.LeagueManager ? window.LeagueManager.getMatchByIndex(matchDropdown.value) : ChampionsLeague.matches[matchDropdown.value];
             if (match) {
                 if (window.LeagueManager && window.LeagueManager.isMatchCompleted(match.id)) {
@@ -231,12 +249,12 @@ if(setupBtn) {
                 }
                 gameState.p1Name = match.p1.toUpperCase();
                 gameState.p2Name = match.p2.toUpperCase();
-                gameState.p1Score = match.p1Start; // Applying handicap
-                gameState.p2Score = match.p2Start; // Applying handicap
-                gameState.p1ScoreStart = match.p1Start; // Preserve handicap start for reporting
-                gameState.p2ScoreStart = match.p2Start; // Preserve handicap start for reporting
+                gameState.p1Score = match.p1Start;
+                gameState.p2Score = match.p2Start;
+                gameState.p1ScoreStart = match.p1Start;
+                gameState.p2ScoreStart = match.p2Start;
                 gameState.raceTo = 11;
-                gameState.leagueMatchId = match.id; // Store league match ID for review modal integration
+                gameState.leagueMatchId = match.id;
             }
         } else if (isSingles) {
             if (!singlesMatchDropdown || singlesMatchDropdown.value === "") {
@@ -253,7 +271,7 @@ if(setupBtn) {
                 gameState.p2Score = match.p2Start;
                 gameState.p1ScoreStart = match.p1Start;
                 gameState.p2ScoreStart = match.p2Start;
-                gameState.raceTo = 12; // League matches are race to 12
+                gameState.raceTo = 12;
                 gameState.leagueMatchId = match.id;
                 gameState.isLeagueMatch = true;
             }
@@ -280,7 +298,6 @@ if(setupBtn) {
                 gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
             }
         } else {
-            // STANDARD MANUAL INPUT
             gameState.p1Name = (p1In ? p1In.value : "PLAYER 1").toUpperCase() || "PLAYER 1";
             gameState.p2Name = (p2In ? p2In.value : "PLAYER 2").toUpperCase() || "PLAYER 2";
             gameState.raceTo = parseInt(raceIn ? raceIn.value : 3) || 3;
@@ -297,7 +314,6 @@ if(setupBtn) {
         const isGoldenActive = goldenCheck ? goldenCheck.checked : true;
         localStorage.setItem('goldenBreakEnabled', isGoldenActive);
 
-        // Update displays
         const goalDisp = document.getElementById('race-goal-display');
         if(goalDisp) goalDisp.innerText = gameState.raceTo;
         
@@ -324,7 +340,7 @@ function initProfile(name) {
             totalGoldenBreaks: 0, 
             totalRevDishes: 0, 
             framesWon: 0, 
-            framesLost: 0, // UPDATED: Track frames against
+            framesLost: 0,
             draws: 0,
             history: [] 
         };
@@ -356,11 +372,11 @@ function updateRivalryStats(p1, p2, winnerName) {
     }
     
     rivalryHistory[rivalryKey].dishes[p1] += (p1 === gameState.p1Name ? gameState.p1Dishes : gameState.p2Dishes);
-    rivalryHistory[rivalryKey].dishes[p2] += (p2 === gameState.p1Name ? gameState.p1Dishes : gameState.p2Dishes);
+    rivalryHistory[rivalryKey].dishes[p2] += (p1 === gameState.p1Name ? gameState.p1Dishes : gameState.p2Dishes);
     rivalryHistory[rivalryKey].revDishes[p1] += (p1 === gameState.p1Name ? gameState.p1RevDishes : gameState.p2RevDishes);
-    rivalryHistory[rivalryKey].revDishes[p2] += (p2 === gameState.p1Name ? gameState.p1RevDishes : gameState.p2RevDishes);
+    rivalryHistory[rivalryKey].revDishes[p2] += (p1 === gameState.p1Name ? gameState.p1RevDishes : gameState.p2RevDishes);
     rivalryHistory[rivalryKey].goldenBreaks[p1] += (p1 === gameState.p1Name ? gameState.p1GoldenBreaks : gameState.p2GoldenBreaks);
-    rivalryHistory[rivalryKey].goldenBreaks[p2] += (p2 === gameState.p1Name ? gameState.p1GoldenBreaks : gameState.p2GoldenBreaks);
+    rivalryHistory[rivalryKey].goldenBreaks[p2] += (p1 === gameState.p1Name ? gameState.p1GoldenBreaks : gameState.p2GoldenBreaks);
 
     if (rivalryHistory[rivalryKey].trend.length > 5) rivalryHistory[rivalryKey].trend.pop();
 }
@@ -404,7 +420,7 @@ function updateCareerStats(winnerName, loserName, isDraw = false) {
             recordResult(loserName, "LOSS", lossScore, winnerName);
         }
     }
-    // UPDATED: Logic to track both Frames Won and Frames Lost
+
     playerProfiles[gameState.p1Name].framesWon += gameState.p1Score;
     playerProfiles[gameState.p1Name].framesLost = (playerProfiles[gameState.p1Name].framesLost || 0) + gameState.p2Score;
     
@@ -457,6 +473,7 @@ document.querySelectorAll('.btn-plus').forEach(btn => {
 
 document.querySelectorAll('.dish-option').forEach(btn => {
     btn.addEventListener('click', () => {
+        if (gameState.isFinished) return;
         const type = btn.dataset.type;
         const p = activeScoringPlayer;
         const winnerName = gameState[p + 'Name'];
@@ -482,8 +499,61 @@ document.getElementById('cancel-dish-btn').addEventListener('click', () => {
     dishModal.style.display = 'none';
 });
 
-// --- 5. Winner Logic ---
+// --- 5. AUTOMATIC GAME-MATCH-DAY ARCHIVER & LIVE WEBHOOK SYNC (v5.0.0) ---
+function autoArchiveMatchReport() {
+    const reportData = {
+        matchID: gameState.matchID || `MATCH-${Date.now()}`,
+        time: new Date().toLocaleTimeString('en-GB'),
+        tabName: getTabName(),
+        type: `STANDARD RACE TO ${gameState.raceTo}`,
+        p1Name: gameState.p1Name,
+        p2Name: gameState.p2Name,
+        score: `${gameState.p1Score} - ${gameState.p2Score}`,
+        winner: gameState.p1Score > gameState.p2Score ? gameState.p1Name : gameState.p2Score > gameState.p1Score ? gameState.p2Name : 'DRAW',
+        p1Stats: `Dishes: ${gameState.p1Dishes} | Rev: ${gameState.p1RevDishes} (Frames: ${gameState.p1Score}-${gameState.p2Score})`,
+        p2Stats: `Dishes: ${gameState.p2Dishes} | Rev: ${gameState.p2RevDishes} (Frames: ${gameState.p2Score}-${gameState.p1Score})`,
+        duration: getDuration(),
+        fullReport: generateReportText()
+    };
+
+    let autoQueue = JSON.parse(localStorage.getItem('happy4u_auto_reports') || '[]');
+    autoQueue.unshift(reportData);
+    localStorage.setItem('happy4u_auto_reports', JSON.stringify(autoQueue));
+
+    // Post live to Google Sheets Webhook
+    postReportToGoogleSheet(reportData);
+}
+
+function postReportToGoogleSheet(reportData) {
+    if (!GOOGLE_SHEET_WEBHOOK_URL || GOOGLE_SHEET_WEBHOOK_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE")) {
+        console.log("Webhook URL not configured. Stored locally.");
+        return;
+    }
+
+    fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reportData)
+    })
+    .then(() => console.log("Match report successfully synced to GAME-MATCH-DAY Google Sheet!"))
+    .catch(err => console.warn("Offline / network error. Queued for background sync.", err));
+}
+
+function syncPendingGoogleSheetReports() {
+    if (!navigator.onLine || !GOOGLE_SHEET_WEBHOOK_URL || GOOGLE_SHEET_WEBHOOK_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE")) return;
+    const queue = JSON.parse(localStorage.getItem('happy4u_auto_reports') || '[]');
+    if (queue.length > 0) {
+        queue.forEach(item => postReportToGoogleSheet(item));
+    }
+}
+
+window.addEventListener('online', syncPendingGoogleSheetReports);
+
+// --- Winner Logic ---
 function checkWinner(newsEvent) {
+    if (gameState.isFinished) return;
+
     const p1 = gameState.p1Score;
     const p2 = gameState.p2Score;
 
@@ -512,103 +582,92 @@ function checkWinner(newsEvent) {
 
 function showWinner(name) {
     if (!gameState.isFinished) {
+        gameState.isFinished = true;
         let loser = (name === gameState.p1Name) ? gameState.p2Name : gameState.p1Name;
         updateCareerStats(name, loser, false);
-    }
-    gameState.isFinished = true; 
-    
-    // Mark league match as completed if this was a Bar 8 Champions match
-    if (gameState.leagueMatchId && window.LeagueManager) {
-        const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
-        window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
-            score: finalScore,
-            reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
-            gameState: { ...gameState }
-        });
-        LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
-        LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+
+        // Archive locally and start the webhook sync without opening the report preview.
+        autoArchiveMatchReport();
+
+        if (gameState.leagueMatchId && window.LeagueManager) {
+            const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
+            window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
+                score: finalScore,
+                reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
+                gameState: { ...gameState }
+            });
+            LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
+            LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+        }
+
+        if (isPracticeMode() && !gameState.practiceLegSaved) {
+            recordPracticeLeg();
+            gameState.practiceLegSaved = true;
+        }
+
+        saveData();
     }
 
-    if (isPracticeMode() && !gameState.practiceLegSaved) {
-        recordPracticeLeg();
-        gameState.practiceLegSaved = true;
+    if (reportViewModal) {
+        reportViewModal.style.display = 'none';
     }
-    
-    saveData();
+
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `CONGRATULATIONS WINNER <span style="color:var(--neon-magenta);">${name}</span><br>` +
                         `<small style="font-size: 0.7em; color: white;">FINAL SCORE: ${gameState.p1Score}-${gameState.p2Score}</small>`;
     
-    const reportBtn = document.getElementById('view-report-btn');
-    const againBtn = document.getElementById('again-race-btn');
-    if (reportBtn && againBtn) {
-        againBtn.parentNode.insertBefore(reportBtn, againBtn);
-        reportBtn.style.display = "block";
-        reportBtn.style.flex = "1";
-    }
     winnerModal.style.display = 'flex';
-    if (reportTextArea && reportViewModal) {
-        reportTextArea.innerText = generateReportText();
-        reportViewModal.style.display = 'flex';
-    }
     updateTicker(`CHAMPION: ${name} WINS THE MATCH!`);
 }
 
 function showDraw() {
-    if (!gameState.isFinished) updateCareerStats(null, null, true);
-    gameState.isFinished = true;
-    
-    // Mark league match as completed if this was a Bar 8 Champions match
-    if (gameState.leagueMatchId && window.LeagueManager) {
-        const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
-        window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
-            score: finalScore,
-            reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
-            gameState: { ...gameState }
-        });
-        LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
-        LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+    if (!gameState.isFinished) {
+        gameState.isFinished = true;
+        updateCareerStats(null, null, true);
+
+        // Archive locally and start the webhook sync without opening the report preview.
+        autoArchiveMatchReport();
+
+        if (gameState.leagueMatchId && window.LeagueManager) {
+            const finalScore = `${gameState.p1Name} (${gameState.p1Score}) - ${gameState.p2Name} (${gameState.p2Score})`;
+            window.LeagueManager.markMatchCompleted(gameState.leagueMatchId, {
+                score: finalScore,
+                reportText: `Final score recorded ${gameState.p1Score}-${gameState.p2Score}`,
+                gameState: { ...gameState }
+            });
+            LeagueManager.populateDropdown('match-list-dropdown', 'bar8');
+            LeagueManager.populateDropdown('singles-match-dropdown', 'singles');
+        }
+
+        if (isPracticeMode() && !gameState.practiceLegSaved) {
+            recordPracticeLeg();
+            gameState.practiceLegSaved = true;
+        }
+
+        saveData();
     }
 
-    if (isPracticeMode() && !gameState.practiceLegSaved) {
-        recordPracticeLeg();
-        gameState.practiceLegSaved = true;
+    if (reportViewModal) {
+        reportViewModal.style.display = 'none';
     }
-    
-    saveData();
+
     const winText = document.getElementById('winner-text');
     winText.innerHTML = `<span style="color:var(--neon-cyan);">MATCH DRAWN (6-6)</span><br>` +
                         `<small style="font-size: 0.7em; color: white;">LEAGUE POINTS SPLIT</small>`;
     
-    const reportBtn = document.getElementById('view-report-btn');
-    const againBtn = document.getElementById('again-race-btn');
-    if (reportBtn && againBtn) {
-        againBtn.parentNode.insertBefore(reportBtn, againBtn);
-        reportBtn.style.display = "block";
-    }
+    // DISPLAY WINNER OVERLAY DIRECTLY (IMAGE 2)
     winnerModal.style.display = 'flex';
-    if (reportTextArea && reportViewModal) {
-        reportTextArea.innerText = generateReportText();
-        reportViewModal.style.display = 'flex';
-    }
     updateTicker(`LEAGUE ALERT: MATCH ENDED IN A DRAW!`);
 }
 
 // --- BRIDGE FUNCTION FOR CHAMPIONS LEAGUE SUMMARY ---
 function showSummary() {
-    // 1. Pull the formatted text from your champions.js logic
-    // This ensures handicaps are included in the log
     const reportText = ChampionsLeague.generateReport();
-    
-    // 2. Find the black text area in your Match Summary popup
     const displayArea = document.getElementById('summary-display-area');
     const summaryModal = document.getElementById('summary-modal');
     
     if (displayArea && summaryModal) {
-        // 3. Inject the text into the preview
         displayArea.textContent = reportText;
-        
-        // 4. Open the popup
         summaryModal.style.display = 'flex';
     } else {
         console.error("Error: Could not find summary elements. Check your IDs.");
@@ -654,15 +713,28 @@ document.getElementById('again-race-btn').addEventListener('click', () => {
     if (isPracticeMode()) {
         resetPracticeLeg();
     } else {
+        // Reset frame scores
         gameState.p1Score = 0;
         gameState.p2Score = 0;
+        
+        // Reset frame dish stats for the new race
+        gameState.p1Dishes = 0;
+        gameState.p1RevDishes = 0;
+        gameState.p1GoldenBreaks = 0;
+        gameState.p2Dishes = 0;
+        gameState.p2RevDishes = 0;
+        gameState.p2GoldenBreaks = 0;
+
         gameState.isFinished = false; 
         matchHistory = [];
-        totalFramesPlayed = 0;
+        // Note: totalFramesPlayed is intentionally NOT reset to 0, ensuring continuous alternating break rotation across races!
         gameState.practiceLegSaved = false;
+        gameState.matchID = "MATCH-" + Date.now(); 
+
         updateUI();
         updateBreakIndicator();
         updateTicker("NEW RACE STARTED!");
+        saveData();
     }
     winnerModal.style.display = 'none';
 });
@@ -774,6 +846,7 @@ function addBackupButtons() {
     const sortedPlayers = Object.keys(playerProfiles).sort((a,b) => playerProfiles[b].matchesWon - playerProfiles[a].matchesWon);
     const topPlayer = sortedPlayers.length > 0 ? sortedPlayers[0] : "NO DATA";
     const lastBackup = localStorage.getItem('happy4u_last_backup') || "NEVER";
+    const autoReports = JSON.parse(localStorage.getItem('happy4u_auto_reports') || '[]');
 
     const leagueBtn = createMenuBtn("LEAGUE MATCH", "🏆", "var(--neon-cyan)", () => {
         infoModal.style.display = 'none';
@@ -801,11 +874,26 @@ function addBackupButtons() {
         addBackupButtons(); 
     }, `LAST: ${lastBackup}`);
 
+    const gameMatchDayBtn = createMenuBtn("GAME-MATCH-DAY", "📊", "var(--neon-cyan)", () => {
+        const queue = JSON.parse(localStorage.getItem('happy4u_auto_reports') || '[]');
+        if (queue.length === 0) {
+            alert("No automatic match reports recorded yet.");
+            return;
+        }
+        let combinedText = queue.map(r => r.fullReport).join("\n\n======================================================\n\n");
+        const blob = new Blob([combinedText], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `GAME-MATCH-DAY_Reports_${new Date().toISOString().slice(0,10)}.txt`;
+        link.click();
+    }, `${autoReports.length} LOGGED`);
+
     container.appendChild(leagueBtn);
     container.appendChild(drillsBtn);
     container.appendChild(fameBtn);
     container.appendChild(practiceLedgerBtn);
     container.appendChild(backupBtn);
+    container.appendChild(gameMatchDayBtn);
     
     infoContent.appendChild(container);
 }
@@ -946,8 +1034,12 @@ function generateReportText() {
     });
 
     if (gameState.isFinished) {
-        const winner = gameState.p1Score > gameState.p2Score ? gameState.p1Name : gameState.p2Name;
-        report += `\nCONGRATULATIONS WINNER ${winner}\n`;
+        if (gameState.p1Score === gameState.p2Score) {
+            report += `\nMATCH DRAWN\n`;
+        } else {
+            const winner = gameState.p1Score > gameState.p2Score ? gameState.p1Name : gameState.p2Name;
+            report += `\nCONGRATULATIONS WINNER ${winner}\n`;
+        }
         report += `FINAL SCORE: ${gameState.p1Score}-${gameState.p2Score}\n`;
     }
 
@@ -1037,9 +1129,6 @@ async function updateStorageDisplay() {
     }
 }
 
-/**
- * UPDATED viewPlayerHistory: Recent Performance Log
- */
 window.viewPlayerHistory = function(name) {
     const p = playerProfiles[name];
     if (!p.history || p.history.length === 0) return alert(`No match history for ${name} yet.`);
@@ -1126,9 +1215,6 @@ window.viewPlayerHistory = function(name) {
     profModal.style.display = 'flex';
 }
 
-/**
- * loadMatchFromHistory
- */
 window.loadMatchFromHistory = function(p1, p2) {
     const profModal = document.getElementById('prof-history-modal');
     if(profModal) profModal.style.display = 'none';
@@ -1147,9 +1233,6 @@ window.loadMatchFromHistory = function(p1, p2) {
     if(setupModal) setupModal.style.display = 'flex';
 };
 
-/**
- * RE-ALIGNED viewRivalries
- */
 window.viewRivalries = function(name) {
     let rivalKeys = Object.keys(rivalryHistory).filter(key => key.includes(name));
     let rivalIndex = 0;
